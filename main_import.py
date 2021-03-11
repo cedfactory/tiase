@@ -1,3 +1,5 @@
-import lib.import as fimport
+from lib.fimport import *
+from lib.visu import *
 
-df = fimport.GetDataFrameFromCsv("AI.PA")
+df = fimport.GetDataFrameFromYahoo("AI.PA")
+visu.DisplayFromDataframe(df,"Close")
