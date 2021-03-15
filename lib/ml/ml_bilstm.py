@@ -27,6 +27,23 @@ def ReadData(filename):
 
     return df
 
+#
+# PlotLoss found in history
+# todo : to move into mltoolbox
+#
+def PlotLoss(history):
+    plt.plot(history.history['loss'], label='loss')
+    plt.plot(history.history['val_loss'], label='val_loss')
+    ymax = max(history.history['loss']) / 2
+    plt.ylim([0, ymax])
+    plt.xlabel('Epoch')
+    plt.ylabel('Error [MPG]')
+    plt.legend()
+    plt.grid(True)
+
+
+
+
 def ReadDataFromYahooCsv(csvfile):
     dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
     dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
@@ -34,10 +51,14 @@ def ReadDataFromYahooCsv(csvfile):
     return dataframe
 
 class BiLSTM:
-    seq_len = 64 #128
 
-    def __init__(self, df):
+    def __init__(self):
+        self.seq_len = 64 #128
+
+    def ImportData(self, df):
         self.df = df
+        self.NormalizeData()
+
 
     def NormalizeData(self):
         '''Calculate percentage change'''
@@ -315,6 +336,20 @@ class BiLSTM:
 
         return history
 
+    def TrainModel(self, epochs):
+        self.CreateTrainingValidationTestSplit()
+        #this.df_train.head()
+
+        #this.PlotDailyChanges()
+        self.CreateTrainingValidationTestData()
+        self.CreateModel1()
+        self.history = self.FitModel(epochs)
+
+    def DisplayStats(self):
+        PlotLoss(self.history)
+        self.EvaluatePredictions()
+
+
     def EvaluatePredictions(self):
         '''Evaluate predictions and metrics'''
 
@@ -406,6 +441,12 @@ class BiLSTM:
         print("min_return = {}    max_return = {}".format(self.min_return, self.max_return))
         print("min_volume = {}    max_volume = {}".format(self.min_volume, self.max_volume))
 
+    def DeNormalizeValue(self, normalizedValue, minValue, maxValue):
+        return normalizedValue * (maxValue - minValue) + minValue
+
+    def DeNormalizeValues(self, normalizedValues, minValue, maxValue):
+        return [self.DeNormalizeValue(normalizeValue, minValue, maxValue) for normalizeValue in normalizedValues]
+
     def StatsForTrends(self):
         df2 = self.df.copy()
         df2.drop(columns=['Date'], inplace=True)
@@ -421,18 +462,29 @@ class BiLSTM:
             expected.append(data[:, 3][index+self.seq_len])
         sequence = np.array(sequence)
         predictions = self.model.predict(sequence)
-        #print(predictions)
+        print("StatsForTrends")
+        DeNormalizedExpectations = self.DeNormalizeValues(expected, self.min_return, self.max_return)
+        DeNormalizedPredictions = self.DeNormalizeValues(predictions, self.min_return, self.max_return)
+        #print(DeNormalizedExpectations)
+        #print(DeNormalizedPredictions)
 
         allOk = 0
+        down = 0
+        up = 0
         for index in range(n):
-            predicted = predictions[index][0]
-            if (expected[index] - lastClose[index])*(predicted-lastClose[index]) > 0:
+            predicted = DeNormalizedPredictions[index][0]
+            if DeNormalizedExpectations[index] > 0:
+                up = up + 1
+            else:
+                down = down + 1
+            if (DeNormalizedExpectations[index]*predicted) > 0:
                 ok = 1
                 allOk = allOk + 1
             else:
                 ok = 0
             #print("{}   {} {} vs {}".format(ok, lastClose[index], expected[index], predicted))
-        print("StatsForTrends : {} / {} => {}".format(allOk, n, 100 * allOk / n))
+        print("StatsForTrends : {} down / {} up".format(down, up))
+        print("StatsForTrends : {} / {} => {:.2f}%".format(allOk, n, 100 * allOk / n))
     
     def MakeTrendPredictionForNextTick(self):
         df2 = self.df.copy()
@@ -448,16 +500,11 @@ class BiLSTM:
         sequence.append(data[index:index+self.seq_len])
         lastClose = data[:, 3][index+self.seq_len-1]
         sequence = np.array(sequence)
-        predictions = self.model.predict(sequence)
-        predicted = predictions[0][0]
-        if predicted > lastClose:
-           trend = 1
-        else:
-            trend = -1
-        prediction = predicted * (self.max_return - self.min_return) + self.min_return
-        return [prediction, trend]
+        normalizedPrediction = self.model.predict(sequence)
+        prediction = self.DeNormalizeValue(normalizedPrediction[0][0], self.min_return, self.max_return)
+        return prediction
 
-
+    ''' deprecated
     def MakePrediction(self, iStart, n):
         df2 = self.df
         df2.drop(columns=['Date'], inplace=True)
@@ -477,3 +524,4 @@ class BiLSTM:
         #print(np.array(expected))
         #print(predictions.flatten())
         return [np.array(expected), predictions.flatten()]
+    '''
