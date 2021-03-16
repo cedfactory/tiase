@@ -406,7 +406,7 @@ class BiLSTM:
         plt.legend(loc='best')
 
     def SaveModel(self, name):
-        filename = '/tmp/'+name+'.hdf5'
+        filename = './'+name+'.hdf5'
         print(filename)
         print(self.min_return)
         self.model.save(filename)
@@ -421,7 +421,7 @@ class BiLSTM:
         ET.SubElement(root, "mse").text = str(self.test_mae)
         ET.SubElement(root, "mape").text = str(self.test_mape)
 
-        xmlfilename = '/tmp/'+name+'.xml'
+        xmlfilename = './'+name+'.xml'
 
         tree = ET.ElementTree(root)
         print(xmlfilename)

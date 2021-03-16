@@ -1,8 +1,10 @@
 from importlib import reload
 from lib.ml import ml_bilstm
 reload(ml_bilstm)
-from lib.ml import ml
-reload(ml)
+from lib.fimport import fimport
+reload(fimport)
+from lib.visu import visu
+reload(visu)
 
 import pandas as pd
 import datetime
@@ -15,8 +17,8 @@ prices = './lib/data/IBM_Prices.csv'
 value = "IBM"
 df = ml_bilstm.ReadData(prices)
 
-importers.DisplayFromDataframe(df, 'Close')
-#importers.DisplayFromDataframe(df, 'Volume')
+visu.DisplayFromDataframe(df, 'Close')
+#visu.DisplayFromDataframe(df, 'Volume')
 #df.head()
 
 bilstm = ml_bilstm.BiLSTM()
@@ -25,7 +27,7 @@ bilstm.TrainModel(epochs = 10)
 bilstm.DisplayStats()
 bilstm.SaveModel('bi_lstm_'+value)
 
-xmlfile = "/tmp/bi_lstm_"+value+".xml"
+xmlfile = "./bi_lstm_"+value+".xml"
 df = ml_bilstm.ReadData(prices)
 
 #importers.DisplayFromDataframe(df, 'Close')
