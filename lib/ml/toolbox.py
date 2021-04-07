@@ -3,6 +3,7 @@ import numpy as np
 from collections import namedtuple
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
+from sklearn.manifold import TSNE
 
 def AddTrend(df, columnSource, columnTarget):
     diff = df[columnSource] - df[columnSource].shift(1)
@@ -57,3 +58,13 @@ def ExportROCCurve(testvspreds, filename):
     plt.legend(loc='lower right', prop={'size':8})
     fig.savefig(filename)
     plt.close(idfigroc)
+
+def ExportTSNE(X, y, filename):
+    fig = plt.figure(figsize=(10, 10))
+    fig.add_subplot(111)
+    #model = TSNE(perplexity = 50, learning_rate = 400, n_iter = 2000, n_iter_without_progress = 100)
+    model = TSNE(n_components=2, random_state=0)
+    npX = np.array(X)
+    Xfitted = model.fit_transform(X)
+    plt.scatter(Xfitted[:,0], Xfitted[:,1], c=y, cmap=plt.cm.Spectral)
+    fig.savefig(filename)
