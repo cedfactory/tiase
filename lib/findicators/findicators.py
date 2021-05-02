@@ -1,10 +1,15 @@
 import pandas as pd
+
+# https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
 from stockstats import StockDataFrame as Sdf
 
-def add_technical_indicators(df):
+# https://github.com/peerchemist/finta
+from finta import TA
+
+def add_technical_indicators(df, indicators):
     """
     calculate technical indicators
-    use stockstats package to add technical inidactors
+    use stockstats package to add technical indicators
     :param data: (df) pandas dataframe
     :return: (df) pandas dataframe
     """
@@ -26,9 +31,37 @@ def add_technical_indicators(df):
     stock = Sdf.retype(df.copy())
 
     # add indicators to the dataframe
-    df = df.join(stock.get('macd'))
-    df = df.join(stock.get('rsi_30'))
-    df = df.join(stock.get('cci_30'))
-    df = df.join(stock.get('dx_30'))
+
+    if 'macd' in indicators:
+        df['macd'] = stock.get('macd').copy() # from stockstats
+        #df['macd'] = TA.MACD(stock)['MACD'].copy() # from finta
+        indicators.remove("macd")
+
+    if 'ema' in indicators:
+        df['ema'] = TA.EMA(stock).copy()
+        indicators.remove("ema")
+
+    if 'bbands' in indicators:
+        bbands = TA.BBANDS(stock).copy()
+        df = pd.concat([df, bbands], axis = 1)
+        df.rename(columns={'BB_UPPER': 'bb_upper'}, inplace=True)
+        df.rename(columns={'BB_MIDDLE': 'bb_middler'}, inplace=True)
+        df.rename(columns={'BB_LOWER': 'bb_lower'}, inplace=True)
+        indicators.remove("bbands")
+
+    if 'rsi_30' in indicators:
+        df['rsi_30'] = stock.get('rsi_30').copy()
+        indicators.remove("rsi_30")
+        
+    if 'cci_30' in indicators:
+        df['cci_30'] = stock.get('cci_30').copy()
+        indicators.remove("cci_30")
+        
+    if 'dx_30' in indicators:
+        df['dx_30'] = stock.get('dx_30').copy()
+        indicators.remove("dx_30")
+
+    if len(indicators) != 0:
+        print("!!! add_technical_indicators !!! unknown indicators : {}".format(indicators))
     
     return df
