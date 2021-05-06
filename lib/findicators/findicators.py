@@ -6,6 +6,12 @@ from stockstats import StockDataFrame as Sdf
 # https://github.com/peerchemist/finta
 from finta import TA
 
+
+def remove_features(df, features):
+    for feature in features:
+        df.drop(feature, axis=1, inplace=True)
+    return df
+
 def add_technical_indicators(df, indicators):
     """
     calculate technical indicators
@@ -26,6 +32,9 @@ def add_technical_indicators(df, indicators):
         df.rename(columns={'High': 'high'}, inplace=True)
     if 'Volume' in columns:
         df.rename(columns={'Volume': 'volume'}, inplace=True)
+    if 'Adj Close' in columns:
+        df.rename(columns={'Adj Close': 'adj close'}, inplace=True)
+
 
     # call stockstats
     stock = Sdf.retype(df.copy())

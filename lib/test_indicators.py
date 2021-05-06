@@ -12,4 +12,6 @@ class TestIndicators:
         assert(len(list(df.columns)) == 6)
         df = findicators.add_technical_indicators(df, ["macd", "rsi_30", "cci_30", "dx_30"])
         assert(len(list(df.columns)) == 10)
+        df = findicators.remove_features(df, ["open", "high", "low"])
+        assert(len(list(df.columns)) == 7)
 
