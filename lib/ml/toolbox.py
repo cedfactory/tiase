@@ -41,13 +41,7 @@ def get_train_test_data(df, seq_len, train_split):
     y_test = np.expand_dims(y_test, -1)
 
     return X_train, y_train, X_test, y_test, y_normaliser
-
-
-def AddTrend(df, columnSource, columnTarget):
-    diff = df[columnSource] - df[columnSource].shift(1)
-    df[columnTarget] = diff.gt(0).map({False: 0, True: 1})
-    return df
-    
+  
 def get_mape(y_true, y_pred):
     """
     Compute Mean Absolute Percentage Error (MAPE)

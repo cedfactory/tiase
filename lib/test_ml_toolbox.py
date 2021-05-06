@@ -17,15 +17,6 @@ class TestMlToolbox:
         y_train_expected = np.array([[0.3], [0.2], [0.2], [0. ]])
         np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
 
-    
-    def test_get_trend_close(self):
-        data = {'Values':[20, 21, 23, 19, 18, 24]}
-        df = pd.DataFrame(data)
-        dfWithTrends = toolbox.AddTrend(df, "Values", "Trend")
-        trends = dfWithTrends.loc[:,'Trend'].values
-        equal = np.array_equal(trends, [0, 1, 1, 0, 0, 1])
-        assert(equal)
-
     def test_mape(self):
         y_true = np.array([1, 2, -4])
         y_pred = np.array([-39, -58, 76])
