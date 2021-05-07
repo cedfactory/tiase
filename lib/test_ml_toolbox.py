@@ -17,19 +17,6 @@ class TestMlToolbox:
         y_train_expected = np.array([[0.3], [0.2], [0.2], [0. ]])
         np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
 
-    def test_mape(self):
-        y_true = np.array([1, 2, -4])
-        y_pred = np.array([-39, -58, 76])
-        mape = toolbox.get_mape(y_true, y_pred)
-        assert(mape == 3000)
-
-    def test_rmse(self):
-        y_true = np.array([28, 20, 30])
-        y_pred = np.array([26, 30, 16])
-        rmse = toolbox.get_rmse(y_true, y_pred)
-        assert(rmse == 10)
- 
-  
   
          
 
