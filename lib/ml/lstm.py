@@ -7,7 +7,7 @@ import numpy as np
 #
 # https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
 #
-def create_model_lstm(X_train, y_train, seq_len):
+def lstm_create_model(X_train, y_train, seq_len):
     tf.random.set_seed(20)
     np.random.seed(10)
     lstm_input = Input(shape=(seq_len, 6), name='lstm_input')

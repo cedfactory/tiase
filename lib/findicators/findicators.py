@@ -58,7 +58,7 @@ def add_technical_indicators(df, indicators):
         bbands = TA.BBANDS(stock).copy()
         df = pd.concat([df, bbands], axis = 1)
         df.rename(columns={'BB_UPPER': 'bb_upper'}, inplace=True)
-        df.rename(columns={'BB_MIDDLE': 'bb_middler'}, inplace=True)
+        df.rename(columns={'BB_MIDDLE': 'bb_middle'}, inplace=True)
         df.rename(columns={'BB_LOWER': 'bb_lower'}, inplace=True)
         indicators.remove("bbands")
 
