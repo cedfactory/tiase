@@ -37,16 +37,13 @@ def get_rmse(y_true, y_pred):
 
 
 
-def make_analysis(model, X_test, y_test):
+def classification_analysis(model, X_test, y_test):
 
     result = {}
 
     y_pred = model.predict(X_test)
     result["y_pred"] = y_pred
 
-    result["mape"] = get_mape(y_test, y_pred)
-    result["rmse"] = get_rmse(y_test, y_pred)
-    
     score = model.score(X_test, y_test)
     result["score"] = score
 
@@ -55,6 +52,17 @@ def make_analysis(model, X_test, y_test):
 
     result["confusion_matrix"] = confusion_matrix(y_test, y_pred)
     #cm_display = ConfusionMatrixDisplay(cm).plot()
+
+    return result
+
+def regression_analysis(model, X_test, y_test):
+    result = {}
+
+    y_pred = model.predict(X_test)
+    result["y_pred"] = y_pred
+
+    result["mape"] = get_mape(y_test, y_pred)
+    result["rmse"] = get_rmse(y_test, y_pred)
 
     return result
 
