@@ -1,7 +1,7 @@
 from lib.fimport import *
 from lib.findicators import *
 
-df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/_AI.PA.csv")
+df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
 visu.ExportFromDataframe(df,"Close","close.png")
 print(df.head())
 

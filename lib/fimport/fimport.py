@@ -2,15 +2,53 @@ import yfinance as yf
 import pandas as pd
 import datetime
 
-values_cac40=['AI.PA', 'AIR.PA', 'ALO.PA', 'MT', 'ATOS', 'CS.PA', 'BNP.PA', 'EN.PA', 'CAP.PA', 'CA.PA',
-            'ACA.PA', 'BN.PA', 'DSY.PA', 'ENGI.PA', 'EL.PA', 'RMS.PA', 'KER.PA', 'LR.PA', 'OR.PA', 'MC.PA',
-            'ML.PA', 'ORA.PA', 'RI.PA', 'PUB.PA', 'RNO.PA', 'SAF.PA', 'SGO.PA', 'SAN.PA', 'SU.PA', 'GLE.PA',
-            'STLA', 'STM.PA', 'TEP.PA', 'HO.PA', 'FP.PA', 'URW.AS', 'VIE.PA', 'DG.PA', 'VIV.PA', 'WLN.PA']
+cac40 = {
+    "AI.PA": "Air Liquide",
+    "AIR.PA": "Airbus Group",
+    "ALO.PA": "ALSTOM",
+    "MT": "ArcelorMittal",
+    "ATOS": "Atos",
+    "CS.PA": "AXA",
+    "BNP.PA": "BNP Paribas",
+    "EN.PA": "Bouygues",
+    "CAP.PA": "Capgemini",
+    "CA.PA": "Carrefour",
+    "ACA.PA": "Credit Agricole",
+    "BN.PA": "Danone",
+    "DSY.PA": "Dassault Systemes",
+    "ENGI.PA": "Engie",
+    "EL.PA": "EssilorLuxottica",
+    "RMS.PA": "Hermes International",
+    "KER.PA": "Kering",
+    "LR.PA": "Legrand",
+    "OR.PA": "L'Oréal",
+    "MC.PA": "LVMH",
+    "ML.PA": "Michelin",
+    "ORA.PA": "Orange",
+    "RI.PA": "Pernod Ricard",
+    "PUB.PA": "Publicis",
+    "RNO.PA": "Renault",
+    "SAF.PA": "Safran",
+    "SGO.PA": "Saint-Gobain",
+    "SAN.PA": "Sanofi",
+    "SU.PA": "Schneider Electric",
+    "GLE.PA": "Société Générale",
+    "STLA": "Stellantis",
+    "STM.PA": "STMicroElectronics",
+    "TEP.PA": "Teleperformance",
+    "HO.PA": "Thales",
+    "FP.PA": "Total",
+    "URW.AS": "Unibail-Rodamco-Westfield",
+    "VIE.PA": "Veolia Environnement",
+    "DG.PA": "Vinci",
+    "VIV.PA": "Vivendi",
+    "WLN.PA": "Worldline"
+}
 
 def DownloadFromYahoo(values):
     for value in values:
         data_df = yf.download(value, period="max")
-        filename = './data/'+value+'.csv'
+        filename = './' + value + '.csv'
         print(filename)
         data_df.to_csv(filename)
 
@@ -52,7 +90,7 @@ def _test2():
 
 def _download(values):
     if values == "cac40":
-        DownloadFromYahoo(values_cac40)
+        DownloadFromYahoo(cac40.keys())
 
     
 if __name__ == '__main__':
