@@ -20,21 +20,8 @@ def add_technical_indicators(df, indicators):
     :return: (df) pandas dataframe
     """
 
-    # rename columns if necessary
-    columns = list(df.columns)
-    if 'Open' in columns:
-        df.rename(columns={'Open': 'open'}, inplace=True)
-    if 'Close' in columns:
-        df.rename(columns={'Close': 'close'}, inplace=True)
-    if 'Low' in columns:
-        df.rename(columns={'Low': 'low'}, inplace=True)
-    if 'High' in columns:
-        df.rename(columns={'High': 'high'}, inplace=True)
-    if 'Volume' in columns:
-        df.rename(columns={'Volume': 'volume'}, inplace=True)
-    if 'Adj Close' in columns:
-        df.rename(columns={'Adj Close': 'adj close'}, inplace=True)
-
+    # Change all column headings to be lower case, and remove spacing
+    df.columns = [str(x).lower().replace(' ', '_') for x in df.columns]
 
     # call stockstats
     stock = Sdf.retype(df.copy())
