@@ -27,10 +27,10 @@ def add_technical_indicators(df, indicators):
     stock = Sdf.retype(df.copy())
 
     # add indicators to the dataframe
-    if 'trend' in indicators:
+    if 'trend_1d' in indicators:
         diff = df["close"] - df["close"].shift(1)
-        df["trend"] = diff.gt(0).map({False: 0, True: 1})
-        indicators.remove("trend")
+        df["trend_1d"] = diff.gt(0).map({False: 0, True: 1})
+        indicators.remove("trend_1d")
 
     if 'macd' in indicators:
         df['macd'] = stock.get('macd').copy() # from stockstats

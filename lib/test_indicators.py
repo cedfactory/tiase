@@ -16,8 +16,8 @@ class TestIndicators:
     def test_get_trend_close(self):
         data = {'close':[20, 21, 23, 19, 18, 24]}
         df = pd.DataFrame(data)
-        df = findicators.add_technical_indicators(df, ["trend"])
-        trends = df.loc[:,'trend'].values
+        df = findicators.add_technical_indicators(df, ["trend_1d"])
+        trends = df.loc[:,'trend_1d'].values
         equal = np.array_equal(trends, [0, 1, 1, 0, 0, 1])
         assert(equal)
 
