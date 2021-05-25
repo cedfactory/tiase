@@ -37,7 +37,7 @@ def get_train_test_data_from_dataframe0(df, seq_len, train_split):
     y_train = np.expand_dims(y_train, -1)
 
     y_normaliser = preprocessing.MinMaxScaler()
-    next_day_close_values = np.array([train_data['adj close'][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
+    next_day_close_values = np.array([train_data['adj_close'][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
     next_day_close_values = np.expand_dims(next_day_close_values, -1)
 
     y_normaliser.fit(next_day_close_values)
@@ -46,7 +46,7 @@ def get_train_test_data_from_dataframe0(df, seq_len, train_split):
     X_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
     
 
-    y_test = np.array([test_data['adj close'][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
+    y_test = np.array([test_data['adj_close'][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
     
     y_test = np.expand_dims(y_test, -1)
 
@@ -74,7 +74,7 @@ def get_train_test_data_from_dataframe(df, seq_len, train_split):
     X_train = np.array([train_normalised_data[i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
     y_train = np.array([train_normalised_data[:,0][i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
     X_test = np.array([test_normalised_data[i : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
-    y_test = np.array([test_data['adj close'][i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
+    y_test = np.array([test_data['adj_close'][i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
 
     print("test_normalised_data")
     print(test_normalised_data)
@@ -86,7 +86,7 @@ def get_train_test_data_from_dataframe(df, seq_len, train_split):
     y_train = np.expand_dims(y_train, -1)
 
     y_normaliser = preprocessing.MinMaxScaler()
-    next_day_close_values = np.array([train_data['adj close'][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
+    next_day_close_values = np.array([train_data['adj_close'][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
     next_day_close_values = np.expand_dims(next_day_close_values, -1)
 
     y_normaliser.fit(next_day_close_values)
@@ -95,7 +95,7 @@ def get_train_test_data_from_dataframe(df, seq_len, train_split):
     X_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
     
 
-    y_test = np.array([test_data['adj close'][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
+    y_test = np.array([test_data['adj_close'][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
     
     y_test = np.expand_dims(y_test, -1)
 

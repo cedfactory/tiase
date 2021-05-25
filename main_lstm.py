@@ -56,8 +56,8 @@ for i in range(19):
     df['bb_middle'][i] = df['ema'][i]
     
     if i != 0:
-        higher = df['bb_middle'][i] + 2 * df['adj close'].rolling(i + 1).std()[i]
-        lower = df['bb_middle'][i] - 2 * df['adj close'].rolling(i + 1).std()[i]
+        higher = df['bb_middle'][i] + 2 * df['adj_close'].rolling(i + 1).std()[i]
+        lower = df['bb_middle'][i] - 2 * df['adj_close'].rolling(i + 1).std()[i]
         df['bb_upper'][i] = higher
         df['bb_lower'][i] = lower
     else:
