@@ -14,10 +14,13 @@ class TestIndicators:
         assert(len(list(df.columns)) == 7)
 
     def test_get_trend_close(self):
-        data = {'close':[20, 21, 23, 19, 18, 24]}
+        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27]}
         df = pd.DataFrame(data)
-        df = findicators.add_technical_indicators(df, ["trend_1d"])
-        trends = df.loc[:,'trend_1d'].values
-        equal = np.array_equal(trends, [0, 1, 1, 0, 0, 1])
+        df = findicators.add_technical_indicators(df, ["trend_1d","trend_4d"])
+        trend1 = df.loc[:,'trend_1d'].values
+        equal = np.array_equal(trend1, [0, 1, 1, 0, 0, 1, 1, 1, 1])
+        assert(equal)
+        trend4 = df.loc[:,'trend_4d'].values
+        equal = np.array_equal(trend4, [np.NaN, np.NaN, np.NaN, 0.5, 0.5, 0.5, 0.5, 0.75, 1.], equal_nan = True)
         assert(equal)
 

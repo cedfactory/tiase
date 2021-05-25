@@ -1,3 +1,5 @@
+from parse import parse
+
 import pandas as pd
 
 # https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
@@ -27,41 +29,39 @@ def add_technical_indicators(df, indicators):
     stock = Sdf.retype(df.copy())
 
     # add indicators to the dataframe
-    if 'trend_1d' in indicators:
-        diff = df["close"] - df["close"].shift(1)
-        df["trend_1d"] = diff.gt(0).map({False: 0, True: 1})
-        indicators.remove("trend_1d")
+    for indicator in indicators:
 
-    if 'macd' in indicators:
-        df['macd'] = stock.get('macd').copy() # from stockstats
-        #df['macd'] = TA.MACD(stock)['MACD'].copy() # from finta
-        indicators.remove("macd")
+        result = parse('trend_{}d', indicator)
+        if result != None and result[0].isdigit():
+            seq = int(result[0])
+            diff = df["close"] - df["close"].shift(1)
+            trend_1d = diff.gt(0).map({False: 0, True: 1})
+            df["trend_"+result[0]+"d"] = trend_1d.rolling(seq).mean()
 
-    if 'ema' in indicators:
-        df['ema'] = TA.EMA(stock).copy()
-        indicators.remove("ema")
+        elif indicator == 'macd':
+            df['macd'] = stock.get('macd').copy() # from stockstats
+            #df['macd'] = TA.MACD(stock)['MACD'].copy() # from finta
 
-    if 'bbands' in indicators:
-        bbands = TA.BBANDS(stock).copy()
-        df = pd.concat([df, bbands], axis = 1)
-        df.rename(columns={'BB_UPPER': 'bb_upper'}, inplace=True)
-        df.rename(columns={'BB_MIDDLE': 'bb_middle'}, inplace=True)
-        df.rename(columns={'BB_LOWER': 'bb_lower'}, inplace=True)
-        indicators.remove("bbands")
+        elif indicator == 'ema':
+            df['ema'] = TA.EMA(stock).copy()
 
-    if 'rsi_30' in indicators:
-        df['rsi_30'] = stock.get('rsi_30').copy()
-        indicators.remove("rsi_30")
+        elif indicator == 'bbands':
+            bbands = TA.BBANDS(stock).copy()
+            df = pd.concat([df, bbands], axis = 1)
+            df.rename(columns={'BB_UPPER': 'bb_upper'}, inplace=True)
+            df.rename(columns={'BB_MIDDLE': 'bb_middle'}, inplace=True)
+            df.rename(columns={'BB_LOWER': 'bb_lower'}, inplace=True)
+
+        elif indicator == 'rsi_30':
+            df['rsi_30'] = stock.get('rsi_30').copy()
         
-    if 'cci_30' in indicators:
-        df['cci_30'] = stock.get('cci_30').copy()
-        indicators.remove("cci_30")
+        elif indicator == 'cci_30':
+            df['cci_30'] = stock.get('cci_30').copy()
         
-    if 'dx_30' in indicators:
-        df['dx_30'] = stock.get('dx_30').copy()
-        indicators.remove("dx_30")
+        elif indicator == 'dx_30':
+            df['dx_30'] = stock.get('dx_30').copy()
 
-    if len(indicators) != 0:
-        print("!!! add_technical_indicators !!! unknown indicators : {}".format(indicators))
+        else:
+            print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     
     return df
