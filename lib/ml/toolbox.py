@@ -4,6 +4,14 @@ from collections import namedtuple
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 from sklearn import preprocessing
+import joblib
+
+# filename should have one of the following extension : ['.z', '.gz', '.bz2', '.xz', '.lzma']
+def serialize(scaler, filename):
+    joblib.dump(scaler, filename)
+
+def deserialize(filename):
+    return joblib.load(filename)
 
 #
 # from https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py

@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from lib.fimport import *
 from lib.ml import toolbox
+from sklearn import preprocessing
+import os
 
 class TestMlToolbox:
 
@@ -17,6 +19,22 @@ class TestMlToolbox:
         y_train_expected = np.array([[0.3], [0.2], [0.2], [0. ]])
         np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
 
-  
-         
+
+    def test_serialization(self):
+        data = [[10,1000], [2,500], [3,600], [2,800], [2,500], [0,700], [1,800], [3,500], [5,900], [7,1000]]
+        normalizer = preprocessing.MinMaxScaler()
+
+        normalizer.fit(data)
+        print(normalizer)
+
+        toolbox.serialize(normalizer, "./tmp/normalizer.gz")
+        normalizer_loaded = toolbox.deserialize("./tmp/normalizer.gz")
+        normalized_data = normalizer_loaded.transform(data)
+
+        expected_data = np.array([[1, 1], [0.2, 0], [0.3, 0.2], [0.2, 0.6], [0.2, 0], [0., 0.4], [0.1, 0.6], [0.3, 0], [0.5, 0.8], [0.7, 1]])
+        np.testing.assert_allclose(normalized_data, expected_data, 0.00001)
+
+        # cleaning
+        os.remove("./tmp/normalizer.gz")
+
 
