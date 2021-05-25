@@ -70,7 +70,7 @@ print(df.head(21))
 # prepare data for validation and testing
 #
 seq_len = 21
-X_train, y_train, X_test, y_test, y_reverse_normaliser = toolbox.get_train_test_data_from_dataframe(df, seq_len, .5)
+X_train, y_train, X_test, y_test, x_normaliser, y_normaliser = toolbox.get_train_test_data_from_dataframe(df, seq_len, .5)
 
 print(df.head())
 
@@ -85,12 +85,12 @@ model = lstm.lstm_create_model(X_train, y_train, seq_len)
 # prediction
 #
 
-analysis = analysis.regression_analysis(model, X_test, y_test)
-print("mape : {:.2f}".format(analysis["mape"]))
-print("rmse : {:.2f}".format(analysis["rmse"]))
+result = analysis.regression_analysis(model, X_test, y_test)
+print("mape : {:.2f}".format(result["mape"]))
+print("rmse : {:.2f}".format(result["rmse"]))
 
 y_pred = model.predict(X_test)
-y_pred = y_reverse_normaliser.inverse_transform(y_pred)
+y_pred = y_normaliser.inverse_transform(y_pred)
 
 real = plt.plot(y_test, label='Actual Price')
 pred = plt.plot(y_pred, label='Predicted Price')
@@ -107,19 +107,17 @@ print(mean_squared_error(y_test, y_pred))
 #plt.show()
 plt.savefig('lstm.png')
 
-#analysis.make_analysis(model, X_test, y_test)
-
 #
 # save the model
 #
-def SaveModel(model, analysis, name):
+def SaveModel(model, result, name):
     filename = name+'.hdf5'
     model.save(filename)
 
     root = ET.Element("model")
     ET.SubElement(root, "file").text = name+'.hdf5'
-    ET.SubElement(root, "mape").text = "{:.2f}".format(analysis["mape"]) #str(analysis["mape"])
-    ET.SubElement(root, "rmse").text = "{:.2f}".format(analysis["rmse"]) #str(analysis["rmse"])
+    ET.SubElement(root, "mape").text = "{:.2f}".format(result["mape"]) #str(result["mape"])
+    ET.SubElement(root, "rmse").text = "{:.2f}".format(result["rmse"]) #str(result["rmse"])
 
     xmlfilename = name+'.xml'
 
@@ -139,6 +137,31 @@ def LoadModel(filename):
     
     return model
     
-SaveModel(model, analysis, "lstm")
 
-model = LoadModel("lstm.xml")
+
+#SaveModel(model, result, "lstm")
+toolbox.serialize(x_normaliser, "lstm_x_normalizer.gz")
+toolbox.serialize(y_normaliser, "lstm_y_normalizer.gz")
+
+######
+print("deserialization")
+model2 = LoadModel("lstm.xml")
+
+x_normaliser2 = toolbox.deserialize("lstm_x_normalizer.gz")
+y_normaliser2 = toolbox.deserialize("lstm_y_normalizer.gz")
+
+result = analysis.regression_analysis(model2, X_test, y_test)
+print("mape : {:.2f}".format(result["mape"]))
+print("rmse : {:.2f}".format(result["rmse"]))
+
+
+
+train_normalised_data = x_normaliser2.transform(df)
+
+iStart = len(train_normalised_data) - seq_len
+X = np.array([train_normalised_data[iStart : iStart + seq_len].copy()])
+y_normalized = model2.predict(X)
+y_normalized = np.expand_dims(y_normalized, -1)
+print(y_normalized)
+y = y_normaliser2.inverse_transform(y_normalized[0])
+print(y)

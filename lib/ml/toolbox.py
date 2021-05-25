@@ -65,10 +65,10 @@ def get_train_test_data_from_dataframe(df, seq_len, train_split):
     test_data = test_data.reset_index()
     test_data = test_data.drop(columns = ['Date'])
 
-    normaliser = preprocessing.MinMaxScaler()
-    train_normalised_data = normaliser.fit_transform(train_data)
+    x_normaliser = preprocessing.MinMaxScaler()
+    train_normalised_data = x_normaliser.fit_transform(train_data)
 
-    test_normalised_data = normaliser.transform(test_data)
+    test_normalised_data = x_normaliser.transform(test_data)
     
 
     X_train = np.array([train_normalised_data[i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
@@ -99,4 +99,4 @@ def get_train_test_data_from_dataframe(df, seq_len, train_split):
     
     y_test = np.expand_dims(y_test, -1)
 
-    return X_train, y_train, X_test, y_test, y_normaliser
+    return X_train, y_train, X_test, y_test, x_normaliser, y_normaliser
