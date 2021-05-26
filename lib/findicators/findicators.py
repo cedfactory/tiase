@@ -1,4 +1,5 @@
 from parse import parse
+import numpy as np
 
 import pandas as pd
 
@@ -30,6 +31,25 @@ def add_technical_indicators(df, indicators):
 
     # add indicators to the dataframe
     for indicator in indicators:
+
+        if indicator == "on_balance_volume":
+            # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
+            new_balance_volume = [0]
+            tally = 0
+
+            for i in range(1, len(df)):
+                if (df['adj_close'][i] > df['adj_close'][i - 1]):
+                    tally += df['volume'][i]
+                elif (df['adj_close'][i] < df['adj_close'][i - 1]):
+                    tally -= df['volume'][i]
+                new_balance_volume.append(tally)
+
+            df['on_balance_volume'] = new_balance_volume
+            minimum = min(df['on_balance_volume'])
+
+            df['on_balance_volume'] = df['on_balance_volume'] - minimum
+            df['on_balance_volume'] = (df['on_balance_volume']+1).transform(np.log)
+     
 
         result = parse('trend_{}d', indicator)
         if result != None and result[0].isdigit():
