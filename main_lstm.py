@@ -24,29 +24,7 @@ df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
 # add technical indicators
 #
 
-def on_balance_volume_creation(df):
-    # Adding of on balance volume to dataframe
-    new_balance_volume = [0]
-    tally = 0
-
-    for i in range(1, len(df)):
-        if (df['Adj Close'][i] > df['Adj Close'][i - 1]):
-            tally += df['Volume'][i]
-        elif (df['Adj Close'][i] < df['Adj Close'][i - 1]):
-            tally -= df['Volume'][i]
-        new_balance_volume.append(tally)
-
-    df['On_Balance_Volume'] = new_balance_volume
-    minimum = min(df['On_Balance_Volume'])
-
-    df['On_Balance_Volume'] = df['On_Balance_Volume'] - minimum
-    df['On_Balance_Volume'] = (df['On_Balance_Volume']+1).transform(np.log)
-
-    return df
-
-df = on_balance_volume_creation(df)
-
-df = findicators.add_technical_indicators(df, ["ema","bbands"])
+df = findicators.add_technical_indicators(df, ["on_balance_volume", "ema","bbands"])
 #df = findicators.remove_features(df, ["open","close","low","high","volume"])
 df = findicators.remove_features(df, ["open","close","low","high","volume"])
 print(df.head(21))
@@ -139,7 +117,7 @@ def LoadModel(filename):
     
 
 
-#SaveModel(model, result, "lstm")
+SaveModel(model, result, "lstm")
 toolbox.serialize(x_normaliser, "lstm_x_normalizer.gz")
 toolbox.serialize(y_normaliser, "lstm_y_normalizer.gz")
 

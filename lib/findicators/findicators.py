@@ -32,7 +32,14 @@ def add_technical_indicators(df, indicators):
     # add indicators to the dataframe
     for indicator in indicators:
 
-        if indicator == "on_balance_volume":
+        trend_parsed = parse('trend_{}d', indicator)
+        if trend_parsed != None and trend_parsed[0].isdigit():
+            seq = int(trend_parsed[0])
+            diff = df["close"] - df["close"].shift(1)
+            trend_1d = diff.gt(0).map({False: 0, True: 1})
+            df["trend_"+trend_parsed[0]+"d"] = trend_1d.rolling(seq).mean()
+
+        elif indicator == "on_balance_volume":
             # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
             new_balance_volume = [0]
             tally = 0
@@ -50,14 +57,6 @@ def add_technical_indicators(df, indicators):
             df['on_balance_volume'] = df['on_balance_volume'] - minimum
             df['on_balance_volume'] = (df['on_balance_volume']+1).transform(np.log)
      
-
-        result = parse('trend_{}d', indicator)
-        if result != None and result[0].isdigit():
-            seq = int(result[0])
-            diff = df["close"] - df["close"].shift(1)
-            trend_1d = diff.gt(0).map({False: 0, True: 1})
-            df["trend_"+result[0]+"d"] = trend_1d.rolling(seq).mean()
-
         elif indicator == 'macd':
             df['macd'] = stock.get('macd').copy() # from stockstats
             #df['macd'] = TA.MACD(stock)['MACD'].copy() # from finta
