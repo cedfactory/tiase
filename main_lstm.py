@@ -15,19 +15,26 @@ import tensorflow as tf
 #
 
 df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
+'''
+lstm_basic = lstm_basic.LSTMBasic(df)
+lstm_basic.create_model()
 
-#data = [[10,1000], [2,500], [3,600], [2,800], [2,500], [0,700], [1,800], [3,500], [5,900], [7,1000]]
-#df = pd.DataFrame(data, columns = ['indicator', 'Adj Close'])
-#df.index.name = 'Date'
+lstm_basic.save_model("basic")
+'''
+yo = lstm_basic.LSTMBasic(df, "basic")
+yo.predict()
+
+exit(0)
+
 
 #
 # add technical indicators
 #
 
 df = findicators.add_technical_indicators(df, ["on_balance_volume", "ema","bbands"])
-#df = findicators.remove_features(df, ["open","close","low","high","volume"])
 df = findicators.remove_features(df, ["open","close","low","high","volume"])
 print(df.head(21))
+
 
 # fill NaN
 for i in range(19):
