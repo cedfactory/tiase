@@ -45,6 +45,25 @@ cac40 = {
     "WLN.PA": "Worldline"
 }
 
+# https://www.boursier.com/indices/composition/nasdaq-100-US6311011026,US.html
+nasdaq100 = {
+    "ATVI": "Activision Blizzard, Inc.", # https://fr.finance.yahoo.com/quote/atvi/?p=atvi
+    "ADBE": "Adobe Inc.", # https://fr.finance.yahoo.com/quote/ADBE/?p=ADBE
+    "ALXN": "Alexion Pharmaceuticals, Inc.", # https://fr.finance.yahoo.com/quote/alxn/?p=alxn
+    "ALGN": "Align Technology, Inc.", # https://fr.finance.yahoo.com/quote/ALGN/?p=ALGN
+    "GOOGL": "Alphabet Inc. class A", # https://fr.finance.yahoo.com/quote/googl/?p=googl
+    "GOOG": "Alphabet Inc. class C", # https://fr.finance.yahoo.com/quote/goog/?p=goog
+    "AMZN": "Amazon.com, Inc.", # https://fr.finance.yahoo.com/quote/AMZN/?p=AMZN
+    "AAL" : "American Airlines Group Inc.", # https://fr.finance.yahoo.com/quote/AAL/?p=AAL
+    "AMGN": "Amgen Inc.", # https://fr.finance.yahoo.com/quote/AMGN/?p=AMGN
+    "ADI": "Analog Devices, Inc.", # https://fr.finance.yahoo.com/quote/ADI/?p=ADI
+    "AAPL": "Apple Inc.", # https://fr.finance.yahoo.com/quote/AAPL/?p=AAPL
+    "AMAT": "Applied Materials, Inc.", # https://fr.finance.yahoo.com/quote/AMAT/?p=AMAT
+    "ASML": "ASML Holding N.V.",  # https://fr.finance.yahoo.com/quote/asml/?p=asml
+    "ADSK": "Autodesk, Inc.", # https://fr.finance.yahoo.com/quote/ADSK/?p=ADSK
+    "ADP": "Automatic Data Processing, Inc.", # https://fr.finance.yahoo.com/quote/ADP/?p=ADP
+}
+
 def DownloadFromYahoo(values):
     for value in values:
         data_df = yf.download(value, period="max")
@@ -63,7 +82,7 @@ def GetDataFrameFromCsv(csvfile):
     dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
     #df.index.rename('Time',inplace=True)
     #openValues2 = df.sort_values(by='Time')['open'].to_numpy()
-    dataframe = dataframe.dropna() # remove incoherent values (null, ...)
+    dataframe.dropna(inplace=True) # remove incoherent values (null, NaN, ...)
     return dataframe
 
 
@@ -91,6 +110,8 @@ def _test2():
 def _download(values):
     if values == "cac40":
         DownloadFromYahoo(cac40.keys())
+    elif values == "nasdaq100":
+        DownloadFromYahoo(nasdaq100.keys())
 
     
 if __name__ == '__main__':
@@ -99,5 +120,6 @@ if __name__ == '__main__':
         if sys.argv[1] == "--test1" or sys.argv[1] == "-t1": _test1()
         elif sys.argv[1] == "--test2" or sys.argv[1] == "-t2": _test2()
         elif sys.argv[1] == "--cac40" : _download('cac40')
+        elif sys.argv[1] == "--nasdaq100" : _download('nasdaq100')
         else: _usage()
     else: _usage()
