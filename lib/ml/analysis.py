@@ -3,6 +3,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import RocCurveDisplay
+from sklearn.metrics import mean_squared_error
 
 from collections import namedtuple
 
@@ -63,6 +64,7 @@ def regression_analysis(model, X_test, y_test):
 
     result["mape"] = get_mape(y_test, y_pred)
     result["rmse"] = get_rmse(y_test, y_pred)
+    result["mse"]  = mean_squared_error(y_test, y_pred)
 
     return result
 

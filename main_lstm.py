@@ -14,14 +14,15 @@ import tensorflow as tf
 # import data
 #
 
-df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
-'''
-lstm_basic = lstm_basic.LSTMBasic(df)
-lstm_basic.create_model()
+filename = "./lib/data/CAC40/AI.PA.csv"
+df = fimport.GetDataFrameFromCsv(filename)
 
-lstm_basic.save_model("basic")
-'''
-yo = lstm_basic.LSTMBasic(df, "basic")
+model = lstm_basic.LSTMBasic(df)
+model.create_model()
+
+model.save_model("basic")
+
+yo = lstm_basic.LSTMBasic(df, name="basic")
 yo.predict()
 
 exit(0)

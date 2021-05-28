@@ -14,7 +14,7 @@ from keras.layers import Dense, Dropout, LSTM, Input, Activation, concatenate
 from keras import optimizers
 import numpy as np
 import xml.etree.cElementTree as ET
-
+import matplotlib.pyplot as plt
 
 #
 # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
@@ -34,8 +34,8 @@ class LSTMBasic:
             self.load_model(name)
 
     def create_model(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe(self.df, self.seq_len, .5)
 
+        # build the model
         tf.random.set_seed(20)
         np.random.seed(10)
         lstm_input = Input(shape=(self.seq_len, 6), name='lstm_input')
@@ -47,11 +47,32 @@ class LSTMBasic:
         self.model = Model(inputs=lstm_input, outputs=output)
         adam = optimizers.Adam(lr = 0.0008)
         self.model.compile(optimizer=adam, loss='mse')
-        self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=20, shuffle=True, validation_split = 0.1)
 
+        # training
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe(self.df, self.seq_len, .5)
+        self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=170, shuffle=True, validation_split = 0.1)
+
+        # analysis
         self.analysis = analysis.regression_analysis(self.model, self.X_test, self.y_test)
         print("mape : {:.2f}".format(self.analysis["mape"]))
         print("rmse : {:.2f}".format(self.analysis["rmse"]))
+        print("mse :  {:.2f}".format(self.analysis["mse"]))
+
+        # output
+        y_pred = self.model.predict(self.X_test)
+        y_pred = self.y_normaliser.inverse_transform(y_pred)
+        
+        real = plt.plot(self.y_test, label='Actual Price')
+        pred = plt.plot(y_pred, label='Predicted Price')
+
+        plt.gcf().set_size_inches(12, 8, forward=True)
+        plt.title('Plot of real price and predicted price against number of days')
+        plt.xlabel('Number of days')
+        plt.ylabel('Adjusted Close Price($)')
+        plt.legend(['Actual Price', 'Predicted Price'])
+        plt.savefig('lstm.png')
+
+
 
     def save_model(self, name):
             filename = name+'.hdf5'
