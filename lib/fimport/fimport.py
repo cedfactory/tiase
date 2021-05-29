@@ -62,6 +62,28 @@ nasdaq100 = {
     "ASML": "ASML Holding N.V.",  # https://fr.finance.yahoo.com/quote/asml/?p=asml
     "ADSK": "Autodesk, Inc.", # https://fr.finance.yahoo.com/quote/ADSK/?p=ADSK
     "ADP": "Automatic Data Processing, Inc.", # https://fr.finance.yahoo.com/quote/ADP/?p=ADP
+    "BIDU": "Baidu, Inc.", # https://fr.finance.yahoo.com/quote/BIDU/history?p=BIDU
+    "BIIB": "Biogen Inc.", # https://fr.finance.yahoo.com/quote/BIIB/history?p=BIIB
+    "BMRN": "BioMarin Pharmaceutical Inc.", # https://fr.finance.yahoo.com/quote/BMRN/history?p=BMRN
+    "CDNS": "Cadence Design Systems, Inc.", # https://fr.finance.yahoo.com/quote/CDNS/history?p=CDNS
+    #"": "", # Celgene
+    "CERN": "Cerner Corporation", # https://finance.yahoo.com/quote/CERN?p=CERN
+    "CHTR": "Charter Communications, Inc.", # https://finance.yahoo.com/quote/CHTR/?p=CHTR
+    "CHKP": "Check Point Software Technologies Ltd.", # https://finance.yahoo.com/quote/CHKP/?p=CHKP
+    "CTAS": "Cintas Corporation", # https://finance.yahoo.com/quote/CTAS/?p=CTAS
+    "CSCO": "Cisco Systems, Inc.", # https://finance.yahoo.com/quote/CSCO/?p=CSCO
+    "CTXS": "Citrix Systems, Inc.", # https://finance.yahoo.com/quote/CTXS/?p=CTXS
+    "CTSH": "Cognizant Technology Solutions Corporation", # https://finance.yahoo.com/quote/CTSH?p=CTSH
+    "CMCSA": "Comcast Corporation", # https://finance.yahoo.com/quote/CMCSA/?p=CMCSA
+    "COST": "Costco Wholesale Corporation", # https://finance.yahoo.com/quote/COST/?p=COST
+    "CSX": "CSX Corporation", # https://finance.yahoo.com/quote/CSX/?p=CSX
+    #"": "", # CTRIP.COM INTERNAT ADR 1/4 SH
+    "XRAY": "DENTSPLY SIRONA Inc.", # https://finance.yahoo.com/quote/XRAY?p=XRAY
+    "DLTR": "Dollar Tree, Inc.", # https://finance.yahoo.com/quote/DLTR/?p=DLTR
+    "EBAY": "eBay Inc.", # https://finance.yahoo.com/quote/EBAY/?p=EBAY
+    "EA": "Electronic Arts Inc.", # https://finance.yahoo.com/quote/EA/?p=EA
+    "EXPE": "Expedia Group, Inc.", # https://finance.yahoo.com/quote/EXPE?p=EXPE
+    #"": "" # Express Scripts
 }
 
 def DownloadFromYahoo(values):
