@@ -28,7 +28,21 @@ class LSTMBasic:
         self.df = findicators.add_technical_indicators(self.df, ["on_balance_volume", "ema","bbands"])
         self.df = findicators.remove_features(self.df, ["open","close","low","high","volume"])
 
-        self.df.dropna(inplace = True)
+
+        # fill NaN
+        for i in range(19):
+            self.df['bb_middle'][i] = self.df['ema'][i]
+            
+            if i != 0:
+                higher = self.df['bb_middle'][i] + 2 * self.df['adj_close'].rolling(i + 1).std()[i]
+                lower = self.df['bb_middle'][i] - 2 * self.df['adj_close'].rolling(i + 1).std()[i]
+                self.df['bb_upper'][i] = higher
+                self.df['bb_lower'][i] = lower
+            else:
+                self.df['bb_upper'][i] = self.df['bb_middle'][i]
+                self.df['bb_lower'][i] = self.df['bb_middle'][i]
+
+        #self.df.dropna(inplace = True)
 
         if name != "":
             self.load_model(name)
@@ -49,7 +63,7 @@ class LSTMBasic:
         self.model.compile(optimizer=adam, loss='mse')
 
         # training
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe(self.df, self.seq_len, .5)
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, .7)
         self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=170, shuffle=True, validation_split = 0.1)
 
         # analysis
