@@ -84,6 +84,68 @@ nasdaq100 = {
     "EA": "Electronic Arts Inc.", # https://finance.yahoo.com/quote/EA/?p=EA
     "EXPE": "Expedia Group, Inc.", # https://finance.yahoo.com/quote/EXPE?p=EXPE
     #"": "" # Express Scripts
+    "FB": "Facebook, Inc.", # https://finance.yahoo.com/quote/FB/?p=FB
+    "FAST": "Fastenal Company", # https://finance.yahoo.com/quote/FAST/?p=FAST
+    "FISV": "Fiserv, Inc.", # https://finance.yahoo.com/quote/FISV/?p=FISV
+    "GILD": "Gilead Sciences, Inc.", # https://finance.yahoo.com/quote/GILD/?p=GILD
+    "HAS": "Hasbro, Inc.", # https://finance.yahoo.com/quote/HAS/?p=HAS
+    "HSIC": "Henry Schein, Inc.", # https://finance.yahoo.com/quote/HSIC/?p=HSIC
+    "HOLX": "Hologic, Inc.", # https://finance.yahoo.com/quote/HOLX/?p=HOLX
+    "IDXX": "IDEXX Laboratories, Inc.", # https://finance.yahoo.com/quote/IDXX/?p=IDXX
+    "ILMN": "Illumina, Inc.", # https://finance.yahoo.com/quote/ILMN?p=ILMN
+    "INCY": "Incyte Corporation", # https://finance.yahoo.com/quote/INCY?p=INCY
+    "INTC": "Intel Corporation", # https://finance.yahoo.com/quote/INTC?p=INTC
+    "INTU": "Intuit Inc.", # https://finance.yahoo.com/quote/INTU/?p=INTU
+    "ISRG": "Intuitive Surgical, Inc.", # https://finance.yahoo.com/quote/ISRG/?p=ISRG
+    "JBHT": "J.B. Hunt Transport Services, Inc.", # https://finance.yahoo.com/quote/JBHT/?p=JBHT
+    "JD": "JD.com, Inc.", # https://finance.yahoo.com/quote/JD/?p=JD
+    #"": "KLA-Tencor Corporation", 
+    "KHC": "The Kraft Heinz Company", # https://finance.yahoo.com/quote/KHC/?p=KHC
+    "LRCX": "Lam Research Corporation", # https://finance.yahoo.com/quote/LRCX/?p=LRCX
+    "LBTYA": "Liberty Global plc", # https://finance.yahoo.com/quote/LBTYA/?p=LBTYA
+    "LBTYK": "Liberty Global plc", # https://finance.yahoo.com/quote/LBTYK?p=LBTYK
+    "QRTEA": "Qurate Retail, Inc.", # https://finance.yahoo.com/quote/QRTEA?p=QRTEA
+    "MAR": "Marriott International, Inc.", # https://finance.yahoo.com/quote/MAR/?p=MAR
+    "MXIM": "Maxim Integrated Products, Inc.", # https://finance.yahoo.com/quote/MXIM/?p=MXIM
+    "MELI": "MercadoLibre, Inc.", # https://finance.yahoo.com/quote/MELI/?p=MELI
+    "MCHP": "Microchip Technology Incorporated", # https://finance.yahoo.com/quote/MCHP/?p=MCHP
+    "MU": "Micron Technology, Inc.", # https://finance.yahoo.com/quote/MU/?p=MU
+    "MSFT": "Microsoft Corporation", # https://finance.yahoo.com/quote/MSFT/?p=MSFT
+    "MDLZ": "Mondelez International, Inc.", # https://finance.yahoo.com/quote/MDLZ/?p=MDLZ
+    "MNST": "Monster Beverage Corporation", # https://finance.yahoo.com/quote/MNST/?p=MNST
+    #"": "Mylan Laboratories", # 
+    "NTES": "NetEase, Inc.", # https://finance.yahoo.com/quote/NTES?p=NTES
+    "NFLX": "Netflix, Inc.", # https://finance.yahoo.com/quote/NFLX?p=NFLX
+    "NVDA": "NVIDIA Corporation", # https://finance.yahoo.com/quote/NVDA?p=NVDA
+    "NXPI": "NXP Semiconductors N.V.", # https://finance.yahoo.com/quote/NXPI/?p=NXPI
+    "ORLY": "O'Reilly Automotive, Inc.", # https://finance.yahoo.com/quote/ORLY/?p=ORLY
+    "PCAR": "PACCAR Inc", # https://finance.yahoo.com/quote/PCAR/?p=PCAR
+    "PAYX": "Paychex, Inc.", # https://finance.yahoo.com/quote/PAYX?p=PAYX
+    "PYPL": "PayPal Holdings, Inc.", # https://finance.yahoo.com/quote/PYPL/?p=PYPL
+    "PEP": "PepsiCo, Inc.", # https://finance.yahoo.com/quote/PEP/?p=PEP
+    "BKNG": "Booking Holdings Inc.", # https://finance.yahoo.com/quote/BKNG/?p=BKNG
+    "QCOM": "QUALCOMM Incorporated", # https://finance.yahoo.com/quote/QCOM/?p=QCOM
+    "REGN": "Regeneron Pharmaceuticals, Inc.", # https://finance.yahoo.com/quote/REGN/?p=REGN
+    "ROST": "Ross Stores, Inc.", # https://finance.yahoo.com/quote/ROST/?p=ROST
+    "STX": "Seagate Technology Holdings plc", # https://finance.yahoo.com/quote/STX/?p=STX
+    "SIRI": "Sirius XM Holdings Inc.", # https://finance.yahoo.com/quote/SIRI/?p=SIRI
+    "SWKS": "Skyworks Solutions, Inc.", # https://finance.yahoo.com/quote/SWKS?p=SWKS
+    "SBUX": "Starbucks Corporation", # https://finance.yahoo.com/quote/SBUX/?p=SBUX
+    #"": "", # Symantec
+    "SNPS": "Synopsys, Inc.", # https://finance.yahoo.com/quote/SNPS?p=SNPS&.tsrc=fin-srch-v1
+    "TTWO": "Take-Two Interactive Software, Inc.", # https://finance.yahoo.com/quote/TTWO/?p=TTWO
+    "TSLA": "Tesla, Inc.", # https://finance.yahoo.com/quote/TSLA/?p=TSLA
+    "TXN": "Texas Instruments Incorporated", # https://finance.yahoo.com/quote/TXN/?p=TXN
+    "TMUS": "T-Mobile US, Inc.", # https://finance.yahoo.com/quote/TMUS/?p=TMUS
+    "ULTA": "Ulta Beauty, Inc.", # https://finance.yahoo.com/quote/ULTA/?p=ULTA
+    "VRSK": "Verisk Analytics, Inc.", # https://finance.yahoo.com/quote/VRSK?p=VRSK
+    "VRTX": "Vertex Pharmaceuticals Incorporated", # https://finance.yahoo.com/quote/VRTX/?p=VRTX
+    "VOD": "Vodafone Group Plc", # https://finance.yahoo.com/quote/VOD/?p=VOD
+    "WBA": "Walgreens Boots Alliance, Inc.", # https://finance.yahoo.com/quote/WBA/?p=WBA
+    "WDC": "Western Digital Corporation", # https://finance.yahoo.com/quote/WDC/?p=WDC
+    "WDAY": "Workday, Inc.", # https://finance.yahoo.com/quote/WDAY/?p=WDAY
+    "WYNN": "Wynn Resorts, Limited", # https://finance.yahoo.com/quote/WYNN/?p=WYNN
+    "XLNX": "Xilinx, Inc."  # https://finance.yahoo.com/quote/XLNX/?p=XLNX
 }
 
 def DownloadFromYahoo(values):
