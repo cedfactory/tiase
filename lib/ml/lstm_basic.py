@@ -67,7 +67,7 @@ class LSTMBasic:
         self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=170, shuffle=True, validation_split = 0.1)
 
         # analysis
-        self.analysis = analysis.regression_analysis(self.model, self.X_test, self.y_test)
+        self.analysis = analysis.regression_analysis(self.model, self.y_normaliser, self.X_test, self.y_test)
         print("mape : {:.2f}".format(self.analysis["mape"]))
         print("rmse : {:.2f}".format(self.analysis["rmse"]))
         print("mse :  {:.2f}".format(self.analysis["mse"]))
