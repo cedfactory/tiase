@@ -47,7 +47,10 @@ class LSTMBasic:
         if name != "":
             self.load_model(name)
 
-    def create_model(self):
+    def create_model(self, epochs = 170):
+
+        # split the data
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, .7)
 
         # build the model
         tf.random.set_seed(20)
@@ -63,16 +66,14 @@ class LSTMBasic:
         self.model.compile(optimizer=adam, loss='mse')
 
         # training
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, .7)
-        self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=170, shuffle=True, validation_split = 0.1)
+        self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
 
-        # analysis
+    def get_analysis(self):
         self.analysis = analysis.regression_analysis(self.model, self.y_normaliser, self.X_test, self.y_test)
-        print("mape : {:.2f}".format(self.analysis["mape"]))
-        print("rmse : {:.2f}".format(self.analysis["rmse"]))
-        print("mse :  {:.2f}".format(self.analysis["mse"]))
+        return self.analysis
 
-        # output
+
+    def export_predictions(self, filename):
         y_pred = self.model.predict(self.X_test)
         y_pred = self.y_normaliser.inverse_transform(y_pred)
         
@@ -84,7 +85,7 @@ class LSTMBasic:
         plt.xlabel('Number of days')
         plt.ylabel('Adjusted Close Price($)')
         plt.legend(['Actual Price', 'Predicted Price'])
-        plt.savefig('lstm.png')
+        plt.savefig(filename)
 
 
 
@@ -128,6 +129,5 @@ class LSTMBasic:
         X = np.array([normalised_df[iStart : iStart + self.seq_len].copy()])
         y_normalized = self.model.predict(X)
         y_normalized = np.expand_dims(y_normalized, -1)
-        print(y_normalized)
         y = self.y_normaliser.inverse_transform(y_normalized[0])
-        print(y)
+        return y[0][0]
