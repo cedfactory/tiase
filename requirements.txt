@@ -9,7 +9,7 @@ httplib2==0.11.3
 lxml==4.6.2
 matplotlib==3.3.4
 mplfinance==0.12.7a10
-numpy==1.20.1
+numpy==1.19.5
 plotly==4.14.3
 pandas==1.2.2
 stockstats==0.3.2
