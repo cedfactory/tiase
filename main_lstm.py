@@ -10,6 +10,7 @@ from lib.ml import *
 def basic():
     filename = "./lib/data/CAC40/AI.PA.csv"
     filename = "./google_stocks_data.csv"
+    filename = "./lib/data/test/GOOG.csv"
     df = fimport.GetDataFrameFromCsv(filename)
 
     model = lstm_basic.LSTMBasic(df)
@@ -27,6 +28,18 @@ def basic():
     model_loaded = lstm_basic.LSTMBasic(df, name="basic")
     prediction = model_loaded.predict()
     print(prediction)
+
+
+def trend():
+    filename = "./google_stocks_data.csv"
+    filename = "./lib/data/test/GOOG.csv"
+    df = fimport.GetDataFrameFromCsv(filename)
+
+    model = lstm_trend.LSTMTrend(df)
+    model.create_model()
+
+    model.export_predictions("lstm_trend.png")
+
 
 def classification():
     print("classification")
@@ -50,6 +63,7 @@ if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
         if sys.argv[1] == "--basic": basic()
+        elif sys.argv[1] == "--trend": trend()
         elif sys.argv[1] == "--classification": classification()
         else: _usage()
     else: _usage()
