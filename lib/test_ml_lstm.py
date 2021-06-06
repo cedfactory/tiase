@@ -15,10 +15,10 @@ class TestMlLstm:
 
         analysis = model.get_analysis()
 
-        assert(analysis["mape"] == pytest.approx(11.84, 0.01))
-        assert(analysis["rmse"] == pytest.approx(183.38, 0.01))
-        assert(analysis["mse"] == pytest.approx(33627.30, 0.01))
+        assert(analysis["mape"] == pytest.approx(5.47, 0.01))
+        assert(analysis["rmse"] == pytest.approx(80.48, 0.01))
+        assert(analysis["mse"] == pytest.approx(6477.77, 0.01))
 
         prediction = model.predict()
-        assert(prediction == pytest.approx(1154.5518, 0.0001))
+        assert(prediction == pytest.approx(1424.42, 0.0001))
         

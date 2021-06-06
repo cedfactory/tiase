@@ -58,7 +58,8 @@ class LSTMBasic:
         lstm_input = Input(shape=(self.seq_len, 6), name='lstm_input')
 
         inputs = LSTM(21, name='first_layer')(lstm_input)
-        inputs = Dense(1, name='dense_layer')(inputs)
+        inputs = Dense(15, name='first_dense_layer')(inputs)
+        inputs = Dense(1, name='second_dense_layer')(inputs)
         output = Activation('linear', name='output')(inputs)
 
         self.model = Model(inputs=lstm_input, outputs=output)
