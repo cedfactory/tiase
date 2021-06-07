@@ -1,9 +1,20 @@
+import os
+import sys
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+#from findicators import *
+#from ml import toolbox
+from ml import analysis
+
 import tensorflow as tf
 from keras.models import Model
 from keras.layers import Dense, Dropout, LSTM, Input, Activation, concatenate
 from keras import optimizers
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
 
 
 #
@@ -45,7 +56,34 @@ class LSTMTrend:
         adam = optimizers.Adam(lr = 0.002)
 
         self.model.compile(optimizer=adam, loss='mse')
-        self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=25, shuffle=True, validation_split = 0.1)
+        self.history = self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=25, shuffle=True, validation_split = 0.1)
+
+    def get_analysis(self):
+        self.analysis = analysis.regression_analysis(self.model, self.X_test, self.y_test)
+        self.analysis["history"] = self.history
+        return self.analysis
+
+
+    def generate_predicted_result_based_on_previous_actual(self, actual, y_pred): 
+        temp_actual = actual[:-1]
+
+        #Adding each actual price at time t with the predicted difference to get a predicted price at time t + 1
+        new = np.add(temp_actual, y_pred)
+
+        plt.gcf().set_size_inches(12, 8, forward=True)
+        plt.title('Plot of real price and predicted price against number of days for test set')
+        plt.xlabel('Number of days')
+        plt.ylabel('Adjusted Close Price($)')
+
+        plt.plot(actual[1:], label='Actual Price')
+        plt.plot(new, label='Predicted Price')
+
+        print(mean_squared_error(actual[1:], new, squared = False))
+
+        #plotting of model  
+        plt.legend(['Actual Price', 'Predicted Price'])
+
+        plt.savefig("lstm_trend2.png")
 
 
     def export_predictions(self, filename):
@@ -71,14 +109,14 @@ class LSTMTrend:
 
         predicted = np.array(predicted)
 
-        print(predicted)
-
         real = plt.plot(actual, label='Actual Price')
         pred = plt.plot(predicted, label='Predicted Price')
 
         plt.legend(['Actual Price', 'Predicted Price'])
         plt.gcf().set_size_inches(15, 10, forward=True)
         plt.savefig(filename)
+
+        self.generate_predicted_result_based_on_previous_actual(actual, y_pred)
 
     
     def train_test_split_preparation(self, train_split):
@@ -99,11 +137,6 @@ class LSTMTrend:
         X_train = np.array([train_arr[i : i + self.seq_len] for i in range(len(train_arr) - self.seq_len)])
 
         y_train = np.array([train_arr[i + self.seq_len] for i in range(len(train_arr) - self.seq_len)])
-
-        y_valid = np.array([train_data['Adj Close'][-(int)(len(y_train)/10):].copy()])
-
-        y_valid = y_valid.flatten()
-        y_valid = np.expand_dims(y_valid, -1)
 
         X_test = np.array([test_arr[i : i + self.seq_len] for i in range(len(test_arr) - self.seq_len)])
 

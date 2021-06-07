@@ -38,6 +38,12 @@ def trend():
     model = lstm_trend.LSTMTrend(df)
     model.create_model()
 
+    analysis = model.get_analysis()
+    print(analysis)
+    print("mape : {:.2f}".format(analysis["mape"]))
+    print("rmse : {:.2f}".format(analysis["rmse"]))
+    print("mse :  {:.2f}".format(analysis["mse"]))
+
     model.export_predictions("lstm_trend.png")
 
 

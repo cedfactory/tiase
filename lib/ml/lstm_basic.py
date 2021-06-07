@@ -67,10 +67,11 @@ class LSTMBasic:
         self.model.compile(optimizer=adam, loss='mse')
 
         # training
-        self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
+        self.history = self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
 
     def get_analysis(self):
-        self.analysis = analysis.regression_analysis(self.model, self.y_normaliser, self.X_test, self.y_test)
+        self.analysis = analysis.regression_analysis(self.model, self.X_test, self.y_test, self.y_normaliser)
+        self.analysis["history"] = self.history
         return self.analysis
 
 

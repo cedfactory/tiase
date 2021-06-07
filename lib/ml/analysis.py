@@ -56,11 +56,12 @@ def classification_analysis(model, X_test, y_test):
 
     return result
 
-def regression_analysis(model, y_normaliser, X_test, y_test):
+def regression_analysis(model, X_test, y_test, y_normaliser = None):
     result = {}
 
     y_pred = model.predict(X_test)
-    y_pred = y_normaliser.inverse_transform(y_pred)
+    if y_normaliser != None:
+        y_pred = y_normaliser.inverse_transform(y_pred)
     result["y_pred"] = y_pred
 
     result["mape"] = get_mape(y_test, y_pred)
