@@ -7,12 +7,12 @@ from lib.ml import *
 # basic lstm
 # Reference : https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
 #
-def basic():
+def HaoBasic():
     filename = "./lib/data/CAC40/AI.PA.csv"
-    filename = "./google_stocks_data.csv"
+    filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
 
-    model = lstm_basic.LSTMBasic(df)
+    model = lstm_hao.LSTMHaoBasic(df)
     model.create_model()
 
     analysis = model.get_analysis()
@@ -24,7 +24,7 @@ def basic():
 
     model.save_model("basic")
 
-    model_loaded = lstm_basic.LSTMBasic(df, name="basic")
+    model_loaded = lstm_hao.LSTMHaoBasic(df, name="basic")
     prediction = model_loaded.predict()
     print(prediction)
 
@@ -57,7 +57,7 @@ def export_history(history):
         plt.savefig("_loss.png")
 
 
-def trend():
+def HaoTrend():
     filename = "./lib/data/test/GOOG.csv"
     filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
@@ -87,8 +87,8 @@ def trend():
     '''
 
 
-    model = lstm_trend.LSTMHaoTrend(df)
-    model.create_model(epochs=10)
+    model = lstm_hao.LSTMHaoTrend(df)
+    model.create_model()
 
     analysis = model.get_analysis()
     #print(analysis)
@@ -96,8 +96,8 @@ def trend():
     print("rmse : {:.2f}".format(analysis["rmse"]))
     print("mse :  {:.2f}".format(analysis["mse"]))
 
-    print(analysis["history"].history.keys())
-    export_history(analysis["history"])
+    #print(analysis["history"].history.keys())
+    #export_history(analysis["history"])
 
     model.export_predictions("lstm_trend.png")
 
@@ -107,7 +107,7 @@ def trend():
 def classification():
     print("classification")
 
-    filename = "./google_stocks_data.csv"
+    filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
 
     model = lstm_classification.LSTMClassification(df)
@@ -125,8 +125,8 @@ def _usage():
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--basic": basic()
-        elif sys.argv[1] == "--trend": trend()
+        if sys.argv[1] == "--basic": HaoBasic()
+        elif sys.argv[1] == "--trend": HaoTrend()
         elif sys.argv[1] == "--classification": classification()
         else: _usage()
     else: _usage()
