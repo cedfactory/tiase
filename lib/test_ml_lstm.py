@@ -10,7 +10,7 @@ class TestMlLstmHao:
         filename = "./lib/data/test/google_stocks_data.csv"
         df = fimport.GetDataFrameFromCsv(filename)
 
-        model = lstm_basic.LSTMBasic(df)
+        model = lstm_basic.LSTMHaoBasic(df)
         model.create_model(epochs = 10)
 
         analysis = model.get_analysis()
