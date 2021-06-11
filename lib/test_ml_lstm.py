@@ -4,10 +4,10 @@ from lib.findicators import *
 from lib.ml import *
 import pytest
 
-class TestMlLstm:
+class TestMlLstmHao:
 
-    def test_lstml_basic(self):
-        filename = "./lib/data/test/GOOG.csv"
+    def test_lstml_hao_basic(self):
+        filename = "./lib/data/test/google_stocks_data.csv"
         df = fimport.GetDataFrameFromCsv(filename)
 
         model = lstm_basic.LSTMBasic(df)
@@ -15,10 +15,26 @@ class TestMlLstm:
 
         analysis = model.get_analysis()
 
-        assert(analysis["mape"] == pytest.approx(5.47, 0.01))
-        assert(analysis["rmse"] == pytest.approx(80.48, 0.01))
-        assert(analysis["mse"] == pytest.approx(6477.77, 0.01))
+        assert(analysis["mape"] == pytest.approx(5.54, 0.01))
+        assert(analysis["rmse"] == pytest.approx(81.60, 0.01))
+        assert(analysis["mse"] == pytest.approx(6658.72, 0.01))
 
         prediction = model.predict()
-        assert(prediction == pytest.approx(1424.42, 0.0001))
+        assert(prediction == pytest.approx(1423.31, 0.0001))
         
+
+    def test_lstml_hao_trend(self):
+        filename = "./lib/data/test/google_stocks_data.csv"
+        df = fimport.GetDataFrameFromCsv(filename)
+
+        model = lstm_trend.LSTMHaoTrend(df)
+        model.create_model(epochs = 10)
+
+        analysis = model.get_analysis()
+
+        #assert(analysis["mape"] == inf)
+        assert(analysis["rmse"] == pytest.approx(22.41, 0.01))
+        assert(analysis["mse"] == pytest.approx(502.38, 0.01))
+
+        prediction = model.predict()
+        assert(prediction == pytest.approx(1639.23, 0.0001))
