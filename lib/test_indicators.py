@@ -24,3 +24,8 @@ class TestIndicators:
         equal = np.array_equal(trend4, [np.NaN, np.NaN, np.NaN, 0.5, 0.5, 0.5, 0.5, 0.75, 1.], equal_nan = True)
         assert(equal)
 
+    def test_get_trend_ratio(self):
+        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27, 28]}
+        df = pd.DataFrame(data)
+        trend_ratio = findicators.get_trend_ratio(df)
+        assert(trend_ratio == 70)

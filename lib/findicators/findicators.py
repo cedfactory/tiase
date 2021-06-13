@@ -84,3 +84,13 @@ def add_technical_indicators(df, indicators):
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     
     return df
+
+def get_trend_ratio(df):
+    tmp = df.copy()
+    if not "train_1d" in tmp.columns:
+        tmp =  add_technical_indicators(df, ["trend_1d"])
+    trend_counted = df['trend_1d'].value_counts()
+    trend_ratio = 100 * trend_counted[1] / (trend_counted[1]+trend_counted[0])
+    return trend_ratio
+
+ 
