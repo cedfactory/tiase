@@ -79,7 +79,19 @@ def add_technical_indicators(df, indicators):
         
         elif indicator == 'dx_30':
             df['dx_30'] = stock.get('dx_30').copy()
+        
+        elif indicator == 'williams_%r':
+            df['williams_%r'] = TA.WILLIAMS(stock).copy()
 
+        elif indicator == 'stoch_%k':
+            df['stoch_%k'] = TA.STOCH(stock).copy()
+
+        elif indicator == 'stoch_%d':
+            df['stoch_%d'] = TA.STOCHD(stock).copy()
+           
+        elif indicator == 'er':
+            df['er'] = TA.ER(stock).copy()
+           
         else:
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     

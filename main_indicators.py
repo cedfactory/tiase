@@ -19,7 +19,9 @@ def various():
     visu.DisplayFromDataframe(df,"Close","close.png")
     print(df.head())
 
-    df = findicators.add_technical_indicators(df, ["trend_1d", "ema", "bbands", "dx_30", "on_balance_volume"])
+    #technical_indicators = ["trend_1d", "ema", "bbands", "dx_30", "on_balance_volume", "williams_%r", "stoch_%k", "stoch_%d"]
+    technical_indicators = ["williams_%r", "stoch_%k", "stoch_%d", "er"]
+    df = findicators.add_technical_indicators(df, technical_indicators)
     print(list(df.columns))
     print(df.head(20))
 
@@ -35,8 +37,8 @@ def cac40():
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
-            df = findicators.add_technical_indicators(df, ["trend_1d","ema","macd","rsi_30","cci_30"])
-            trend_ratio = findicators.get_ratio_trend(df)
+            df = findicators.add_technical_indicators(df, ["trend_1d","ema","macd","rsi_30","cci_30", "williams_%r", "stoch_%k", "stoch_%d", "er"])
+            trend_ratio = findicators.get_trend_ratio(df)
             value = filename[:len(filename)-4]
             print("{} ({}),{:.2f}".format(value, fimport.cac40[value], trend_ratio))
             visu.DisplayFromDataframe(df, 'close', './tmp/'+value+'_close.png')
@@ -44,7 +46,11 @@ def cac40():
             visu.DisplayFromDataframe(df, 'macd', './tmp/'+value+'_macd.png')
             visu.DisplayFromDataframe(df, 'rsi_30', './tmp/'+value+'_rsi_30.png')
             visu.DisplayFromDataframe(df, 'cci_30', './tmp/'+value+'_cci_30.png')
-            exit(0)
+            visu.DisplayFromDataframe(df, 'williams_%r', './tmp/'+value+'_williams%r.png')
+            visu.DisplayFromDataframe(df, 'stoch_%k', './tmp/'+value+'stoch_%k.png')
+            visu.DisplayFromDataframe(df, 'stoch_%d', './tmp/'+value+'stoch_%d.png')
+            visu.DisplayFromDataframe(df, 'er', './tmp/'+value+'er.png')
+            #python mexit(0)
 
 
 
