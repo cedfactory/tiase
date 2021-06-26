@@ -33,11 +33,22 @@ def add_technical_indicators(df, indicators):
     for indicator in indicators:
 
         trend_parsed = parse('trend_{}d', indicator)
+        sma_parsed = parse('sma_{}', indicator)
+        ema_parsed = parse('ema_{}', indicator)
+
         if trend_parsed != None and trend_parsed[0].isdigit():
             seq = int(trend_parsed[0])
             diff = df["close"] - df["close"].shift(1)
             trend_1d = diff.gt(0).map({False: 0, True: 1})
-            df["trend_"+trend_parsed[0]+"d"] = trend_1d.rolling(seq).mean()
+            df["trend_"+str(seq)+"d"] = trend_1d.rolling(seq).mean()
+
+        elif sma_parsed != None and sma_parsed[0].isdigit():
+            seq = int(sma_parsed[0])
+            df["sma_"+str(seq)] = TA.SMA(stock, seq).copy()
+
+        elif ema_parsed != None and ema_parsed[0].isdigit():
+            period = int(ema_parsed[0])
+            df["ema_"+str(period)] = TA.EMA(stock, period = period).copy()
 
         elif indicator == "on_balance_volume":
             # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
@@ -60,9 +71,6 @@ def add_technical_indicators(df, indicators):
         elif indicator == 'macd':
             df['macd'] = stock.get('macd').copy() # from stockstats
             #df['macd'] = TA.MACD(stock)['MACD'].copy() # from finta
-
-        elif indicator == 'ema':
-            df['ema'] = TA.EMA(stock).copy()
 
         elif indicator == 'bbands':
             bbands = TA.BBANDS(stock).copy()
@@ -91,6 +99,18 @@ def add_technical_indicators(df, indicators):
            
         elif indicator == 'er':
             df['er'] = TA.ER(stock).copy()
+           
+        elif indicator == 'stc':
+            df['stc'] = TA.STC(stock).copy()
+           
+        elif indicator == 'atr':
+            df['atr'] = TA.ATR(stock).copy()
+           
+        elif indicator == 'adx':
+            df['adx'] = TA.ADX(stock).copy()
+           
+        elif indicator == 'roc':
+            df['roc'] = TA.ROC(stock).copy()
            
         else:
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))

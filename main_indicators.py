@@ -13,14 +13,14 @@ def various():
     print(trend1)
     print(trend4)
 
-
     print("")
     df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
     visu.DisplayFromDataframe(df,"Close","close.png")
     print(df.head())
 
     #technical_indicators = ["trend_1d", "ema", "bbands", "dx_30", "on_balance_volume", "williams_%r", "stoch_%k", "stoch_%d"]
-    technical_indicators = ["williams_%r", "stoch_%k", "stoch_%d", "er"]
+    #technical_indicators = ["williams_%r", "stoch_%k", "stoch_%d", "er", "stc", "sma_5", "sma_10", "sma_15", "sma_20"]
+    technical_indicators = ["stc", "sma_5", "sma_10", "sma_15", "sma_20", "ema_10", "ema_20", "ema_50", "atr", "adx", "roc"]
     df = findicators.add_technical_indicators(df, technical_indicators)
     print(list(df.columns))
     print(df.head(20))
@@ -37,12 +37,15 @@ def cac40():
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
-            df = findicators.add_technical_indicators(df, ["trend_1d","ema","macd","rsi_30","cci_30", "williams_%r", "stoch_%k", "stoch_%d", "er"])
+            technical_indicators = ["trend_1d","macd","rsi_30","cci_30","williams_%r","stoch_%k","stoch_%d","er","stc"]
+            technical_indicators.extend(["sma_5","sma_10","sma_15","sma_20"])
+            technical_indicators.extend(["ema_10","ema_20","ema_50"])
+            technical_indicators.extend(["atr","adx","roc"])
+            df = findicators.add_technical_indicators(df, technical_indicators)
             trend_ratio = findicators.get_trend_ratio(df)
             value = filename[:len(filename)-4]
             print("{} ({}),{:.2f}".format(value, fimport.cac40[value], trend_ratio))
             visu.DisplayFromDataframe(df, 'close', './tmp/'+value+'_close.png')
-            visu.DisplayFromDataframe(df, 'ema', './tmp/'+value+'_ema.png')
             visu.DisplayFromDataframe(df, 'macd', './tmp/'+value+'_macd.png')
             visu.DisplayFromDataframe(df, 'rsi_30', './tmp/'+value+'_rsi_30.png')
             visu.DisplayFromDataframe(df, 'cci_30', './tmp/'+value+'_cci_30.png')
@@ -50,7 +53,18 @@ def cac40():
             visu.DisplayFromDataframe(df, 'stoch_%k', './tmp/'+value+'stoch_%k.png')
             visu.DisplayFromDataframe(df, 'stoch_%d', './tmp/'+value+'stoch_%d.png')
             visu.DisplayFromDataframe(df, 'er', './tmp/'+value+'er.png')
-            #python mexit(0)
+            visu.DisplayFromDataframe(df, 'stc', './tmp/'+value+'stc.png')
+            visu.DisplayFromDataframe(df, 'sma_5', './tmp/'+value+'sma5.png')
+            visu.DisplayFromDataframe(df, 'sma_10', './tmp/'+value+'sma10.png')
+            visu.DisplayFromDataframe(df, 'sma_15', './tmp/'+value+'sma15.png')
+            visu.DisplayFromDataframe(df, 'sma_20', './tmp/'+value+'sma20.png')
+            visu.DisplayFromDataframe(df, 'ema_10', './tmp/'+value+'ema10.png')
+            visu.DisplayFromDataframe(df, 'ema_20', './tmp/'+value+'ema20.png')
+            visu.DisplayFromDataframe(df, 'ema_50', './tmp/'+value+'ema50.png')
+            visu.DisplayFromDataframe(df, 'atr', './tmp/'+value+'atr.png')
+            visu.DisplayFromDataframe(df, 'adx', './tmp/'+value+'adx.png')
+            visu.DisplayFromDataframe(df, 'roc', './tmp/'+value+'roc.png')
+            #return
 
 
 
