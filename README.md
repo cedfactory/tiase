@@ -1,5 +1,5 @@
 f
 =
 
-[![Build Status](https://travis-ci.org/cedfactory/f.svg?branch=main)](https://travis-ci.org/cedfactory/f)
+[![Build Status](https://travis-ci.com/cedfactory/f.svg?branch=main)](https://travis-ci.org/cedfactory/f)
     

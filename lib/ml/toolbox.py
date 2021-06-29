@@ -16,7 +16,7 @@ def deserialize(filename):
 #
 # from https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
 #
-def get_train_test_data_from_dataframe0(df, seq_len, train_split):
+def get_train_test_data_from_dataframe0(df, seq_len, column_target, train_split):
     #Preparation of train test set.
 
     train_indices = int(df.shape[0] * train_split)
@@ -30,8 +30,8 @@ def get_train_test_data_from_dataframe0(df, seq_len, train_split):
     test_data = test_data.drop(columns = ['Date'])
 
     x_normaliser = preprocessing.MinMaxScaler()
-    train_normalised_data = x_normaliser.fit_transform(train_data)
 
+    train_normalised_data = x_normaliser.fit_transform(train_data)
     test_normalised_data = x_normaliser.transform(test_data)
 
     X_train = np.array([train_normalised_data[:,0:][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
@@ -40,7 +40,7 @@ def get_train_test_data_from_dataframe0(df, seq_len, train_split):
     y_train = np.expand_dims(y_train, -1)
 
     y_normaliser = preprocessing.MinMaxScaler()
-    next_day_close_values = np.array([train_data['adj_close'][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
+    next_day_close_values = np.array([train_data[column_target][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
     next_day_close_values = np.expand_dims(next_day_close_values, -1)
 
     y_normaliser.fit(next_day_close_values)
@@ -49,7 +49,7 @@ def get_train_test_data_from_dataframe0(df, seq_len, train_split):
     X_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
     
 
-    y_test = np.array([test_data['adj_close'][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
+    y_test = np.array([test_data[column_target][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
     
     y_test = np.expand_dims(y_test, -1)
 
@@ -58,7 +58,7 @@ def get_train_test_data_from_dataframe0(df, seq_len, train_split):
 #
 # https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
 #
-def get_train_test_data_from_dataframe(df, seq_len, train_split, column_target):
+def get_train_test_data_from_dataframe(df, seq_len, column_target, train_split):
     #Preparation of train test set.
 
     train_indices = int(df.shape[0] * train_split)
@@ -72,8 +72,8 @@ def get_train_test_data_from_dataframe(df, seq_len, train_split, column_target):
     test_data = test_data.drop(columns = ['Date'])
 
     x_normaliser = preprocessing.MinMaxScaler()
-    train_normalised_data = x_normaliser.fit_transform(train_data)
 
+    train_normalised_data = x_normaliser.fit_transform(train_data)
     test_normalised_data = x_normaliser.transform(test_data)
 
     X_train = np.array([train_normalised_data[:,0:][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])

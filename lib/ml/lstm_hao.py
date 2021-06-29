@@ -25,13 +25,13 @@ class LSTMHaoBasic:
         self.seq_len = 21
         self.df = dataframe
 
-        self.df = findicators.add_technical_indicators(self.df, ["on_balance_volume", "ema","bbands"])
+        self.df = findicators.add_technical_indicators(self.df, ["on_balance_volume", "ema_9","bbands"])
         self.df = findicators.remove_features(self.df, ["open","close","low","high","volume"])
 
 
         # fill NaN
         for i in range(19):
-            self.df['bb_middle'][i] = self.df['ema'][i]
+            self.df['bb_middle'][i] = self.df['ema_9'][i]
             
             if i != 0:
                 higher = self.df['bb_middle'][i] + 2 * self.df['adj_close'].rolling(i + 1).std()[i]
@@ -50,7 +50,7 @@ class LSTMHaoBasic:
     def create_model(self, epochs = 170):
 
         # split the data
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, .7)
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, 'adj_close', .7)
 
         # build the model
         tf.random.set_seed(20)
