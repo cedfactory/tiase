@@ -42,9 +42,10 @@ def cac40():
             technical_indicators.extend(["ema_10","ema_20","ema_50"])
             technical_indicators.extend(["atr","adx","roc"])
             df = findicators.add_technical_indicators(df, technical_indicators)
-            trend_ratio = findicators.get_trend_ratio(df)
+            trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
             value = filename[:len(filename)-4]
-            print("{} ({}),{:.2f}".format(value, fimport.cac40[value], trend_ratio))
+            print("{} ({}),{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(value, fimport.cac40[value], trend_ratio, true_positive, true_negative, false_positive, false_negative))
+            continue
             visu.DisplayFromDataframe(df, 'close', './tmp/'+value+'_close.png')
             visu.DisplayFromDataframe(df, 'macd', './tmp/'+value+'_macd.png')
             visu.DisplayFromDataframe(df, 'rsi_30', './tmp/'+value+'_rsi_30.png')
@@ -64,7 +65,7 @@ def cac40():
             visu.DisplayFromDataframe(df, 'atr', './tmp/'+value+'atr.png')
             visu.DisplayFromDataframe(df, 'adx', './tmp/'+value+'adx.png')
             visu.DisplayFromDataframe(df, 'roc', './tmp/'+value+'roc.png')
-            #return
+
 
 
 
