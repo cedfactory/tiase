@@ -2,6 +2,7 @@ from lib.fimport import *
 from lib.findicators import *
 import pandas as pd
 import numpy as np
+import pytest
 
 class TestIndicators:
     def test_number_colums(self):
@@ -27,5 +28,9 @@ class TestIndicators:
     def test_get_trend_ratio(self):
         data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27, 28]}
         df = pd.DataFrame(data)
-        trend_ratio = findicators.get_trend_ratio(df)
-        assert(trend_ratio == 70)
+        trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
+        assert(trend_ratio == pytest.approx(66.666, 0.001))
+        assert(true_positive == pytest.approx(55.555, 0.001))
+        assert(true_negative == pytest.approx(11.111, 0.001))
+        assert(false_positive == pytest.approx(11.111, 0.001))
+        assert(false_negative == pytest.approx(22.222, 0.001))
