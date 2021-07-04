@@ -2,6 +2,6 @@
 fimport
 """
 
-__all__ = ["fimport","visu"]
+__all__ = ["fimport","synthetic","visu"]
 __version__ = '0.1'
 __author__ = 'ced'
