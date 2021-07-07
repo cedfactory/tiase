@@ -34,6 +34,6 @@ def create_dataframe(y, mult=1):
         'Volume': vol
         } 
 
-    dfs = pd.DataFrame(data, index=idx)
-    #dfs.index.rename('Date',inplace=True)
-    return dfs
+    df = pd.DataFrame(data, index=idx)
+    df.set_index('Date',inplace=True)
+    return df
