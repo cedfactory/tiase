@@ -1,14 +1,6 @@
-from sklearn.metrics import confusion_matrix, f1_score
-from sklearn.metrics import ConfusionMatrixDisplay
-
-from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import RocCurveDisplay
-from sklearn.metrics import mean_squared_error
-
+from sklearn import metrics
 from collections import namedtuple
-
 import numpy as np
-
 import matplotlib.pyplot as plt
 
 def get_mape(y_true, y_pred):
@@ -39,20 +31,18 @@ def get_rmse(y_true, y_pred):
 
 
 def classification_analysis(model, X_test, y_test):
-
     result = {}
 
-    y_pred = model.predict(X_test)
+    #y_pred = model.predict(X_test)
+    y_pred = (model.predict(X_test) > 0.5).astype("int32")
     result["y_pred"] = y_pred
+    result["y_test"] = y_test
 
-    score = model.score(X_test, y_test)
-    result["score"] = score
+    result["confusion_matrix"] = metrics.confusion_matrix(y_test, y_pred)
 
-    f1score = f1_score(y_test, y_pred, average='binary')
-    result["f1score"] = f1score
-
-    result["confusion_matrix"] = confusion_matrix(y_test, y_pred)
-    #cm_display = ConfusionMatrixDisplay(cm).plot()
+    result["precision"] = metrics.precision_score(y_test, y_pred)
+    result["recall"] = metrics.recall_score(y_test, y_pred)
+    result["f1_score"] = metrics.f1_score(y_test, y_pred, average="binary")
 
     return result
 
@@ -66,19 +56,35 @@ def regression_analysis(model, X_test, y_test, y_normaliser = None):
 
     result["mape"] = get_mape(y_test, y_pred)
     result["rmse"] = get_rmse(y_test, y_pred)
-    result["mse"]  = mean_squared_error(y_test, y_pred)
+    result["mse"]  = metrics.mean_squared_error(y_test, y_pred)
 
     return result
 
 #
 # ROC curves
 #
+def export_roc_curve(y_test, y_pred, filename):
+    idfigroc = 1
+    fig = plt.figure(idfigroc)
+    plt.title('ROC-curve for {}'.format("classifier"))
+    plt.xlim([-0.05, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.ylabel("True positive rate")
+    plt.xlabel("False positive rate")
+    fpr, tpr, thresholds_tree = metrics.roc_curve(y_test, y_pred)
+    roc_auc = metrics.auc(fpr, tpr)
+    plt.plot(fpr, tpr, lw=2, color='orange', label='{} (auc = {:.2f})'.format("classifier", roc_auc))
+    plt.plot([0,1],[0,1], color='lightgrey', label='Luck', linestyle="--")
+    plt.legend(loc='lower right', prop={'size':8})
+    fig.savefig(filename)
+    plt.close(idfigroc)
+
 colorSet = ['orange', 'greenyellow', 'deepskyblue', 'darkviolet', 'crimson', 'darkslategray', 'indigo', 'navy', 'brown',
             'palevioletred', 'mediumseagreen', 'k', 'darkgoldenrod', 'g', 'midnightblue', 'c', 'y', 'r', 'b', 'm', 'lawngreen',
             'mediumturquoise', 'lime', 'teal', 'drive', 'sienna', 'sandybrown']
 
 testvspred = namedtuple('testvspred', ['classifiername', 'yTest', 'yPred'])
-def ExportROCCurve(testvspreds, filename):
+def export_roc_curves(testvspreds, filename):
     idfigroc = 1
     fig = plt.figure(idfigroc)
     plt.title('ROC-curve for {}'.format("test"))
@@ -88,11 +94,54 @@ def ExportROCCurve(testvspreds, filename):
     plt.xlabel("False positive rate")
     cmpt=0
     for testvspred in testvspreds:
-        fpr, tpr, thresholds_tree = roc_curve(testvspred.yTest, testvspred.yPred)
-        roc_auc = auc(fpr, tpr)
+        fpr, tpr, thresholds_tree = metrics.roc_curve(testvspred.yTest, testvspred.yPred)
+        roc_auc = metrics.auc(fpr, tpr)
         plt.plot(fpr, tpr, lw=2, color=colorSet[cmpt], label='{} (auc = {:.2f})'.format(testvspred.classifiername, roc_auc))
         cmpt += 1
     plt.plot([0,1],[0,1], color='lightgrey', label='Luck', linestyle="--")
     plt.legend(loc='lower right', prop={'size':8})
     fig.savefig(filename)
     plt.close(idfigroc)
+
+def export_history(name, history):
+    #print(history.history["history"].keys())
+
+    if ('accuracy' in history.history.keys()):
+        # summarize history for accuracy
+        fig = plt.figure(1)
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        #plt.show()
+        fig.savefig(name+"_accuracy.png")
+        plt.close(1)
+
+    if ('loss' in history.history.keys()):
+        # summarize history for loss
+        fig = plt.figure(1)
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        #plt.show()
+        fig.savefig(name+"_loss.png")
+        plt.close(1)
+
+def export_confusion_matrix(confusion_matrix, filename):
+    fig = plt.figure(1)
+    plt.imshow(confusion_matrix, cmap=plt.cm.Blues)
+    plt.xlabel("Predicted labels")
+    plt.ylabel("True labels")
+    plt.xticks([], [])
+    plt.yticks([], [])
+    plt.title('Confusion matrix ')
+    plt.colorbar()
+    #plt.show()
+    fig.savefig(filename)
+    plt.close(1)
+    
