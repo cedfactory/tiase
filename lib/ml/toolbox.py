@@ -1,56 +1,147 @@
-import pandas as pd
-import numpy as np
+from sklearn import metrics
 from collections import namedtuple
+import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc
-from sklearn import preprocessing
-import joblib
 
-# filename should have one of the following extension : ['.z', '.gz', '.bz2', '.xz', '.lzma']
-def serialize(scaler, filename):
-    joblib.dump(scaler, filename)
+def get_mape(y_true, y_pred):
+    """
+    Compute Mean Absolute Percentage Error (MAPE)
+    INPUT:
+    y_true - actual variable
+    y_pred - predicted variable
+    OUTPUT:
+    mape - Mean Absolute Percentage Error (%)
+    """
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+    return mape
 
-def deserialize(filename):
-    return joblib.load(filename)
+def get_rmse(y_true, y_pred):
+    """
+    Compute Root Mean Squared Error (RMSE)
+    INPUT:
+    y_true - actual variable
+    y_pred - predicted variable
+    OUTPUT:
+    rmse - Root Mean Squared Error
+    """
+    rmse = np.sqrt(np.mean(np.power((y_true - y_pred),2)))
+    return rmse
+
+
+
+def classification_analysis(model, X_test, y_test):
+    result = {}
+
+    #y_pred = model.predict(X_test)
+    y_pred = (model.predict(X_test) > 0.5).astype("int32")
+    result["y_pred"] = y_pred
+    result["y_test"] = y_test
+
+    result["confusion_matrix"] = metrics.confusion_matrix(y_test, y_pred)
+
+    result["precision"] = metrics.precision_score(y_test, y_pred)
+    result["recall"] = metrics.recall_score(y_test, y_pred)
+    result["f1_score"] = metrics.f1_score(y_test, y_pred, average="binary")
+
+    return result
+
+def regression_analysis(model, X_test, y_test, y_normaliser = None):
+    result = {}
+
+    y_pred = model.predict(X_test)
+    if y_normaliser != None:
+        y_pred = y_normaliser.inverse_transform(y_pred)
+    result["y_pred"] = y_pred
+
+    result["mape"] = get_mape(y_test, y_pred)
+    result["rmse"] = get_rmse(y_test, y_pred)
+    result["mse"]  = metrics.mean_squared_error(y_test, y_pred)
+
+    return result
 
 #
-# from https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
+# ROC curves
 #
-def get_train_test_data_from_dataframe0(df, seq_len, column_target, train_split):
-    #Preparation of train test set.
+def export_roc_curve(y_test, y_pred, filename):
+    idfigroc = 1
+    fig = plt.figure(idfigroc)
+    plt.title('ROC-curve for {}'.format("classifier"))
+    plt.xlim([-0.05, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.ylabel("True positive rate")
+    plt.xlabel("False positive rate")
+    fpr, tpr, thresholds_tree = metrics.roc_curve(y_test, y_pred)
+    roc_auc = metrics.auc(fpr, tpr)
+    plt.plot(fpr, tpr, lw=2, color='orange', label='{} (auc = {:.2f})'.format("classifier", roc_auc))
+    plt.plot([0,1],[0,1], color='lightgrey', label='Luck', linestyle="--")
+    plt.legend(loc='lower right', prop={'size':8})
+    fig.savefig(filename)
+    plt.close(idfigroc)
 
-    train_indices = int(df.shape[0] * train_split)
+colorSet = ['orange', 'greenyellow', 'deepskyblue', 'darkviolet', 'crimson', 'darkslategray', 'indigo', 'navy', 'brown',
+            'palevioletred', 'mediumseagreen', 'k', 'darkgoldenrod', 'g', 'midnightblue', 'c', 'y', 'r', 'b', 'm', 'lawngreen',
+            'mediumturquoise', 'lime', 'teal', 'drive', 'sienna', 'sandybrown']
 
-    train_data = df[:train_indices]
-    #train_data = train_data.reset_index()
-    #train_data = train_data.drop(columns = ['Date'])
+testvspred = namedtuple('testvspred', ['classifiername', 'yTest', 'yPred'])
+def export_roc_curves(testvspreds, filename):
+    idfigroc = 1
+    fig = plt.figure(idfigroc)
+    plt.title('ROC-curve for {}'.format("test"))
+    plt.xlim([-0.05, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.ylabel("True positive rate")
+    plt.xlabel("False positive rate")
+    cmpt=0
+    for testvspred in testvspreds:
+        fpr, tpr, thresholds_tree = metrics.roc_curve(testvspred.yTest, testvspred.yPred)
+        roc_auc = metrics.auc(fpr, tpr)
+        plt.plot(fpr, tpr, lw=2, color=colorSet[cmpt], label='{} (auc = {:.2f})'.format(testvspred.classifiername, roc_auc))
+        cmpt += 1
+    plt.plot([0,1],[0,1], color='lightgrey', label='Luck', linestyle="--")
+    plt.legend(loc='lower right', prop={'size':8})
+    fig.savefig(filename)
+    plt.close(idfigroc)
 
-    test_data = df[train_indices:]
-    test_data = test_data.reset_index()
-    test_data = test_data.drop(columns = ['Date'])
+def export_history(name, history):
+    #print(history.history["history"].keys())
 
-    x_normaliser = preprocessing.MinMaxScaler()
+    if ('accuracy' in history.history.keys()):
+        # summarize history for accuracy
+        fig = plt.figure(1)
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        #plt.show()
+        fig.savefig(name+"_accuracy.png")
+        plt.close(1)
 
-    train_normalised_data = x_normaliser.fit_transform(train_data)
-    test_normalised_data = x_normaliser.transform(test_data)
+    if ('loss' in history.history.keys()):
+        # summarize history for loss
+        fig = plt.figure(1)
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        #plt.show()
+        fig.savefig(name+"_loss.png")
+        plt.close(1)
 
-    X_train = np.array([train_normalised_data[:,0:][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
-
-    y_train = np.array([train_normalised_data[:,0][i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
-    y_train = np.expand_dims(y_train, -1)
-
-    y_normaliser = preprocessing.MinMaxScaler()
-    next_day_close_values = np.array([train_data[column_target][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
-    next_day_close_values = np.expand_dims(next_day_close_values, -1)
-
-    y_normaliser.fit(next_day_close_values)
-
-     
-    X_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
+def export_confusion_matrix(confusion_matrix, filename):
+    fig = plt.figure(1)
+    plt.imshow(confusion_matrix, cmap=plt.cm.Blues)
+    plt.xlabel("Predicted labels")
+    plt.ylabel("True labels")
+    plt.xticks([], [])
+    plt.yticks([], [])
+    plt.title('Confusion matrix ')
+    plt.colorbar()
+    #plt.show()
+    fig.savefig(filename)
+    plt.close(1)
     
-
-    y_test = np.array([test_data[column_target][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
-    
-    y_test = np.expand_dims(y_test, -1)
-
-    return X_train, y_train, X_test, y_test, x_normaliser, y_normaliser
