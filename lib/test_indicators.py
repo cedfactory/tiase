@@ -9,10 +9,27 @@ class TestIndicators:
         df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
         print(list(df.columns))
         assert(len(list(df.columns)) == 6)
-        df = findicators.add_technical_indicators(df, ["macd", "rsi_30", "cci_30", "dx_30", "williams_%r", "stoch_%k", "stoch_%d", "er"])
+
+        # first set of technical indicators
+        technical_indicators = ["macd", "rsi_30", "cci_30", "dx_30", "williams_%r", "stoch_%k", "stoch_%d", "er"]
+        df = findicators.add_technical_indicators(df, technical_indicators)
         assert(len(list(df.columns)) == 14)
+
+        df = findicators.remove_features(df, technical_indicators)
+        assert(len(list(df.columns)) == 6)
+
+        # second set of technical indicators
+        technical_indicators = ["trend_1d", "sma_12", "ema_9", "bbands", "stc", "atr", "adx", "roc"]
+        df = findicators.add_technical_indicators(df, technical_indicators)
+        assert(len(list(df.columns)) == 16)
+
+        technical_indicators.remove("bbands")
+        technical_indicators.extend(["bb_upper", "bb_middle", "bb_lower"])
+        df = findicators.remove_features(df, technical_indicators)
+        assert(len(list(df.columns)) == 6)
+
         df = findicators.remove_features(df, ["open", "high", "low"])
-        assert(len(list(df.columns)) == 11)
+        assert(len(list(df.columns)) == 3)
 
     def test_get_trend_close(self):
         data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27]}
