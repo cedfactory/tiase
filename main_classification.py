@@ -10,7 +10,7 @@ y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height
 df = synthetic.create_dataframe(y, 0.)
 #visu.DisplayFromDataframe(df,"Close", "close.png")
 
-model = lstm.LSTMClassification(df)
+model = classifier_lstm.LSTMClassification(df)
 model.create_model(epochs = 10)
 
 model_analysis = model.get_analysis()
