@@ -4,10 +4,9 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - pip install codecov
   - pip install pytest-cov
 # command to run tests
 script:
-  - pytest lib --cov=./
+  - pytest --cov=./lib
 after_success:
   - bash <(curl -s https://codecov.io/bash)
