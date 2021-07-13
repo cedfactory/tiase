@@ -148,10 +148,10 @@ nasdaq100 = {
     "XLNX": "Xilinx, Inc."  # https://finance.yahoo.com/quote/XLNX/?p=XLNX
 }
 
-def DownloadFromYahoo(values):
+def DownloadFromYahoo(values, folder = ""):
     for value in values:
         data_df = yf.download(value, period="max")
-        filename = './' + value + '.csv'
+        filename = './' + folder + '/' + value + '.csv'
         print(filename)
         data_df.to_csv(filename)
 
@@ -168,42 +168,3 @@ def GetDataFrameFromCsv(csvfile):
     #openValues2 = df.sort_values(by='Time')['open'].to_numpy()
     dataframe.dropna(inplace=True) # remove incoherent values (null, NaN, ...)
     return dataframe
-
-
-###
-### AS A SCRIPT
-### python -m import.py
-###
-
-_usage_str = """
-Options:
-    [ --test, -t]
-"""
-
-def _usage():
-    print(_usage_str)
-
-def _test1():
-    hist = GetDataFrameFromYahoo('AI.PA')
-    print(hist)
-
-def _test2():
-    hist = GetDataFrameFromCsv('./data/AI.PA.csv')
-    DisplayFromDataframe(hist, "Close")
-
-def _download(values):
-    if values == "cac40":
-        DownloadFromYahoo(cac40.keys())
-    elif values == "nasdaq100":
-        DownloadFromYahoo(nasdaq100.keys())
-
-    
-if __name__ == '__main__':
-    import sys
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "--test1" or sys.argv[1] == "-t1": _test1()
-        elif sys.argv[1] == "--test2" or sys.argv[1] == "-t2": _test2()
-        elif sys.argv[1] == "--cac40" : _download('cac40')
-        elif sys.argv[1] == "--nasdaq100" : _download('nasdaq100')
-        else: _usage()
-    else: _usage()
