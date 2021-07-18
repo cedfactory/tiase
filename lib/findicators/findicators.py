@@ -12,7 +12,10 @@ from finta import TA
 
 def remove_features(df, features):
     for feature in features:
-        df.drop(feature, axis=1, inplace=True)
+        if feature in df.columns:
+            df.drop(feature, axis=1, inplace=True)
+        else:
+            print("{} not present in {}".format())
     return df
 
 def add_technical_indicators(df, indicators):
