@@ -15,7 +15,7 @@ def remove_features(df, features):
         if feature in df.columns:
             df.drop(feature, axis=1, inplace=True)
         else:
-            print("{} not present in {}".format())
+            print("{} not present in {}".format(feature, df.columns))
     return df
 
 def add_technical_indicators(df, indicators):
