@@ -32,6 +32,40 @@ class TestMlToolbox:
         np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
 
 
+    def test_get_train_test_data_from_dataframe2(self):
+        target = np.array([1, 0, 1, 1, 0])
+        data =[
+            [0., 11., 3., 1],
+            [0.1, 10., 3.1, 0],
+            [0.2, 9., 3.2, 0],
+            [0.3, 8., 3.3, 1],
+            [0.4, 7., 3.4, 1],
+            [0.5, 6., 3.5, 0],
+            [0.6, 5., 3.6, 1],
+            [0.7, 4., 3.7, 1],
+            [0.8, 3., 3.8, 1],
+            [0.9, 2., 3.9, 0],
+            [1., 1., 4., 0]
+        ]
+        df = pd.DataFrame(data, columns = ['A', 'B', 'C', 'output'])
+        X_train, y_train, X_test, y_test, x_normaliser = toolbox.get_train_test_data_from_dataframe2(df, 3, 'output', 0.7)
+
+        X_train_expected = np.array([[0., 0.16666667, 0.33333333, 1., 0.83333333, 0.66666667, 0., 0.16666667, 0.33333333],
+        [0.16666667, 0.33333333, 0.5, 0.83333333, 0.66666667, 0.5, 0.16666667, 0.33333333, 0.5],
+        [0.33333333, 0.5, 0.66666667, 0.66666667, 0.5, 0.33333333, 0.33333333, 0.5, 0.66666667],
+        [0.5, 0.66666667, 0.83333333, 0.5, 0.33333333, 0.16666667, 0.5, 0.66666667, 0.83333333]])
+        np.testing.assert_allclose(X_train, X_train_expected, 0.00001)
+
+        y_train_expected = np.array([[1], [1], [0], [1]])
+        np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
+
+        X_test_expected = np.array([[1.16666667, 1.33333333, 1.5, -0.16666667, -0.33333333, -0.5, 1.16666667, 1.33333333, 1.5]])
+        np.testing.assert_allclose(X_test, X_test_expected, 0.00001)
+
+        y_test_expected = np.array([[0]])
+        np.testing.assert_allclose(y_test, y_test_expected, 0.00001)
+
+
     def test_minmaxscaler_serialization(self):
         data = [[10,1000], [2,500], [3,600], [2,800], [2,500], [0,700], [1,800], [3,500], [5,900], [7,1000]]
         normalizer = preprocessing.MinMaxScaler()

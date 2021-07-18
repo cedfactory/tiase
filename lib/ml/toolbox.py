@@ -82,3 +82,47 @@ def get_train_test_data_from_dataframe1(df, seq_len, column_target, train_split)
     y_test = np.expand_dims(y_test, 1)
 
     return X_train, y_train, X_test, y_test, x_normaliser
+
+def _get_train_test_data_from_dataframe2(features, target, seq_len):
+    nFeatures = features.shape[1]
+    X_train = []
+    for i in range(len(features) - seq_len):
+        seq = []
+        for j in range(nFeatures):
+            seq.extend(features[:,j][i : i + seq_len].flatten())
+        X_train.append(seq)
+    X_train = np.array(X_train)
+
+    y_train = np.array([target["target"][i + seq_len].copy() for i in range(len(target) - seq_len)])
+    y_train = np.expand_dims(y_train, 1)
+    
+    return X_train, y_train
+
+
+def get_train_test_data_from_dataframe2(df, seq_len, column_target, train_split):
+
+    splitIndex = int(df.shape[0] * train_split)
+
+    # Preparation of train test set.
+    features = df.copy().drop(column_target, axis=1)
+    target = pd.DataFrame({'target': df[column_target]})
+
+    train_features = features[:splitIndex]
+    train_target = target[:splitIndex]
+    train_target = train_target.reset_index(drop=True)
+    #train_target = train_target.drop(columns = ['Date'])
+
+    test_features = features[splitIndex:]
+    test_target = target[splitIndex:]
+    test_target = test_target.reset_index(drop=True)
+    #test_target = test_features.drop(columns = ['Date'])
+
+    features_normaliser = preprocessing.MinMaxScaler()
+
+    train_normalised_features = features_normaliser.fit_transform(train_features)
+    test_normalised_features = features_normaliser.transform(test_features)
+
+    X_train, y_train = _get_train_test_data_from_dataframe2(train_normalised_features, train_target, seq_len)
+    X_test, y_test = _get_train_test_data_from_dataframe2(test_normalised_features, test_target, seq_len)
+
+    return X_train, y_train, X_test, y_test, features_normaliser
