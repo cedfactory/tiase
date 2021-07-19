@@ -7,6 +7,7 @@ sys.path.insert(0, parentdir)
 from findicators import *
 from ml import toolbox
 from ml import analysis
+from ml import classifier
 
 import numpy as np
 import tensorflow as tf
@@ -20,9 +21,8 @@ from keras.preprocessing import sequence
 # Simple LSTM for Sequence Classification
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
 #
-class LSTMClassification:
-
-    def __init__(self, dataframe, name = ""):
+class ClassifierLSTM(classifier.Classifier):
+    def __init__(self, dataframe, params = None):
         self.seq_len = 21
         self.df = dataframe
 
@@ -31,8 +31,17 @@ class LSTMClassification:
 
         self.df.dropna(inplace = True)
 
-    def create_model(self, epochs = 170):
+        self.epochs = 170
+        if "epochs" in params:
+            self.epochs = params["epochs"]
 
+    def build_model(self):
+        self.model = Sequential()
+        self.model.add(LSTM(100, input_shape=(1, self.seq_len)))
+        self.model.add(Dense(1, activation='sigmoid'))
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    def create_model(self):
         # split the data
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = toolbox.get_train_test_data_from_dataframe1(self.df, self.seq_len, 'trend_1d', .7)
         self.y_train = self.y_train.astype(int)
@@ -45,54 +54,28 @@ class LSTMClassification:
         tf.random.set_seed(20)
         np.random.seed(10)
 
-        self.model = Sequential()
-        self.model.add(LSTM(100, input_shape=(1, self.seq_len)))
-        self.model.add(Dense(1, activation='sigmoid'))
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.build_model()
 
-
-        '''
-        lstm_input = Input(shape=(self.seq_len, 6), name='lstm_input')
-
-        inputs = LSTM(21, name='first_layer')(lstm_input)
-        inputs = Dense(15, name='first_dense_layer')(inputs)
-        inputs = Dense(1, name='second_dense_layer')(inputs)
-        output = Activation('linear', name='output')(inputs)
-
-        self.model = Model(inputs=lstm_input, outputs=output)
-        adam = optimizers.Adam(lr = 0.0008)
-        self.model.compile(optimizer=adam, loss='mse')
-        '''
-
-        '''
-        self.model = Sequential()
-        self.model.add(Embedding(input_dim = 188, output_dim = 50, input_length = len(self.X_train[0])))
-        self.model.add(LSTM(output_dim=256, activation='sigmoid', inner_activation='hard_sigmoid', return_sequences=True))
-        self.model.add(Dropout(0.5))
-        self.model.add(LSTM(output_dim=256, activation='sigmoid', inner_activation='hard_sigmoid'))
-        self.model.add(Dropout(0.5))
-        self.model.add(Dense(1, activation='sigmoid'))
-        self.model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-        '''
-        
-        '''
-        self.model = Sequential()
-        self.model.add(LSTM(units=100, input_shape=(1, self.seq_len)))
-        self.model.add(Dense(1, activation='sigmoid'))
-        #self.model.add(Dropout(0.5))
-        #self.model.add(Dense(100, activation='relu'))
-        #self.model.add(Dense(self.X_train.shape[1], activation='softmax'))
-        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        '''
         print(self.model.summary())
-        self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=64)
+        self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=64)
 
         # Final evaluation of the model
         scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
-
     def get_analysis(self):
         self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test)
         self.analysis["history"] = self.history
         return self.analysis
+
+class ClassifierLSTM2(ClassifierLSTM):
+    def __init__(self, dataframe, name = ""):
+        super().__init__(dataframe, name)
+    
+    def build_model(self):
+        self.model = Sequential()
+        self.model.add(LSTM(100, input_shape=(1, self.seq_len)))
+        self.model.add(Dropout(0.5))
+        self.model.add(Dense(100, activation='sigmoid'))
+        self.model.add(Dense(1, activation='sigmoid'))
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
