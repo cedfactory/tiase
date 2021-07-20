@@ -20,6 +20,7 @@ gClassifiers = [
     { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())}
 ]
 
+TestVSPred = []
 for gClassifier in gClassifiers:
     name = gClassifier["name"]
     model = gClassifier["classifier"]
@@ -32,3 +33,7 @@ for gClassifier in gClassifiers:
 
     analysis.export_confusion_matrix(model_analysis["confusion_matrix"], name+"_lstm_classification_confusion_matrix.png")
     analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_pred"], name+"_lstm_classification_roc_curve.png")
+
+    TestVSPred.append(analysis.testvspred(name, model_analysis["y_test"], model_analysis["y_pred"]))
+
+analysis.export_roc_curves(TestVSPred, "roc_curves.png")
