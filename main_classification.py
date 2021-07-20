@@ -16,6 +16,7 @@ print(df.head())
 gClassifiers = [
     { "name": "LSTM", "classifier" : classifier_lstm.ClassifierLSTM(df.copy(), params={'epochs': 20})},
     { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy())},
+    { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())},
     { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())}
 ]
 
