@@ -4,6 +4,7 @@ import pandas as pd
 import os
 
 def various():
+
     print("trend :")
     data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27]}
     df = pd.DataFrame(data)
@@ -13,7 +14,6 @@ def various():
     print(trend1)
     print(trend4)
 
-    print("")
     df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
     visu.DisplayFromDataframe(df,"Close","close.png")
     print(df.head())
@@ -22,11 +22,14 @@ def various():
     #technical_indicators = ["williams_%r", "stoch_%k", "stoch_%d", "er", "stc", "sma_5", "sma_10", "sma_15", "sma_20"]
     technical_indicators = ["stc", "sma_5", "sma_10", "sma_15", "sma_20", "ema_10", "ema_20", "ema_50", "atr", "adx", "roc"]
     df = findicators.add_technical_indicators(df, technical_indicators)
-    print(list(df.columns))
-    print(df.head(20))
 
     df = findicators.remove_features(df, ['open', 'high', 'low', 'adj_close', 'volume'])
     print(df.head(20))
+
+    idx = pd.Index(pd.date_range("19991231", periods=10), name='Date')
+    df = pd.DataFrame([1]*10, columns=["Foobar"], index=idx)
+    df = findicators.add_temporal_indicators(df, "Date")
+    print(df.head())
 
 
 #

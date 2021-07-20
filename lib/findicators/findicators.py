@@ -18,6 +18,47 @@ def remove_features(df, features):
             print("{} not present in {}".format(feature, df.columns))
     return df
 
+def make_date(df, date_field):
+    "Make sure `df[date_field]` is of the right date type."
+    field_dtype = df[date_field].dtype
+    if isinstance(field_dtype, pd.core.dtypes.dtypes.DatetimeTZDtype):
+        field_dtype = np.datetime64
+    if not np.issubdtype(field_dtype, np.datetime64):
+        df[date_field] = pd.to_datetime(df[date_field], infer_datetime_format=True)
+
+def add_temporal_indicators(df, field_name, time=False):
+    "Helper function that adds columns relevant to a date in the column `field_name` of `df`."
+
+    # Change all column headings to be lower case, and remove spacing
+    df.columns = [str(x).lower().replace(' ', '_') for x in df.columns]
+
+    if field_name not in df.columns and field_name != df.index.name:
+        print("[add_temporal_indicators] {} is not present among the columns {} or in the index {}".format(datefield, df.columns, df.index.name))
+        return df
+
+    # if the datefield is the index of the dataframe, we create a temporary column
+    FieldToDrop = False
+    if field_name == df.index.name:
+        field_name = 'DateTmp'
+        df[field_name] = df.index
+        FieldToDrop = True
+
+    make_date(df, field_name)
+
+    field = df[field_name]
+    prefix = "" #ifnone(prefix, re.sub('[Dd]ate$', '', field_name))
+    attr = ['Year', 'Month', 'Week', 'Day', 'Dayofweek', 'Dayofyear', 'Is_month_end', 'Is_month_start',
+            'Is_quarter_end', 'Is_quarter_start', 'Is_year_end', 'Is_year_start']
+    if time: attr = attr + ['Hour', 'Minute', 'Second']
+    # Pandas removed `dt.week` in v1.1.10
+    week = field.dt.isocalendar().week.astype(field.dt.day.dtype) if hasattr(field.dt, 'isocalendar') else field.dt.week
+    for n in attr: df[prefix + n] = getattr(field.dt, n.lower()) if n != 'Week' else week
+    mask = ~field.isna()
+    df[prefix + 'Elapsed'] = np.where(mask, field.values.astype(np.int64) // 10 ** 9, np.nan)
+    if FieldToDrop: df.drop(field_name, axis=1, inplace=True)
+
+    return df
+
 def add_technical_indicators(df, indicators):
     """
     calculate technical indicators

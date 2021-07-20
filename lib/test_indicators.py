@@ -1,8 +1,10 @@
 from lib.fimport import *
 from lib.findicators import *
 import pandas as pd
+#from pandas._testing import assert_frame_equal
 import numpy as np
 import pytest
+import datetime
 
 class TestIndicators:
     def test_number_colums(self):
@@ -51,3 +53,12 @@ class TestIndicators:
         assert(true_negative == pytest.approx(11.111, 0.001))
         assert(false_positive == pytest.approx(11.111, 0.001))
         assert(false_negative == pytest.approx(22.222, 0.001))
+
+    def test_temporal_indicators(self):
+        idx = pd.Index(pd.date_range("19991231", periods=10), name='Date')
+        df = pd.DataFrame([1]*10, columns=["Foobar"], index=idx)
+        df = findicators.add_temporal_indicators(df, "Date")
+
+        expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/temporal_indicators_reference.csv")
+        #assert_frame_equal(df, expected_df, check_dtype=False) // don't work :(
+        assert(df.equals(expected_df))
