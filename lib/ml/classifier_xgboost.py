@@ -32,10 +32,3 @@ class ClassifierXGBoost(classifier.Classifier):
 
         self.build_model()
         self.model.fit(self.X_train,self.y_train)
-
-    def get_analysis(self):
-        print("svc analysis")
-        self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test)
-        return self.analysis
-
-

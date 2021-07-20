@@ -63,11 +63,6 @@ class ClassifierLSTM(classifier.Classifier):
         scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
-    def get_analysis(self):
-        self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test)
-        self.analysis["history"] = self.history
-        return self.analysis
-
 class ClassifierLSTM2(ClassifierLSTM):
     def __init__(self, dataframe, name = ""):
         super().__init__(dataframe, name)
