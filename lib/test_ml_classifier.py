@@ -15,10 +15,10 @@ class TestMlClassifier:
         return df
 
 
-    def test_classifier_lstm(self):
+    def test_classifier_lstm1(self):
         df = self.get_dataframe()
         
-        model = classifier_lstm.ClassifierLSTM(df, params={'epochs': 20})
+        model = classifier_lstm.ClassifierLSTM1(df, params={'epochs': 20})
         model.create_model()
 
         model_analysis = model.get_analysis()
@@ -26,6 +26,30 @@ class TestMlClassifier:
         assert(model_analysis["precision"] == pytest.approx(0.992647, 0.00001))
         assert(model_analysis["recall"] == pytest.approx(1., 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(0.996309, 0.00001))
+
+    def test_classifier_lstm2(self):
+        df = self.get_dataframe()
+        
+        model = classifier_lstm.ClassifierLSTM2(df, params={'epochs': 20})
+        model.create_model()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.985185, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.992537, 0.00001))
+
+    def test_classifier_lstm3(self):
+        df = self.get_dataframe()
+        
+        model = classifier_lstm.ClassifierLSTM3(df, params={'epochs': 20})
+        model.create_model()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.955555, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.977272, 0.00001))
 
     def test_classifier_svc(self):
         df = self.get_dataframe()

@@ -20,10 +20,11 @@ df.dropna(inplace = True)
 print(df.head())
 
 gClassifiers = [
-    { "name": "LSTM", "classifier" : classifier_lstm.ClassifierLSTM(df.copy(), params={'epochs': 20})},
-    { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 10})},
-    { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())},
-    { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())}
+    { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), params={'epochs': 20})},
+    { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 20})},
+    { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), params={'epochs': 20})},
+    { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())},
+    { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())}
 ]
 
 TestVSPred = []
@@ -37,8 +38,8 @@ for gClassifier in gClassifiers:
     print("Recall : ", model_analysis["recall"])
     print("f1_score:", model_analysis["f1_score"])
 
-    analysis.export_confusion_matrix(model_analysis["confusion_matrix"], name+"_lstm_classification_confusion_matrix.png")
-    analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_pred"], name+"_lstm_classification_roc_curve.png")
+    analysis.export_confusion_matrix(model_analysis["confusion_matrix"], name+"_classification_confusion_matrix.png")
+    analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_pred"], name+"_classification_roc_curve.png")
     if model_analysis["history"] != None:
         analysis.export_history(name, model_analysis["history"])
 

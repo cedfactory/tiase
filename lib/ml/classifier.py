@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 class Classifier(object):
     __metaclass__=ABCMeta
     @abstractmethod
-    def __build_model(self):
+    def build_model(self):
         pass
 
     @abstractmethod

@@ -14,10 +14,10 @@ class ClassifierXGBoost(classifier.Classifier):
         self.seq_len = 50
         self.df = dataframe
 
-    def __build_model(self):
+    def build_model(self):
         self.model = XGBClassifier()
 
     def create_model(self):
         self.set_train_test_data()
-        self.__build_model()
+        self.build_model()
         self.model.fit(self.X_train,self.y_train)
