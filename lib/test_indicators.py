@@ -7,6 +7,14 @@ import pytest
 import datetime
 
 class TestIndicators:
+    def test_get_all_default_technical_indicators(self):
+        ti = findicators.get_all_default_technical_indicators()
+        assert(len(ti) == 21)
+        expected_ti = ["trend_1d","macd","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc"]
+        expected_ti.extend(["sma_5","sma_10","sma_15","sma_20"])
+        expected_ti.extend(["ema_10","ema_20","ema_50"])
+        assert(ti == expected_ti)
+
     def test_number_colums(self):
         df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
         print(list(df.columns))

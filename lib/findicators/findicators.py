@@ -59,6 +59,12 @@ def add_temporal_indicators(df, field_name, time=False):
 
     return df
 
+def get_all_default_technical_indicators():
+    technical_indicators = ["trend_1d","macd","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc"]
+    technical_indicators.extend(["sma_5","sma_10","sma_15","sma_20"])
+    technical_indicators.extend(["ema_10","ema_20","ema_50"])
+    return technical_indicators
+
 def add_technical_indicators(df, indicators):
     """
     calculate technical indicators
@@ -181,7 +187,6 @@ def get_trend_info(df):
     true_negative = 100*tmp['true_negative'].value_counts(normalize=True)[1]
     false_positive = 100*tmp['false_positive'].value_counts(normalize=True)[1]
     false_negative = 100*tmp['false_negative'].value_counts(normalize=True)[1]
-
 
     return trend_ratio, true_positive, true_negative, false_positive, false_negative
 
