@@ -104,3 +104,30 @@ class ClassifierLSTM3(ClassifierLSTM):
         outputs = layers.Dense(1)(x)
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
+
+# Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
+class ClassifierBiLSTM(ClassifierLSTM):
+    def __init__(self, dataframe, params = None):
+        super().__init__(dataframe, params)
+    
+    def build_model(self):
+        print("[Build ClassifierBiLSTM]")
+
+        # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
+        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+
+        in_seq = keras.Input(shape=(1, shapeDim2))
+      
+        x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(in_seq)
+        x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+        x = layers.Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x) 
+      
+        avg_pool = layers.GlobalAveragePooling1D()(x)
+        max_pool = layers.GlobalMaxPooling1D()(x)
+        conc = layers.concatenate([avg_pool, max_pool])
+        conc = layers.Dense(int(self.seq_len/2), activation="relu")(conc)
+        out = layers.Dense(1, activation="sigmoid")(conc)      
+
+        self.model = keras.Model(inputs=in_seq, outputs=out)
+        self.model.compile(loss="mse", optimizer="adam", metrics=['mse', 'mae', 'mape'])    
+
