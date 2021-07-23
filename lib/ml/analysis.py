@@ -30,19 +30,19 @@ def get_rmse(y_true, y_pred):
 
 
 
-def classification_analysis(model, X_test, y_test):
+def classification_analysis(model, X_test, y_test, y_test_pred, y_test_prob):
     result = {}
 
-    #y_pred = model.predict(X_test)
-    y_pred = (model.predict(X_test) > 0.5).astype("int32")
-    result["y_pred"] = y_pred
+    result["X_test"] = X_test
     result["y_test"] = y_test
+    result["y_test_pred"] = y_test_pred
+    result["y_test_prob"] = y_test_prob
 
-    result["confusion_matrix"] = metrics.confusion_matrix(y_test, y_pred)
+    result["confusion_matrix"] = metrics.confusion_matrix(y_test, y_test_pred)
 
-    result["precision"] = metrics.precision_score(y_test, y_pred)
-    result["recall"] = metrics.recall_score(y_test, y_pred)
-    result["f1_score"] = metrics.f1_score(y_test, y_pred, average="binary")
+    result["precision"] = metrics.precision_score(y_test, y_test_pred)
+    result["recall"] = metrics.recall_score(y_test, y_test_pred)
+    result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average="binary")
 
     return result
 
@@ -62,7 +62,7 @@ def regression_analysis(model, X_test, y_test, y_normaliser = None):
 
 #
 # ROC curves
-#
+# https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-imbalanced-classification/
 def export_roc_curve(y_test, y_pred, filename):
     idfigroc = 1
     fig = plt.figure(idfigroc)

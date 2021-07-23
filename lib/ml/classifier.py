@@ -29,7 +29,4 @@ class Classifier(object):
 
     @abstractmethod
     def get_analysis(self):
-        self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test)
-        self.analysis["history"] = getattr(self, "history", None)
-        return self.analysis
-
+        pass

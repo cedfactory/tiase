@@ -8,7 +8,7 @@ filename = "./lib/data/test/google_stocks_data.csv"
 df = fimport.GetDataFrameFromCsv(filename)
 
 y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
-df = synthetic.create_dataframe(y, 0.)
+#df = synthetic.create_dataframe(y, 0.8)
 visu.DisplayFromDataframe(df,"Close", "close.png")
 
 #
@@ -39,10 +39,10 @@ for gClassifier in gClassifiers:
     print("f1_score:", model_analysis["f1_score"])
 
     analysis.export_confusion_matrix(model_analysis["confusion_matrix"], name+"_classification_confusion_matrix.png")
-    analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_pred"], name+"_classification_roc_curve.png")
-    if model_analysis["history"] != None:
+    analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], name+"_classification_roc_curve.png")
+    if "history" in model_analysis.keys():
         analysis.export_history(name, model_analysis["history"])
 
-    TestVSPred.append(analysis.testvspred(name, model_analysis["y_test"], model_analysis["y_pred"]))
+    TestVSPred.append(analysis.testvspred(name, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
 analysis.export_roc_curves(TestVSPred, "roc_curves.png")

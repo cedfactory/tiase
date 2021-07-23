@@ -45,6 +45,13 @@ class ClassifierLSTM(classifier.Classifier):
         # Final evaluation of the model
         scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
         print("Accuracy: %.2f%%" % (scores[1]*100))
+    
+    def get_analysis(self):
+        self.y_test_prob = self.model.predict(self.X_test)
+        self.y_test_pred = (self.y_test_prob > 0.5).astype("int32")
+        self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis["history"] = getattr(self.model, "history", None)
+        return self.analysis
 
 class ClassifierLSTM1(ClassifierLSTM):
     def __init__(self, dataframe, params = None):
@@ -93,7 +100,7 @@ class ClassifierLSTM3(ClassifierLSTM):
 
         inputs = keras.Input(shape=(1, shapeDim2))
         x = layers.LSTM(100, activation="sigmoid")(inputs)
-        #x = layers.Dense(64, activation="relu")(x)
+        #x = layers.Dense(64, activation="sigmoid")(x)
         outputs = layers.Dense(1)(x)
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
