@@ -46,26 +46,20 @@ def stats(value):
     trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
     print("{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(trend_ratio, true_positive, true_negative, false_positive, false_negative))
 
-    visu.DisplayFromDataframe(df, 'close', './tmp/'+value+'_close.png')
-    visu.DisplayFromDataframe(df, 'macd', './tmp/'+value+'_macd.png')
-    visu.DisplayFromDataframe(df, 'rsi_30', './tmp/'+value+'_rsi_30.png')
-    visu.DisplayFromDataframe(df, 'cci_30', './tmp/'+value+'_cci_30.png')
-    visu.DisplayFromDataframe(df, 'williams_%r', './tmp/'+value+'_williams%r.png')
-    visu.DisplayFromDataframe(df, 'stoch_%k', './tmp/'+value+'_stoch_%k.png')
-    visu.DisplayFromDataframe(df, 'stoch_%d', './tmp/'+value+'_stoch_%d.png')
-    visu.DisplayFromDataframe(df, 'er', './tmp/'+value+'_er.png')
-    visu.DisplayFromDataframe(df, 'stc', './tmp/'+value+'_stc.png')
-    visu.DisplayFromDataframe(df, 'sma_5', './tmp/'+value+'_sma5.png')
-    visu.DisplayFromDataframe(df, 'sma_10', './tmp/'+value+'_sma10.png')
-    visu.DisplayFromDataframe(df, 'sma_15', './tmp/'+value+'_sma15.png')
-    visu.DisplayFromDataframe(df, 'sma_20', './tmp/'+value+'_sma20.png')
-    visu.DisplayFromDataframe(df, 'ema_10', './tmp/'+value+'_ema10.png')
-    visu.DisplayFromDataframe(df, 'ema_20', './tmp/'+value+'_ema20.png')
-    visu.DisplayFromDataframe(df, 'ema_50', './tmp/'+value+'_ema50.png')
-    visu.DisplayFromDataframe(df, 'atr', './tmp/'+value+'_atr.png')
-    visu.DisplayFromDataframe(df, 'adx', './tmp/'+value+'_adx.png')
-    visu.DisplayFromDataframe(df, 'roc', './tmp/'+value+'_roc.png')
+    # output index.html
+    f = open("./tmp/index_"+value+".html", "w")
+    f.write("<html><body>")
+    f.write("<center><h1>"+value+" ("+name+")</h1></Center>")
 
+    f.write("<p>trend ratio : {:.2f}%</p>".format(trend_ratio))
+
+    for column in df.columns:
+        imgname = value+'_'+column+'.png'
+        visu.DisplayFromDataframe(df, column, './tmp/'+imgname)
+        f.write('<img width=50% src='+imgname+' />')
+
+    f.write("</body></html>")
+    f.close()
 
 #
 # parse directory cac40
