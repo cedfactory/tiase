@@ -1,3 +1,3 @@
-__all__ = ["fimport,findicators,ml"]
+__all__ = ["alfred"]
 __version__ = '0.1'
 __author__ = 'ced'
