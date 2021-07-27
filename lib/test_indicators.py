@@ -9,8 +9,8 @@ import datetime
 class TestIndicators:
     def test_get_all_default_technical_indicators(self):
         ti = findicators.get_all_default_technical_indicators()
-        assert(len(ti) == 21)
-        expected_ti = ["trend_1d","macd","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc"]
+        assert(len(ti) == 23)
+        expected_ti = ["trend_1d","macd","macds","macdh","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc"]
         expected_ti.extend(["sma_5","sma_10","sma_15","sma_20"])
         expected_ti.extend(["ema_10","ema_20","ema_50"])
         assert(ti == expected_ti)
@@ -38,7 +38,10 @@ class TestIndicators:
         df = findicators.remove_features(df, technical_indicators)
         assert(len(list(df.columns)) == 6)
 
-        df = findicators.remove_features(df, ["open", "high", "low"])
+        df = findicators.remove_features(df, ["open", "high"])
+        assert(len(list(df.columns)) == 4)
+
+        df = findicators.remove_features(df, ["fakecolumn", "low"])
         assert(len(list(df.columns)) == 3)
 
     def test_get_trend_close(self):
