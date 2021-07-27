@@ -21,9 +21,9 @@ class TestIndicators:
         assert(len(list(df.columns)) == 6)
 
         # first set of technical indicators
-        technical_indicators = ["macd", "rsi_30", "cci_30", "dx_30", "williams_%r", "stoch_%k", "stoch_%d", "er"]
+        technical_indicators = ["macd", "macds", "macdh", "rsi_30", "cci_30", "dx_30", "williams_%r", "stoch_%k", "stoch_%d", "er"]
         df = findicators.add_technical_indicators(df, technical_indicators)
-        assert(len(list(df.columns)) == 14)
+        assert(len(list(df.columns)) == 16)
 
         df = findicators.remove_features(df, technical_indicators)
         assert(len(list(df.columns)) == 6)
