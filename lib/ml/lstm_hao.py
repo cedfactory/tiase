@@ -1,12 +1,5 @@
-import os
-import sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
-from findicators import *
-from ml import toolbox
-from ml import analysis
+from ..findicators import *
+from ..ml import toolbox,analysis
 
 import tensorflow as tf
 from keras.models import Model
