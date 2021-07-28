@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<dings>
+    <ding>
+        <import value="AI.PA"/>
+        <features indicators="close" target="trend_1d"/>
+        <classifier name="svc"/>
+    </ding>
+</dings>

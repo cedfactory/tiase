@@ -1,13 +1,6 @@
-import os
-import sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
-
 from sklearn.svm import SVC
-from ml import classifier,toolbox,analysis
-from findicators import *
+from ..ml import classifier,toolbox,analysis
+from ..findicators import *
 
 class ClassifierSVC(classifier.Classifier):
     def __init__(self, dataframe, name = ""):
