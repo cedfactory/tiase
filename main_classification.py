@@ -23,6 +23,7 @@ gClassifiers = [
     { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), params={'epochs': 20})},
     { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 20})},
     { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), params={'epochs': 20})},
+    { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), params={'epochs': 20})},
     { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), params={'epochs': 20})},
     { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())},
     { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())}
