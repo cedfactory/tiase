@@ -54,14 +54,14 @@ class TestMlClassifier:
     def test_classifier_lstm_hao2020(self):
         df = self.get_dataframe()
         
-        model = classifier_lstm.ClassifierLSTM3(df, params={'epochs': 20})
+        model = classifier_lstm.ClassifierLSTM_Hao2020(df, params={'epochs': 20})
         model.create_model()
 
         model_analysis = model.get_analysis()
 
         assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
-        assert(model_analysis["recall"] == pytest.approx(0.955555, 0.00001))
-        assert(model_analysis["f1_score"] == pytest.approx(0.977272, 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.985185, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.992537, 0.00001))
 
     def test_classifier_bilstm(self):
         df = self.get_dataframe()
