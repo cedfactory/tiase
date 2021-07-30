@@ -12,6 +12,7 @@ mplfinance==0.12.7a10
 numpy==1.19.5
 plotly==4.14.3
 pandas==1.2.2
+rich==10.6.0
 stockstats==0.3.2
 urllib3==1.24.1
 Werkzeug==1.0.1
