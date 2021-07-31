@@ -14,6 +14,29 @@ class TestMlClassifier:
         df.dropna(inplace = True)
         return df
 
+    def test_classifier_alwayssameclass(self):
+        df = self.get_dataframe()
+
+        model = classifier_naive.ClassifierAlwaysSameClass(df)
+        model.create_model()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(0.496, 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.663101, 0.00001))
+
+    def test_classifier_alwaysasprevious(self):
+        df = self.get_dataframe()
+
+        model = classifier_naive.ClassifierAlwaysAsPrevious(df)
+        model.create_model()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(0.967741, 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.967741, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.967741, 0.00001))
 
     def test_classifier_lstm1(self):
         df = self.get_dataframe()
