@@ -8,12 +8,12 @@ class ClassifierXGBoost(classifier.Classifier):
         self.df = dataframe
 
     def build_model(self):
-        self.model = XGBClassifier()
+        self.model = XGBClassifier(use_label_encoder=False)
 
     def create_model(self):
         self.set_train_test_data()
         self.build_model()
-        self.model.fit(self.X_train,self.y_train)
+        self.model.fit(self.X_train,self.y_train, eval_metric="logloss")
 
     def get_analysis(self):
         self.y_test_pred = self.model.predict(self.X_test)
