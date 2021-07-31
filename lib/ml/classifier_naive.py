@@ -26,7 +26,7 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         self.y_test_prob = np.empty(len(self.y_test))
         self.y_test_prob.fill(1)
 
-        self.analysis = analysis.classification_analysis(None, self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis
 
 class ClassifierAlwaysAsPrevious(classifier.Classifier):
@@ -47,5 +47,5 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         self.y_test_prob = np.empty(len(self.y_test))
         self.y_test_prob.fill(1.)
 
-        self.analysis = analysis.classification_analysis(None, self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis

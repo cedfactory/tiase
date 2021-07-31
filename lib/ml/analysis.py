@@ -30,7 +30,7 @@ def get_rmse(y_true, y_pred):
 
 
 
-def classification_analysis(model, X_test, y_test, y_test_pred, y_test_prob):
+def classification_analysis(X_test, y_test, y_test_pred, y_test_prob):
     result = {}
 
     result["X_test"] = X_test
