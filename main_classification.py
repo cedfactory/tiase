@@ -4,11 +4,13 @@ from lib.fimport import *
 from lib.findicators import *
 from lib.ml import *
 
+from rich import print,inspect
+
 filename = "./lib/data/test/google_stocks_data.csv"
 df = fimport.GetDataFrameFromCsv(filename)
 
 y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
-#df = synthetic.create_dataframe(y, 0.8)
+df = synthetic.create_dataframe(y, 0.)
 visu.DisplayFromDataframe(df,"Close", "close.png")
 
 #
@@ -23,14 +25,18 @@ gClassifiers = [
     { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), params={'epochs': 20})},
     { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 20})},
     { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), params={'epochs': 20})},
+    { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), params={'epochs': 20})},
     { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), params={'epochs': 20})},
     { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())},
-    { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())}
+    { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())},
+    { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy())},
+    { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), params={'class_to_return': 1})}
 ]
 
 TestVSPred = []
 for gClassifier in gClassifiers:
     name = gClassifier["name"]
+    print(name)
     model = gClassifier["classifier"]
     model.create_model()
 

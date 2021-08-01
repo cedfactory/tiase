@@ -19,5 +19,5 @@ class ClassifierSVC(classifier.Classifier):
         self.y_test_pred = self.model.predict(self.X_test)
         self.y_test_prob = self.model.predict_proba(self.X_test)
         self.y_test_prob = self.y_test_prob[:, 1]
-        self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis

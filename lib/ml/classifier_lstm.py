@@ -1,12 +1,17 @@
 from ..findicators import *
 from ..ml import toolbox,analysis,classifier
 
+from rich import print,inspect
+
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
+# Functional API : https://keras.io/guides/functional_api/
+from tensorflow import keras
+from tensorflow.keras import layers
 
 #
 # Simple LSTM for Sequence Classification
@@ -43,7 +48,7 @@ class ClassifierLSTM(classifier.Classifier):
     def get_analysis(self):
         self.y_test_prob = self.model.predict(self.X_test)
         self.y_test_pred = (self.y_test_prob > 0.5).astype("int32")
-        self.analysis = analysis.classification_analysis(self.model, self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         self.analysis["history"] = getattr(self.model, "history", None)
         return self.analysis
 
@@ -79,9 +84,8 @@ class ClassifierLSTM2(ClassifierLSTM):
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+
 # Functional API : https://keras.io/guides/functional_api/
-from tensorflow import keras
-from tensorflow.keras import layers
 class ClassifierLSTM3(ClassifierLSTM):
     def __init__(self, dataframe, params = None):
         super().__init__(dataframe, params)
@@ -98,6 +102,44 @@ class ClassifierLSTM3(ClassifierLSTM):
         outputs = layers.Dense(1)(x)
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
+
+#
+# "Predicting the Trend of Stock Market Index Using the Hybrid Neural Network Based on Multiple Time Scale Feature Learning", Yaping Hao - Qiang Gao, 2020
+# https://www.mdpi.com/2076-3417/10/11/3961
+# https://www.researchgate.net/publication/342045600_Predicting_the_Trend_of_Stock_Market_Index_Using_the_Hybrid_Neural_Network_Based_on_Multiple_Time_Scale_Feature_Learning
+#
+class ClassifierLSTM_Hao2020(ClassifierLSTM):
+    def __init__(self, dataframe, params = None):
+        super().__init__(dataframe, params)
+    
+    def build_model(self):
+        print("[Build ClassifierLSTM_Hao2020]")
+
+        # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
+        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+
+        inputs = keras.Input(shape=(1, shapeDim2), name="Input")
+        convmax2 = layers.Conv1D(96, 3, activation="relu", padding='same')(inputs)
+        convmax2 = layers.MaxPooling1D(pool_size=1, padding='same')(convmax2)
+        
+        convmax3 = layers.Conv1D(96, 3, activation="relu", padding='same')(convmax2)
+        convmax3 = layers.MaxPooling1D(pool_size=1, padding='same')(convmax3)
+        F3 = layers.LSTM(64, activation="sigmoid")(convmax3)
+
+        F2 = layers.LSTM(64, activation="sigmoid")(convmax2)
+        
+        F1 = layers.LSTM(64, activation="sigmoid")(inputs)
+
+        concat = layers.concatenate([F1, F2, F3])
+ 
+        outputs = layers.Dense(32)(concat)
+        outputs = layers.Dense(16)(outputs)
+        outputs = layers.Dense(1, name="Output")(outputs)
+
+        self.model = keras.Model(inputs=inputs, outputs=outputs)
+        self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
+
+        self.model.save("lstm.hdf5")
 
 # Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
 class ClassifierBiLSTM(ClassifierLSTM):
