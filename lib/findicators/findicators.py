@@ -85,6 +85,7 @@ def add_technical_indicators(df, indicators):
         trend_parsed = parse('trend_{}d', indicator)
         sma_parsed = parse('sma_{}', indicator)
         ema_parsed = parse('ema_{}', indicator)
+        wma_parsed = parse('wma_{}', indicator)
 
         if trend_parsed != None and trend_parsed[0].isdigit():
             seq = int(trend_parsed[0])
@@ -99,6 +100,10 @@ def add_technical_indicators(df, indicators):
         elif ema_parsed != None and ema_parsed[0].isdigit():
             period = int(ema_parsed[0])
             df["ema_"+str(period)] = TA.EMA(stock, period = period).copy()
+
+        elif wma_parsed != None and wma_parsed[0].isdigit():
+            period = int(wma_parsed[0])
+            df["wma_"+str(period)] = TA.WMA(stock, period = period).copy()
 
         elif indicator == "on_balance_volume":
             # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
@@ -167,7 +172,17 @@ def add_technical_indicators(df, indicators):
            
         elif indicator == 'roc':
             df['roc'] = TA.ROC(stock).copy()
-           
+
+        elif indicator == 'mom':
+            df['mom'] = TA.MOM(stock).copy()
+
+        elif indicator == 'simple_rtn':
+            df['simple_rtn'] = df['close'].pct_change()
+
+        elif indicator == 'target':
+            df['target'] = df['close'].pct_change()
+            df['target'] = np.where(df['target'] > 0, 1, 0)
+            df['target'] = df['target'].shift(-1)
         else:
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     

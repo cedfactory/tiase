@@ -125,4 +125,15 @@ def get_train_test_data_from_dataframe2(df, seq_len, column_target, train_split)
     X_train, y_train = _get_train_test_data_from_dataframe2(train_normalised_features, train_target, seq_len)
     X_test, y_test = _get_train_test_data_from_dataframe2(test_normalised_features, test_target, seq_len)
 
+    df_X_train = pd.DataFrame(X_train)
+    df_y_train = pd.DataFrame(y_train)
+    df_X_test = pd.DataFrame(X_test)
+    df_y_test = pd.DataFrame(y_test)
+
+    df_X_train.to_csv("X_train.csv")
+    df_y_train.to_csv("y_train.csv")
+
+    df_X_test.to_csv("X_test.csv")
+    df_y_test.to_csv("y_test.csv")
+
     return X_train, y_train, X_test, y_test, features_normaliser
