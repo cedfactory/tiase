@@ -1,11 +1,11 @@
-import pandas as pd
 import numpy as np
-import fselection
-
+import pandas as pd
 from sklearn.preprocessing import KBinsDiscretizer
 
-def data_discretization(df, columns):
+import fselection
 
+
+def data_discretization(df, columns):
     for col in columns:
         if col == "rsi_30":
             d1 = pd.DataFrame(df[col])
@@ -162,8 +162,8 @@ def data_discretization(df, columns):
 
     return df
 
-def data_discretization_unsupervized(df, columns):
 
+def data_discretization_unsupervized(df, columns):
     columns = fselection.get_sma_ema_wma(df, columns)
 
     d1 = df[columns].copy()
@@ -172,7 +172,7 @@ def data_discretization_unsupervized(df, columns):
     kbins = KBinsDiscretizer(n_bins=4, encode='ordinal', strategy='uniform')
     data_trans = kbins.fit_transform(d1)
 
-    d1 = pd.DataFrame(data = data_trans, columns= columns, index = d1_index)
+    d1 = pd.DataFrame(data=data_trans, columns=columns, index=d1_index)
 
     for column in columns:
         df[column] = d1[column].copy()

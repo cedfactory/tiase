@@ -1,8 +1,8 @@
 import pandas as pd
-import numpy as np
 
 from imblearn.over_sampling import ADASYN
 from imblearn.over_sampling import SMOTE
+
 
 def smote_balance(df):
     # input DataFrame
@@ -19,14 +19,14 @@ def smote_balance(df):
     X = X.to_numpy()
     y = y.to_numpy()
 
-    if(BALANCE_METHODE == True):
+    if (BALANCE_METHODE == True):
         oversampling = SMOTE()
     else:
         oversampling = ADASYN()
 
     X, y = oversampling.fit_resample(X, y)
 
-    X_df = pd.DataFrame(X, columns = X_columns)
+    X_df = pd.DataFrame(X, columns=X_columns)
     y_df = pd.DataFrame(y, columns=[target])
 
     frame = [X_df, y_df]

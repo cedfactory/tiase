@@ -1,7 +1,6 @@
-import pandas as pd
-
-import fprep
 import fdiscretize
+import fprep
+
 
 def process_technical_indicators(df, preprocessing):
     """
@@ -39,10 +38,12 @@ def process_technical_indicators(df, preprocessing):
             columns = ['simple_rtn']
             df = fprep.data_x2_transformation(df, columns)
         elif preprocess == 'discretization':
-            columns = ['atr','mom','roc','er','adx','stc','stoch_%k','cci_30','wma','ema','sma','macd','stoch_%d','williams_%r', 'rsi_30']
+            columns = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'wma', 'ema', 'sma', 'macd',
+                       'stoch_%d', 'williams_%r', 'rsi_30']
             df = fdiscretize.data_discretization(df, columns)
         elif preprocess == 'discretization_unsupervised':
-            columns = ['atr','mom','roc','er','adx','stc','stoch_%k','wma','ema','sma','cci_30','macd','stoch_%d','williams_%r', 'rsi_30']
+            columns = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'wma', 'ema', 'sma', 'cci_30', 'macd',
+                       'stoch_%d', 'williams_%r', 'rsi_30']
             df = fdiscretize.data_discretization_unsupervized(df, columns)
         elif preprocess == 'scaling':
             df = fprep.data_scaling(df)

@@ -1,17 +1,16 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
 import numpy as np
-
+import pandas as pd
+import seaborn as sns
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import MinMaxScaler
-from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
 from sklearn.feature_selection import RFECV
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+
 
 def get_sma_ema_wma(df, columns):
-
     if "sma" in columns:
         columns = [x for x in columns if x is not "sma"]
         col_sma_lst = [item for item in df.columns if item.startswith("sma")]
@@ -29,8 +28,8 @@ def get_sma_ema_wma(df, columns):
 
     return columns
 
-def correlation_reduction(df, columns):
 
+def correlation_reduction(df, columns):
     columns = get_sma_ema_wma(df, columns)
 
     df_for_feature_eng = df[columns]
@@ -53,7 +52,7 @@ def correlation_reduction(df, columns):
     # Drop features
     data = data.drop(data[to_drop], axis=1)
 
-    #columns.extend(["target"])
+    # columns.extend(["target"])
 
     df_for_feature_eng = df[data.columns]
     plt.figure(figsize=(16, 16))
@@ -64,8 +63,8 @@ def correlation_reduction(df, columns):
     df = df[data.columns]
     return df
 
-def pca_reduction(df, columns):
 
+def pca_reduction(df, columns):
     columns = get_sma_ema_wma(df, columns)
 
     print("Feature PCA selection...")
@@ -92,12 +91,13 @@ def pca_reduction(df, columns):
 
     return df_result
 
-def rfecv_reduction(df, columns):
-    #model_type = 'XGB'
-    model_type = 'SVC'
-    scoring = 'accuracy' # 'precision' , 'f1' , 'recall', 'accuracy'
 
-    #MIN_FEATURE = int(len(columns) * 2 / 3)
+def rfecv_reduction(df, columns):
+    # model_type = 'XGB'
+    model_type = 'SVC'
+    scoring = 'accuracy'  # 'precision' , 'f1' , 'recall', 'accuracy'
+
+    # MIN_FEATURE = int(len(columns) * 2 / 3)
     MIN_FEATURE = 3
 
     print("RFECV Feature selection...")
@@ -118,8 +118,8 @@ def rfecv_reduction(df, columns):
     if (model_type == 'SVC'):
         rfc = SVC(kernel="linear")
 
-    #rfecv = RFECV(estimator=rfc, step=1, cv=StratifiedKFold(10), scoring=scoring)
-    rfecv = RFECV(estimator=rfc, scoring=scoring, min_features_to_select = MIN_FEATURE)
+    # rfecv = RFECV(estimator=rfc, step=1, cv=StratifiedKFold(10), scoring=scoring)
+    rfecv = RFECV(estimator=rfc, scoring=scoring, min_features_to_select=MIN_FEATURE)
     rfecv.fit(X, target)
 
     print('Optimal number of features: {}'.format(rfecv.n_features_))
@@ -148,5 +148,3 @@ def rfecv_reduction(df, columns):
     df_result = pd.concat(frames, axis=1).reindex(df.index)
 
     return df_result
-
-
