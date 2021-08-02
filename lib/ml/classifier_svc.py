@@ -1,5 +1,5 @@
 from sklearn.svm import SVC
-from ..ml import classifier,toolbox,analysis
+from . import classifier,toolbox,analysis
 from ..findicators import *
 
 class ClassifierSVC(classifier.Classifier):

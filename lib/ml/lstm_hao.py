@@ -1,5 +1,5 @@
 from ..findicators import *
-from ..ml import toolbox,analysis
+from . import toolbox,analysis
 
 import tensorflow as tf
 from keras.models import Model

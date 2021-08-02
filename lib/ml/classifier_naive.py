@@ -1,4 +1,4 @@
-from ..ml import toolbox,analysis,classifier
+from . import toolbox,analysis,classifier
 import numpy as np
 
 from rich import print,inspect

@@ -1,5 +1,5 @@
 from ..findicators import *
-from ..ml import analysis,toolbox
+from . import analysis,toolbox
 
 from abc import ABCMeta, abstractmethod
 

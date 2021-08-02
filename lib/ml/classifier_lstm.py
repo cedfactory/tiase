@@ -1,5 +1,5 @@
 from ..findicators import *
-from ..ml import toolbox,analysis,classifier
+from . import toolbox,analysis,classifier
 
 from rich import print,inspect
 

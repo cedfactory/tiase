@@ -1,5 +1,5 @@
 from xgboost import XGBClassifier
-from ..ml import classifier,toolbox,analysis
+from . import classifier,toolbox,analysis
 from ..findicators import *
 
 class ClassifierXGBoost(classifier.Classifier):
