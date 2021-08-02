@@ -60,7 +60,8 @@ def add_temporal_indicators(df, field_name, time=False):
     return df
 
 def get_all_default_technical_indicators():
-    technical_indicators = ["trend_1d","macd","macds","macdh","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc"]
+    technical_indicators = ["trend_1d","macd","macds","macdh","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc","mom","simple_rtn"]
+    technical_indicators.extend(["wma_5","wma_10","wma_15"])
     technical_indicators.extend(["sma_5","sma_10","sma_15","sma_20"])
     technical_indicators.extend(["ema_10","ema_20","ema_50"])
     return technical_indicators

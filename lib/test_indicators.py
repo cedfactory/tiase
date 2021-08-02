@@ -9,8 +9,9 @@ import datetime
 class TestIndicators:
     def test_get_all_default_technical_indicators(self):
         ti = findicators.get_all_default_technical_indicators()
-        assert(len(ti) == 23)
-        expected_ti = ["trend_1d","macd","macds","macdh","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc"]
+        assert(len(ti) == 28)
+        expected_ti = ["trend_1d","macd","macds","macdh","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc","mom","simple_rtn"]
+        expected_ti.extend(["wma_5","wma_10","wma_15"])
         expected_ti.extend(["sma_5","sma_10","sma_15","sma_20"])
         expected_ti.extend(["ema_10","ema_20","ema_50"])
         assert(ti == expected_ti)
@@ -29,9 +30,9 @@ class TestIndicators:
         assert(len(list(df.columns)) == 6)
 
         # second set of technical indicators
-        technical_indicators = ["trend_1d", "sma_12", "ema_9", "bbands", "stc", "atr", "adx", "roc"]
+        technical_indicators = ["trend_1d", "sma_12", "ema_9", "bbands", "stc", "atr", "adx", "roc", "wma_5", "mom", "simple_rtn"]
         df = findicators.add_technical_indicators(df, technical_indicators)
-        assert(len(list(df.columns)) == 16)
+        assert(len(list(df.columns)) == 19)
 
         technical_indicators.remove("bbands")
         technical_indicators.extend(["bb_upper", "bb_middle", "bb_lower"])
