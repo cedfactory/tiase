@@ -9,6 +9,10 @@ from stockstats import StockDataFrame as Sdf
 # https://github.com/peerchemist/finta
 from finta import TA
 
+def normalize_column_headings(df):
+    # Change all column headings to be lower case, and remove spacing
+    df.columns = [str(x).lower().replace(' ', '_') for x in df.columns]
+    return df
 
 def remove_features(df, features):
     for feature in features:
@@ -74,8 +78,7 @@ def add_technical_indicators(df, indicators):
     :return: (df) pandas dataframe
     """
 
-    # Change all column headings to be lower case, and remove spacing
-    df.columns = [str(x).lower().replace(' ', '_') for x in df.columns]
+    df = normalize_column_headings(df)
 
     # call stockstats
     stock = Sdf.retype(df.copy())
