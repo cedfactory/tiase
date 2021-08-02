@@ -51,5 +51,39 @@ class TestDataProcess:
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_discretization_unsupervised_reference.csv")
+
         assert(df.equals(expected_df))
 
+    def test_transformation_log(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+        technical_indicators = ['simple_rtn']
+        df = findicators.add_technical_indicators(df, technical_indicators)
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+
+        df = fdataprep.process_technical_indicators(df, ['transformation_log'])
+
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
+
+        expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_transformation_log_reference.csv")
+        
+        array = df['simple_rtn'].to_numpy()
+        array_expected = expected_df['simple_rtn'].to_numpy()
+        assert(np.allclose(array, array_expected))
+
+    def test_transformation_x2(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+        technical_indicators = ['simple_rtn']
+        df = findicators.add_technical_indicators(df, technical_indicators)
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+
+        df = fdataprep.process_technical_indicators(df, ['transformation_x2'])
+
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
+
+        expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_transformation_x2_reference.csv")
+        
+        array = df['simple_rtn'].to_numpy()
+        array_expected = expected_df['simple_rtn'].to_numpy()
+        assert(np.allclose(array, array_expected))

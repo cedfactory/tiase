@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
-
+from ..fimport import visu
 
 def missing_values(df):
     # Drop the NaNs
@@ -157,7 +157,7 @@ def data_log_transformation(df, columns):
     # Do the logarithm trasnformations for required features
 
     for col in columns:
-        plot_histogram(df, col, 'histogram_log_1_' + str(col) + '.png')
+        visu.DisplayHistogramFromDataframe(df, col, './tmp/histogram_log_1_' + str(col) + '.png')
 
     logarithm_transformer = FunctionTransformer(np.log1p, validate=True)
 
@@ -169,14 +169,14 @@ def data_log_transformation(df, columns):
         i = i + 1
 
     for col in columns:
-        plot_histogram(df, col, 'histogram_log_2_' + str(col) + '.png')
+        visu.DisplayHistogramFromDataframe(df, col, './tmp/histogram_log_2_' + str(col) + '.png')
 
     return df
 
 
 def data_x2_transformation(df, columns):
     for col in columns:
-        plot_histogram(df, col, 'histogram_xx_1_' + str(col) + '.png')
+        visu.DisplayHistogramFromDataframe(df, col, './tmp/histogram_xx_1_' + str(col) + '.png')
 
     # Do the x2 trasnformations for required features
     exp_transformer = FunctionTransformer(lambda x: x ** 2, validate=True)
@@ -190,7 +190,7 @@ def data_x2_transformation(df, columns):
         i = i + 1
 
     for col in columns:
-        plot_histogram(df, col, 'histogram_xx_2_' + str(col) + '.png')
+        visu.DisplayHistogramFromDataframe(df, col, './tmp/histogram_xx_2_' + str(col) + '.png')
 
     return df
 
