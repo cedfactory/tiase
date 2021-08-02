@@ -96,6 +96,12 @@ def pca_reduction(df, columns):
 
     return df_result
 
+def drop_missing_columns(df_columns, columns):
+    for feature in columns:
+        if feature not in columns:
+            columns.remove(feature)
+    return df_columns
+
 
 def rfecv_reduction(df, columns):
     # model_type = 'XGB'
@@ -110,8 +116,9 @@ def rfecv_reduction(df, columns):
     print("scoring: ", scoring)
 
     columns = get_sma_ema_wma(df, columns)
+    columns = drop_missing_columns(df.columns.tolist(), columns)
 
-    df_index = df.index.tolist()
+    # df_index = df.index.tolist()
     X = df[columns].copy()
     target = df['target']
     df = df.drop(columns, axis=1)
