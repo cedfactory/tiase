@@ -2,9 +2,26 @@ from lib.fimport import *
 from lib.findicators import *
 from lib.featureengineering import fprocessfeature
 from lib.fdatapreprocessing import fdataprep
+import numpy as np
 
 import pandas as pd
 import os
+
+from rich import print,inspect
+
+def check(action):
+    print("check \"{}\"".format(action))
+    y = synthetic.get_sinusoid(length=5, amplitude=1, frequency=.1, phi=0, height = 0)
+    df = synthetic.create_dataframe(y, 0.)
+    visu.DisplayFromDataframe(df,"Close", "close.png")
+
+    if action == "missing_values":
+        df["Open"][1] = np.nan
+        print(df.head())
+        df = fdataprep.process_technical_indicators(df, ['missing_values'])
+        print(df.head())
+        
+
 
 #
 # parse directory cac40
@@ -50,6 +67,8 @@ def cac40():
             df = fdataprep.process_technical_indicators(df, ['outliers_mam'])
             df = fdataprep.process_technical_indicators(df, ['outliers_winsorize'])
 
+            break
+
 _usage_str = """
 Options:
     [--cac40]
@@ -61,6 +80,7 @@ def _usage():
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--cac40": cac40()
+        if sys.argv[1] == "--check" and len(sys.argv) > 2: check(sys.argv[2])
+        elif sys.argv[1] == "--cac40": cac40()
         else: _usage()
     else: _usage()

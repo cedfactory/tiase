@@ -10,7 +10,7 @@ def process_technical_indicators(df, preprocessing):
     # process data indicators
     for preprocess in preprocessing:
         if preprocess == 'missing_values':
-            df = fprep.missing_valures(df)
+            df = fprep.missing_values(df)
         elif preprocess == 'duplicates':
             df = fprep.drop_duplicates(df)
         elif preprocess == 'outliers_stdcutoff':

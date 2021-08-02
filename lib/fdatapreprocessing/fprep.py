@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
 
 
-def missing_valures(df):
+def missing_values(df):
     # Drop the NaNs
     df.dropna(axis=0, how='any', inplace=True)
     # df = df.reset_index(drop=True)
