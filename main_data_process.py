@@ -9,30 +9,37 @@ import os
 
 from rich import print,inspect
 
+def get_real_dataframe():
+    filename = "./lib/data/test/google_stocks_data.csv"
+    df = fimport.GetDataFrameFromCsv(filename)
+    df = findicators.normalize_column_headings(df)
+    return df
+
+def get_synthetic_dataframe():
+    y = synthetic.get_sinusoid(length=5, amplitude=1, frequency=.1, phi=0, height = 0)
+    df = synthetic.create_dataframe(y, 0.)
+    df = findicators.normalize_column_headings(df)
+    return df
+
+
 def check(action):
     print("check \"{}\"".format(action))
 
-    filename = "./lib/data/test/google_stocks_data.csv"
-    df = fimport.GetDataFrameFromCsv(filename)
-
-    y = synthetic.get_sinusoid(length=5, amplitude=1, frequency=.1, phi=0, height = 0)
-    #df = synthetic.create_dataframe(y, 0.)
-
-    df = findicators.normalize_column_headings(df)
-    visu.DisplayFromDataframe(df, "close", "close.png")
-
     if action == "missing_values":
+        df = get_synthetic_dataframe()
         df["open"][1] = np.nan
         print(df.head())
         df = fdataprep.process_technical_indicators(df, ['missing_values'])
         print(df.head())
         
     elif action == "outliers_stdcutoff":
+        df = get_synthetic_dataframe()
         print(df.head())
         df = fdataprep.process_technical_indicators(df, ['outliers_stdcutoff'])
         print(df.head())
         
     elif action == "discretization":
+        df = get_real_dataframe()
         df = df.head(200)
         technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
         # todo : integrate ['wma', 'ema', 'sma']
@@ -41,7 +48,21 @@ def check(action):
         df = fdataprep.process_technical_indicators(df, ['discretization'])
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
-        df.to_csv("./lib/data/test/datapreprocess_discretization_reference.csv")
+        #df.to_csv("./lib/data/test/datapreprocess_discretization_reference.csv")
+
+    elif action == "discretization_unsupervised":
+        df = get_real_dataframe()
+        df = df.head(200)
+        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
+        # todo : integrate ['wma', 'ema', 'sma']
+        df = findicators.add_technical_indicators(df, technical_indicators)
+        print(df.head())
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+
+        df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
+        print(df.head())
+        #df.to_csv("./lib/data/test/datapreprocess_discretization_unsupervised_reference.csv")
 
 
 #
