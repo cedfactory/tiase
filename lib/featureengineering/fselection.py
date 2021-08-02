@@ -32,6 +32,7 @@ def get_sma_ema_wma(df, columns):
 def correlation_reduction(df, columns):
     columns = get_sma_ema_wma(df, columns)
 
+    df_copy_target = df['target'].copy()
     df_for_feature_eng = df[columns]
     plt.figure(figsize=(16, 16))
     heatmap = sns.heatmap(df_for_feature_eng.corr(), vmin=-1, vmax=1, annot=True)
@@ -61,7 +62,11 @@ def correlation_reduction(df, columns):
     plt.clf()
 
     df = df[data.columns]
-    return df
+
+    frames = [df, df_copy_target]
+    df_result = pd.concat(frames, axis=1).reindex(df.index)
+
+    return df_result
 
 
 def pca_reduction(df, columns):
