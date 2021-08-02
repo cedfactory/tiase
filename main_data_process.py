@@ -11,16 +11,37 @@ from rich import print,inspect
 
 def check(action):
     print("check \"{}\"".format(action))
+
+    filename = "./lib/data/test/google_stocks_data.csv"
+    df = fimport.GetDataFrameFromCsv(filename)
+
     y = synthetic.get_sinusoid(length=5, amplitude=1, frequency=.1, phi=0, height = 0)
-    df = synthetic.create_dataframe(y, 0.)
-    visu.DisplayFromDataframe(df,"Close", "close.png")
+    #df = synthetic.create_dataframe(y, 0.)
+
+    df = findicators.normalize_column_headings(df)
+    visu.DisplayFromDataframe(df, "close", "close.png")
 
     if action == "missing_values":
-        df["Open"][1] = np.nan
+        df["open"][1] = np.nan
         print(df.head())
         df = fdataprep.process_technical_indicators(df, ['missing_values'])
         print(df.head())
         
+    elif action == "outliers_stdcutoff":
+        print(df.head())
+        df = fdataprep.process_technical_indicators(df, ['outliers_stdcutoff'])
+        print(df.head())
+        
+    elif action == "discretization":
+        df = df.head(200)
+        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
+        # todo : integrate ['wma', 'ema', 'sma']
+        df = findicators.add_technical_indicators(df, technical_indicators)
+        print(df.head())
+        df = fdataprep.process_technical_indicators(df, ['discretization'])
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
+        print(df.head())
+        df.to_csv("./lib/data/test/datapreprocess_discretization_reference.csv")
 
 
 #
@@ -71,7 +92,7 @@ def cac40():
 
 _usage_str = """
 Options:
-    [--cac40]
+    [--check --cac40]
 """
 
 def _usage():
