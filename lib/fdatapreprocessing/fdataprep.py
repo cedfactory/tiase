@@ -1,6 +1,4 @@
-import fdiscretize
-import fprep
-
+from . import fprep,fdiscretize
 
 def process_technical_indicators(df, preprocessing):
     """

@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import KBinsDiscretizer
-
-import fselection
-
+from ..featureengineering import fselection
 
 def data_discretization(df, columns):
     for col in columns:

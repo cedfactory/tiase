@@ -1,6 +1,5 @@
-import fbalance
-import fselection
 
+from . import fselection,fbalance
 
 def process_features(df, featureengineering):
     # process data indicators
