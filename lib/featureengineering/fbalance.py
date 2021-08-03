@@ -4,12 +4,11 @@ from imblearn.over_sampling import ADASYN
 from imblearn.over_sampling import SMOTE
 
 
-def smote_balance(df):
+def smote_balance(df, target):
     # input DataFrame
     # X → Independent Variable in DataFrame\
     # y → Dependent Variable in Pandas DataFrame format
     BALANCE_METHODE = True
-    target = 'target'
     data = df.copy()
 
     X = data.drop(target, axis=1)
