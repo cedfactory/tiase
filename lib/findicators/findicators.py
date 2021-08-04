@@ -3,6 +3,8 @@ import numpy as np
 
 import pandas as pd
 
+import vsa
+
 # https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
 from stockstats import StockDataFrame as Sdf
 
@@ -182,6 +184,11 @@ def add_technical_indicators(df, indicators):
 
         elif indicator == 'simple_rtn':
             df['simple_rtn'] = df['close'].pct_change()
+
+        elif indicator == 'vsa':
+            days = [1, 2, 3, 5, 20, 40, 60]
+            df = vsa.create_bunch_of_vsa_features(df, days)
+            df['outcomes_vsa'] = df.close.pct_change(-1)
 
         elif indicator == 'target':
             df['target'] = df['close'].pct_change()

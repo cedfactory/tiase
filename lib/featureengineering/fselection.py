@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -160,3 +161,87 @@ def rfecv_reduction(df, columns):
     df_result = pd.concat(frames, axis=1).reindex(df.index)
 
     return df_result
+
+def get_outliers(df, n_sigmas):
+    # i is number of sigma, which define the boundary along mean
+
+    df['outliers'] = 0
+
+    for col in df.columns:
+        mu = df[col].mean()
+        sigma = df[col].std()
+
+        # condition = (df[col] > mu + sigma * i) | (df[col] < mu - sigma * i)
+        # outliers[f'{col}_outliers'] = df[col][condition]
+
+        cond = (df[col] > mu + sigma * n_sigmas) | (df[col] < mu - sigma * n_sigmas)
+        df['outliers'] = np.where(cond, 1, df['outliers'])
+
+    return df
+
+
+def vsa_corr_selection(df):
+    if (os.path.isdir("vsa_traces") == False):
+        print("new vsa traces directory")
+        os.mkdir('./vsa_traces')
+
+    vsa_columns = [feature for feature in df.columns if feature.startswith("vsa_")]
+    # check the correlation
+    df_vsa = df[vsa_columns]
+    corr_vsa = df_vsa.corrwith(df.outcomes_vsa)
+
+    plt.figure(figsize=(15, 5))
+    corr_vsa.sort_values(ascending=False).plot.barh(title='Strength of Correlation')
+    plt.savefig('./vsa_traces/' + 'vsa_corr.png')
+    plt.clf()
+
+    plt.figure(figsize=(15, 5))
+
+    corr_matrix_vsa = df_vsa.corr()
+    corr_matrix_vsa = corr_matrix_vsa.sort_values(ascending=False, by=df_vsa.columns[0])
+    sns.clustermap(corr_matrix_vsa, cmap='coolwarm', linewidth=1, method='ward')
+    plt.savefig('./vsa_traces/' + 'vsa_cluster_map.png')
+    plt.clf()
+
+    deselected_features_v1 = ['vsa_close_loc_3D', 'vsa_close_loc_60D',
+                              'vsa_volume_3D', 'vsa_volume_60D',
+                              'vsa_price_spread_3D', 'vsa_price_spread_60D',
+                              'vsa_close_change_3D', 'vsa_close_change_60D']
+
+    selected_features_1D_list = ['vsa_volume_2D', 'vsa_price_spread_2D', 'vsa_close_loc_2D', 'vsa_close_change_2D']
+    #selected_features_1D_list = ['vsa_volume_1D', 'vsa_price_spread_1D', 'vsa_close_loc_1D', 'vsa_close_change_1D']
+
+    selected_features_1D = df_vsa[selected_features_1D_list]
+
+    selected_features_1D.replace([np.inf, -np.inf], np.nan)
+    selected_features_1D.dropna(axis=0, how='any', inplace=True)
+    sns.pairplot(selected_features_1D)
+    plt.savefig('./vsa_traces/' + 'vsa_pairplot_1D_map_with_outliers.png')
+    plt.clf()
+
+    df = get_outliers(df, 2.5)
+
+    df.drop(df[df['outliers'] == 1].index, inplace=True)
+
+    sns.pairplot(df, vars=selected_features_1D_list);
+    plt.savefig('./vsa_traces/' + 'vsa_pairplot_1D_map_with_no_outliers.png')
+    plt.clf()
+
+    df['sign_of_trend'] = df['outcomes_vsa'].apply(np.sign)
+    #df['sign_of_trend'] = np.where(df['sign_of_trend'] == 0, 1, df['sign_of_trend'])
+
+    df['sign_of_trend'] = df['sign_of_trend'] * 10
+
+    sns.pairplot(df,
+                 vars=selected_features_1D_list,
+                 diag_kind='kde',
+                 #palette='husl',
+                 palette='bright',
+                 hue='sign_of_trend',
+                 #markers=['*', '<', '+'],
+                 #markers=['v', '.', 'x'],
+                 markers=["o", "s", "D"],
+                 plot_kws={'alpha': 0.3})  # transparence:0.3
+
+    plt.savefig('./vsa_traces/' + 'vsa_pairplot_2D_final.png')
+    plt.clf()

@@ -21,5 +21,6 @@ def process_features(df, featureengineering):
             df = fselection.rfecv_reduction(df, columns)
         elif process == 'smote':
             df = fbalance.smote_balance(df)
-
+        elif process == 'vsa_reduction':
+            df = fselection.vsa_corr_selection(df)
     return df

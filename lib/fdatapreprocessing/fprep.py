@@ -3,7 +3,15 @@ import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
 from ..fimport import visu
 
-def missing_values(df):
+def missing_valures(df):
+    df['inf'] = 0
+    for col in df.columns:
+        df['inf'] = np.where( (df[col] == np.inf) | (df[col] == -np.inf) , 1 , df['inf'] )
+
+    df = df.drop(df[df.inf == 1].index)
+    df = df.drop(['inf'], axis=1)
+
+    df.replace([np.inf, -np.inf], np.nan)
     # Drop the NaNs
     df.dropna(axis=0, how='any', inplace=True)
     # df = df.reset_index(drop=True)
@@ -44,6 +52,24 @@ def normalize_outliers_std_cutoff(df, n_sigmas):
 
     return df
 
+def cut_outliers_std_cutoff(df, n_sigmas):
+    d1 = pd.DataFrame(df['close'])
+    d1['simple_rtn'] = d1.close.pct_change()
+    d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
+
+    mu = d1_mean.loc['mean']
+    sigma = d1_mean.loc['std']
+
+    cond = (d1['simple_rtn'] > mu + sigma * n_sigmas) | (d1['simple_rtn'] < mu - sigma * n_sigmas)
+    d1['outliers'] = np.where(cond, 1, 0)
+
+    nb_outliers = d1.outliers.value_counts()
+    print(nb_outliers)
+
+    #drop all outliers raws
+    df.drop(df[d1['outliers'] == 1].index, inplace=True)
+
+    return df
 
 def normalize_outliers_winsorize(df, outlier_cutoff):
     d1 = pd.DataFrame(df['close'])
