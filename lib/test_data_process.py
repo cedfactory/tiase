@@ -22,10 +22,12 @@ class TestDataProcess:
     def test_missing_values(self):
         df = self.get_synthetic_dataframe()
         df["open"][1] = np.nan
+        df["close"][2] = np.inf
+        df["high"][3] = -np.inf
 
         assert(df.shape[0] == 5)
         df = fdataprep.process_technical_indicators(df, ['missing_values'])
-        assert(df.shape[0] == 4)
+        assert(df.shape[0] == 2)
 
     def test_discretization(self):
         df = self.get_real_dataframe()

@@ -19,7 +19,7 @@ class TestFeatureEngineering:
         df = findicators.normalize_column_headings(df)
         return df
 
-    def test_missing_values(self):
+    def test_smote_balance(self):
         df = self.get_real_dataframe()
         df = df.head(200)
         df = findicators.add_technical_indicators(df, ['trend_1d'])
