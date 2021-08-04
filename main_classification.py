@@ -10,7 +10,7 @@ filename = "./lib/data/test/google_stocks_data.csv"
 df = fimport.GetDataFrameFromCsv(filename)
 
 y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
-df = synthetic.create_dataframe(y, 0.)
+df = synthetic.create_dataframe(y, 0.8)
 visu.DisplayFromDataframe(df,"Close", "close.png")
 
 #
@@ -25,7 +25,7 @@ gClassifiers = [
     { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), params={'epochs': 20})},
     { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 20})},
     { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), params={'epochs': 20})},
-    { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), params={'epochs': 20})},
+    { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), params={'epochs': 40})},
     { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), params={'epochs': 20})},
     { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())},
     { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())},

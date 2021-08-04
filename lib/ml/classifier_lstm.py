@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
+from keras import backend as K
 # Functional API : https://keras.io/guides/functional_api/
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -114,32 +115,33 @@ class ClassifierLSTM_Hao2020(ClassifierLSTM):
     
     def build_model(self):
         print("[Build ClassifierLSTM_Hao2020]")
-
+        
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
         shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
 
         inputs = keras.Input(shape=(1, shapeDim2), name="Input")
-        convmax2 = layers.Conv1D(96, 3, activation="relu", padding='same')(inputs)
-        convmax2 = layers.MaxPooling1D(pool_size=1, padding='same')(convmax2)
+        convmax2 = layers.Conv1D(10, 3, activation="relu", padding='same')(inputs)
+        convmax2 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax2)
         
-        convmax3 = layers.Conv1D(96, 3, activation="relu", padding='same')(convmax2)
-        convmax3 = layers.MaxPooling1D(pool_size=1, padding='same')(convmax3)
-        F3 = layers.LSTM(64, activation="sigmoid")(convmax3)
+        convmax3 = layers.Conv1D(20, 3, activation="relu", padding='same')(convmax2)
+        convmax3 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax3)
+        F3 = layers.LSTM(10, activation="sigmoid")(convmax3)
 
-        F2 = layers.LSTM(64, activation="sigmoid")(convmax2)
+        F2 = layers.LSTM(10, activation="sigmoid")(convmax2)
         
-        F1 = layers.LSTM(64, activation="sigmoid")(inputs)
+        F1 = layers.LSTM(10, activation="sigmoid")(inputs)
 
         concat = layers.concatenate([F1, F2, F3])
  
-        outputs = layers.Dense(32)(concat)
-        outputs = layers.Dense(16)(outputs)
+        outputs = layers.Dense(10)(concat)
         outputs = layers.Dense(1, name="Output")(outputs)
 
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
+        K.set_value(self.model.optimizer.learning_rate, 0.001)
 
         self.model.save("lstm.hdf5")
+
 
 # Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
 class ClassifierBiLSTM(ClassifierLSTM):
