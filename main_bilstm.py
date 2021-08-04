@@ -371,7 +371,6 @@ class BiLSTM:
         self.test_mse = test_eval[0]
         self.test_mae = test_eval[1]
         self.test_mape = test_eval[2]
-        return
 
         '''Display results'''
 
