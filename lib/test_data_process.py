@@ -56,6 +56,34 @@ class TestDataProcess:
 
         assert(df.equals(expected_df))
 
+    def test_outliers_mam(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+
+        df = fdataprep.process_technical_indicators(df, ['outliers_mam'])
+
+        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
+
+        expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_outliers_mam_reference.csv")
+        
+        array = df['close'].to_numpy()
+        array_expected = expected_df['close'].to_numpy()
+        assert(np.allclose(array, array_expected))
+
+    def test_outliers_ema(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+
+        df = fdataprep.process_technical_indicators(df, ['outliers_ema'])
+
+        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
+
+        expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_outliers_ema_reference.csv")
+        
+        array = df['close'].to_numpy()
+        array_expected = expected_df['close'].to_numpy()
+        assert(np.allclose(array, array_expected))
+
     def test_transformation_log(self):
         df = self.get_real_dataframe()
         df = df.head(200)

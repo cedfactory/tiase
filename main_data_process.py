@@ -77,6 +77,28 @@ def check(action):
         print(df.head())
         df.to_csv("./lib/data/test/datapreprocess_transformation_log_reference.csv")
 
+    elif action == "outliers_mam":
+        df = get_real_dataframe()
+        df = df.head(200)
+        print(df.head())
+        
+        df = fdataprep.process_technical_indicators(df, ['outliers_mam'])
+
+        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
+        print(df.head())
+        df.to_csv("./lib/data/test/datapreprocess_outliers_mam_reference.csv")
+
+    elif action == "outliers_ema":
+        df = get_real_dataframe()
+        df = df.head(200)
+        print(df.head())
+        
+        df = fdataprep.process_technical_indicators(df, ['outliers_ema'])
+
+        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
+        print(df.head())
+        df.to_csv("./lib/data/test/datapreprocess_outliers_ema_reference.csv")
+
     elif action == "transformation_x2":
         df = get_real_dataframe()
         df = df.head(200)
@@ -90,6 +112,8 @@ def check(action):
         print(df.head())
         df.to_csv("./lib/data/test/datapreprocess_transformation_x2_reference.csv")
 
+    else:
+        print("action {} is unknown".format(action))
 
 #
 # parse directory cac40
@@ -139,8 +163,8 @@ def cac40():
 
 _usage_str = """
 Options:
-    [--check [process] --cac40]
-process \in [missing_values,outliers_stdcutoff,discretization,discretization_unsupervised,transformation_log,transformation_x2]
+    [--check [ process ] --cac40]
+process in [ missing_values,outliers_stdcutoff,discretization,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema]
 """
 
 def _usage():
