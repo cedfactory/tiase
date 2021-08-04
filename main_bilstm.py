@@ -292,16 +292,16 @@ class BiLSTM:
         in_seq = Input(shape=(self.seq_len, 5))
 
         c7 = int(self.seq_len/4)
-        x = self.Inception_A(in_seq, 32)
-        x = self.Inception_A(x, 32)
-        x = self.Inception_B(x, 32)
-        x = self.Inception_B(x, 32)
-        x = self.Inception_C(x, 32)
-        x = self.Inception_C(x, 32)    
+        x = self.inception_a(in_seq, c7)
+        x = self.inception_a(x, c7)
+        x = self.inception_b(x, c7)
+        x = self.inception_b(x, c7)
+        x = self.inception_c(x, c7)
+        x = self.inception_c(x, c7)    
             
-        x = Bidirectional(LSTM(128, return_sequences=True))(x)
-        x = Bidirectional(LSTM(128, return_sequences=True))(x)
-        x = Bidirectional(LSTM(64, return_sequences=True))(x) 
+        x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+        x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+        x = Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x) 
             
         avg_pool = GlobalAveragePooling1D()(x)
         max_pool = GlobalMaxPooling1D()(x)
@@ -432,11 +432,11 @@ class BiLSTM:
         print("min_return = {}    max_return = {}".format(self.min_return, self.max_return))
         print("min_volume = {}    max_volume = {}".format(self.min_volume, self.max_volume))
 
-    def denormalize_value(self, normalizedValue, minValue, maxValue):
-        return normalizedValue * (maxValue - minValue) + minValue
+    def denormalize_value(self, normalized_value, min_value, max_value):
+        return normalized_value * (max_value - min_value) + min_value
 
-    def denormalize_values(self, normalizedValues, minValue, maxValue):
-        return [self.denormalize_value(normalizeValue, minValue, maxValue) for normalizeValue in normalizedValues]
+    def denormalize_values(self, normalized_values, min_value, max_value):
+        return [self.denormalize_value(normalize_value, min_value, max_value) for normalize_value in normalized_values]
 
     def stats_for_trends(self):
         df2 = self.df.copy()
@@ -454,26 +454,26 @@ class BiLSTM:
         sequence = np.array(sequence)
         predictions = self.model.predict(sequence)
         print("stats_for_trends")
-        DeNormalizedExpectations = self.denormalize_values(expected, self.min_return, self.max_return)
-        DeNormalizedPredictions = self.denormalize_values(predictions, self.min_return, self.max_return)
+        denormalized_expectations = self.denormalize_values(expected, self.min_return, self.max_return)
+        denormalized_expectations = self.denormalize_values(predictions, self.min_return, self.max_return)
 
-        allOk = 0
+        all_ok = 0
         down = 0
         up = 0
         for index in range(n):
-            predicted = DeNormalizedPredictions[index][0]
-            if DeNormalizedExpectations[index] > 0:
+            predicted = denormalized_expectations[index][0]
+            if denormalized_expectations[index] > 0:
                 up = up + 1
             else:
                 down = down + 1
-            if (DeNormalizedExpectations[index]*predicted) > 0:
+            if (denormalized_expectations[index]*predicted) > 0:
                 ok = 1
-                allOk = allOk + 1
+                all_ok = all_ok + 1
             else:
                 ok = 0
             #print("{}   {} {} vs {}".format(ok, lastClose[index], expected[index], predicted))
         print("StatsForTrends : {} down / {} up".format(down, up))
-        print("StatsForTrends : {} / {} => {:.2f}%".format(allOk, n, 100 * allOk / n))
+        print("StatsForTrends : {} / {} => {:.2f}%".format(all_ok, n, 100 * all_ok / n))
     
     def make_trend_prediction_for_next_tick(self):
         df2 = self.df.copy()
@@ -482,15 +482,15 @@ class BiLSTM:
         data = df2.values
         sequence = []
         expected = []
-        lastClose = []
+        last_close = []
         n = len(df2.index)
         index = n-self.seq_len
 
         sequence.append(data[index:index+self.seq_len])
-        lastClose = data[:, 3][index+self.seq_len-1]
+        last_close = data[:, 3][index+self.seq_len-1]
         sequence = np.array(sequence)
-        normalizedPrediction = self.model.predict(sequence)
-        prediction = self.denormalize_value(normalizedPrediction[0][0], self.min_return, self.max_return)
+        normalized_prediction = self.model.predict(sequence)
+        prediction = self.denormalize_value(normalized_prediction[0][0], self.min_return, self.max_return)
         return prediction
 
 
