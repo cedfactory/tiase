@@ -4,8 +4,8 @@ from lib.fimport import visu
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input,Bidirectional,LSTM,Dense,GlobalAveragePooling1D,GlobalMaxPooling1D,concatenate
 print('Tensorflow version: {}'.format(tf.__version__))
 
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ import xml.etree.cElementTree as ET
 #
 # Read Data
 #
-def ReadData(filename):
+def read_data(filename):
     df = pd.read_csv(filename, delimiter=',', usecols=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
 
     # Replace 0 to avoid dividing by 0 later on
@@ -29,10 +29,10 @@ def ReadData(filename):
     return df
 
 #
-# PlotLoss found in history
+# plot_loss found in history
 # todo : to move into mltoolbox
 #
-def PlotLoss(history):
+def plot_loss(history):
     plt.plot(history.history['loss'], label='loss')
     plt.plot(history.history['val_loss'], label='val_loss')
     ymax = max(history.history['loss']) / 2
@@ -42,26 +42,17 @@ def PlotLoss(history):
     plt.legend()
     plt.grid(True)
 
-
-
-
-def ReadDataFromYahooCsv(csvfile):
-    dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
-    dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
-    dataframe = dataframe.dropna() # remove incoherent values (null, ...)
-    return dataframe
-
 class BiLSTM:
 
     def __init__(self):
         self.seq_len = 64 #128
 
-    def ImportData(self, df):
+    def import_data(self, df):
         self.df = df
-        self.NormalizeData()
+        self.normalize_data()
 
 
-    def NormalizeData(self):
+    def normalize_data(self):
         '''Calculate percentage change'''
         
         self.df['Open'] = self.df['Open'].pct_change() # Create arithmetic returns column
@@ -95,7 +86,7 @@ class BiLSTM:
         # Min-max normalize volume columns (0-1 range)
         self.df['Volume'] = (self.df['Volume'] - self.min_volume) / (self.max_volume - self.min_volume)
 
-    def CreateTrainingValidationTestSplit(self):
+    def create_training_validation_test_split(self):
         ###############################################################################
         '''Create training, validation and test split'''
 
@@ -120,7 +111,7 @@ class BiLSTM:
         print('Validation data shape: {}'.format(self.val_data.shape))
         print('Test data shape: {}'.format(self.test_data.shape))
 
-    def PlotDailyChanges(self):
+    def plot_daily_changes(self):
         fig = plt.figure(figsize=(15,10))
         st = fig.suptitle("Data Separation", fontsize=20)
         st.set_y(0.92)
@@ -153,7 +144,7 @@ class BiLSTM:
 
         plt.legend(loc='best')
 
-    def CreateTrainingValidationTestData(self):
+    def create_training_validation_test_data(self):
         # Training data
         self.X_train, self.y_train = [], []
         for i in range(self.seq_len, len(self.train_data)):
@@ -185,7 +176,7 @@ class BiLSTM:
     #
     # Bi-LSTM model
     #
-    def CreateModel1(self):
+    def create_model1(self):
         in_seq = Input(shape = (self.seq_len, 5))
       
         x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(in_seq)
@@ -203,7 +194,7 @@ class BiLSTM:
         #self.model.summary()
 
 
-    def Inception_A(self, layer_in, c7):
+    def inception_a(self, layer_in, c7):
         branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
         branch1x1 = BatchNormalization()(branch1x1_1)
         branch1x1 = ReLU()(branch1x1)
@@ -233,7 +224,7 @@ class BiLSTM:
         return outputs
 
 
-    def Inception_B(self, layer_in, c7):
+    def inception_b(self, layer_in, c7):
         branch3x3 = Conv1D(c7, kernel_size=3, padding="same", strides=2, use_bias=False)(layer_in)
         branch3x3 = BatchNormalization()(branch3x3)
         branch3x3 = ReLU()(branch3x3)  
@@ -254,7 +245,7 @@ class BiLSTM:
         return outputs
 
 
-    def Inception_C(self, layer_in, c7):
+    def inception_c(self, layer_in, c7):
         branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
         branch1x1 = BatchNormalization()(branch1x1_1)
         branch1x1 = ReLU()(branch1x1)   
@@ -297,7 +288,7 @@ class BiLSTM:
     #
     # CNN + Bi-LSTM model
     #
-    def CreateModel2(self):
+    def create_model2(self):
         in_seq = Input(shape=(self.seq_len, 5))
 
         c7 = int(self.seq_len/4)
@@ -323,7 +314,7 @@ class BiLSTM:
  
 
 
-    def FitModel(self, epochs):
+    def fit_model(self, epochs):
         #callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=2)
         callback = tf.keras.callbacks.ModelCheckpoint('Bi-LSTM.hdf5', monitor='val_loss', save_best_only=True, verbose=1)
 
@@ -331,27 +322,27 @@ class BiLSTM:
                     batch_size=2048,
                     verbose=2,
                     callbacks=[callback],
-                    epochs=epochs, #200
+                    epochs=epochs,
                     #shuffle=True,
                     validation_data=(self.X_val, self.y_val),)    
 
         return history
 
-    def TrainModel(self, epochs):
-        self.CreateTrainingValidationTestSplit()
+    def train_model(self, epochs):
+        self.create_training_validation_test_split()
         #this.df_train.head()
 
         #this.PlotDailyChanges()
-        self.CreateTrainingValidationTestData()
-        self.CreateModel1()
-        self.history = self.FitModel(epochs)
+        self.create_training_validation_test_data()
+        self.create_model1()
+        self.history = self.fit_model(epochs)
 
-    def DisplayStats(self):
-        PlotLoss(self.history)
-        self.EvaluatePredictions()
+    def display_stats(self):
+        plot_loss(self.history)
+        self.evaluate_predictions()
 
 
-    def EvaluatePredictions(self):
+    def evaluate_predictions(self):
         '''Evaluate predictions and metrics'''
 
         #Calculate predication for training, validation and test data
@@ -405,7 +396,7 @@ class BiLSTM:
         plt.tight_layout()
         plt.legend(loc='best')
 
-    def SaveModel(self, name):
+    def save_model(self, name):
         filename = './'+name+'.hdf5'
         print(filename)
         print(self.min_return)
@@ -427,7 +418,7 @@ class BiLSTM:
         print(xmlfilename)
         tree.write(xmlfilename)
 
-    def LoadModel(self, filename):
+    def load_model(self, filename):
 
         tree = ET.parse(filename)
         root = tree.getroot()
@@ -441,13 +432,13 @@ class BiLSTM:
         print("min_return = {}    max_return = {}".format(self.min_return, self.max_return))
         print("min_volume = {}    max_volume = {}".format(self.min_volume, self.max_volume))
 
-    def DeNormalizeValue(self, normalizedValue, minValue, maxValue):
+    def denormalize_value(self, normalizedValue, minValue, maxValue):
         return normalizedValue * (maxValue - minValue) + minValue
 
-    def DeNormalizeValues(self, normalizedValues, minValue, maxValue):
-        return [self.DeNormalizeValue(normalizeValue, minValue, maxValue) for normalizeValue in normalizedValues]
+    def denormalize_values(self, normalizedValues, minValue, maxValue):
+        return [self.denormalize_value(normalizeValue, minValue, maxValue) for normalizeValue in normalizedValues]
 
-    def StatsForTrends(self):
+    def stats_for_trends(self):
         df2 = self.df.copy()
         df2.drop(columns=['Date'], inplace=True)
         #print(df2[0:67])
@@ -462,11 +453,9 @@ class BiLSTM:
             expected.append(data[:, 3][index+self.seq_len])
         sequence = np.array(sequence)
         predictions = self.model.predict(sequence)
-        print("StatsForTrends")
-        DeNormalizedExpectations = self.DeNormalizeValues(expected, self.min_return, self.max_return)
-        DeNormalizedPredictions = self.DeNormalizeValues(predictions, self.min_return, self.max_return)
-        #print(DeNormalizedExpectations)
-        #print(DeNormalizedPredictions)
+        print("stats_for_trends")
+        DeNormalizedExpectations = self.denormalize_values(expected, self.min_return, self.max_return)
+        DeNormalizedPredictions = self.denormalize_values(predictions, self.min_return, self.max_return)
 
         allOk = 0
         down = 0
@@ -486,7 +475,7 @@ class BiLSTM:
         print("StatsForTrends : {} down / {} up".format(down, up))
         print("StatsForTrends : {} / {} => {:.2f}%".format(allOk, n, 100 * allOk / n))
     
-    def MakeTrendPredictionForNextTick(self):
+    def make_trend_prediction_for_next_tick(self):
         df2 = self.df.copy()
         df2.drop(columns=['Date'], inplace=True)
         #print(df2[0:67])
@@ -501,32 +490,8 @@ class BiLSTM:
         lastClose = data[:, 3][index+self.seq_len-1]
         sequence = np.array(sequence)
         normalizedPrediction = self.model.predict(sequence)
-        prediction = self.DeNormalizeValue(normalizedPrediction[0][0], self.min_return, self.max_return)
+        prediction = self.denormalize_value(normalizedPrediction[0][0], self.min_return, self.max_return)
         return prediction
-
-    ''' deprecated
-    def MakePrediction(self, iStart, n):
-        df2 = self.df
-        df2.drop(columns=['Date'], inplace=True)
-        #print(df2[0:67])
-        data = df2.values
-        sequence = []
-        expected = []
-        lastClose = []
-        for index in range(iStart,iStart+n):
-            sequence.append(data[index:index+self.seq_len])
-            lastClose.append(data[:, 3][index+self.seq_len-1])
-            expected.append(data[:, 3][index+self.seq_len])
-        sequence = np.array(sequence)
-        predictions = self.model.predict(sequence)
-        #print(predictions)
-
-        #print(np.array(expected))
-        #print(predictions.flatten())
-        return [np.array(expected), predictions.flatten()]
-    '''
-
-
 
 
 
@@ -534,28 +499,28 @@ class BiLSTM:
 
 prices = './lib/data/IBM_Prices.csv'
 value = "IBM"
-df = ReadData(prices)
+df = read_data(prices)
 
 visu.DisplayFromDataframe(df, 'Close', 'close.png')
 #visu.DisplayFromDataframe(df, 'Volume')
 #df.head()
 
 bilstm = BiLSTM()
-bilstm.ImportData(df)
-bilstm.TrainModel(epochs = 1)
-bilstm.DisplayStats()
-bilstm.SaveModel('bi_lstm_'+value)
+bilstm.import_data(df)
+bilstm.train_model(epochs = 1)
+bilstm.display_stats()
+bilstm.save_model('bi_lstm_'+value)
 
 xmlfile = "./bi_lstm_"+value+".xml"
-df = ReadData(prices)
+df = read_data(prices)
 
 #importers.DisplayFromDataframe(df, 'Close')
 #importers.DisplayFromDataframe(df, 'Volume')
 #df.head()
 
 bilstm = BiLSTM()
-bilstm.ImportData(df)
-bilstm.LoadModel(xmlfile)
-bilstm.StatsForTrends()
-prediction = bilstm.MakeTrendPredictionForNextTick()
+bilstm.import_data(df)
+bilstm.load_model(xmlfile)
+bilstm.stats_for_trends()
+prediction = bilstm.make_trend_prediction_for_next_tick()
 print(prediction)
