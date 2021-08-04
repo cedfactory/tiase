@@ -3,7 +3,7 @@ import numpy as np
 
 import pandas as pd
 
-import vsa
+from . import vsa
 
 # https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
 from stockstats import StockDataFrame as Sdf
