@@ -323,7 +323,6 @@ class BiLSTM:
                     verbose=2,
                     callbacks=[callback],
                     epochs=epochs,
-                    #shuffle=True,
                     validation_data=(self.X_val, self.y_val),)    
 
         return history
@@ -455,7 +454,9 @@ class BiLSTM:
         predictions = self.model.predict(sequence)
         print("stats_for_trends")
         denormalized_expectations = self.denormalize_values(expected, self.min_return, self.max_return)
+        print(denormalized_expectations)
         denormalized_expectations = self.denormalize_values(predictions, self.min_return, self.max_return)
+        print(denormalized_expectations)
 
         all_ok = 0
         down = 0
@@ -488,6 +489,7 @@ class BiLSTM:
 
         sequence.append(data[index:index+self.seq_len])
         last_close = data[:, 3][index+self.seq_len-1]
+        print(last_close)
         sequence = np.array(sequence)
         normalized_prediction = self.model.predict(sequence)
         prediction = self.denormalize_value(normalized_prediction[0][0], self.min_return, self.max_return)
