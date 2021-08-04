@@ -23,4 +23,7 @@ def process_features(df, featureengineering):
             df = fbalance.smote_balance(df)
         elif process == 'vsa_reduction':
             df = fselection.vsa_corr_selection(df)
+        else:
+            print(":fix: process {} is unknown".format(process))
+
     return df

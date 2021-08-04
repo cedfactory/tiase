@@ -106,7 +106,7 @@ def drop_missing_columns(df_columns, columns):
 
 def rfecv_reduction(df, columns):
     # model_type = 'XGB'
-    model_type = 'SVC'
+    model_type = 'Forest'
     scoring = 'accuracy'  # 'precision' , 'f1' , 'recall', 'accuracy'
 
     # MIN_FEATURE = int(len(columns) * 2 / 3)

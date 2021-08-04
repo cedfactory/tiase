@@ -38,11 +38,28 @@ def check(action):
         print(df['trend_1d'].value_counts())
         #df.to_csv("./lib/data/test/featureengineering_smote_reference.csv")
 
+    if action == "reductions":
+        df = get_real_dataframe()
+        df = df.head(200)
+        techindicators = ['rsi_30', 'atr', 'williams_%r', 'macd', 'stoch_%k', 'stoch_%d', 'roc', 'mom', 'adx', 'er', 'cci_30', 'stc', 'target']
+        df = findicators.add_technical_indicators(df, techindicators)
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        df = df.astype({"target": int})
+        print(df.head())
+
+        for reduction in ["correlation_reduction","pca_reduction","rfecv_reduction"]:
+            df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
+            print(df_reduction.head())
+            df_reduction.to_csv("./lib/data/test/featureengineering_"+reduction+"_reference.csv")
+
+    else:
+        print("action {} is unknown".format(action))
+
 
 _usage_str = """
 Options:
-    [--check [process]]
-process \in [smote]
+    [--check [ process ]]
+process in [ smote,reductions ]
 """
 
 def _usage():
