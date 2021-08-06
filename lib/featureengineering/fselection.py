@@ -1,11 +1,14 @@
-import matplotlib.pyplot as plt
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2, f_regression
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
@@ -28,6 +31,43 @@ def get_sma_ema_wma(df, columns):
         columns.extend(col_wma_lst)
 
     return columns
+
+
+def kbest_reduction(df, model_type, k_best=0.5):
+    if model_type == 'regression':
+        selection_type = f_regression
+    else:
+        # selection_type = f_classif
+        selection_type = chi2
+
+    if k_best < 1:
+        k_best = int((len(df.columns) - 2) * k_best)
+    else:
+        k_best = k_best
+
+    list_features = df.columns.to_list()
+    list_features.remove('simple_rtn')
+    list_features.remove('target')
+
+    df_copy_simple_rtn = df['simple_rtn'].copy()
+    df_copy_target = df['target'].copy()
+
+    df_for_feature_eng = df[list_features]
+
+    select = SelectKBest(score_func=selection_type, k=k_best)
+    fit_features = select.fit_transform(df_for_feature_eng, df_copy_target)
+    filter = select.get_support()
+
+    features = np.array(df_for_feature_eng.columns)
+
+    columns = features[filter]
+
+    selected_features = df_for_feature_eng[columns]
+
+    frames = [df_copy_simple_rtn, df_copy_target, selected_features]
+    df_result = pd.concat(frames, axis=1).reindex(df.index)
+
+    return df_result
 
 
 def correlation_reduction(df, columns):
@@ -97,6 +137,7 @@ def pca_reduction(df, columns):
 
     return df_result
 
+
 def drop_missing_columns(df_columns, columns):
     for feature in columns:
         if feature not in columns:
@@ -162,6 +203,7 @@ def rfecv_reduction(df, columns):
 
     return df_result
 
+
 def get_outliers(df, n_sigmas):
     # i is number of sigma, which define the boundary along mean
 
@@ -209,7 +251,7 @@ def vsa_corr_selection(df):
                               'vsa_close_change_3D', 'vsa_close_change_60D']
 
     selected_features_1D_list = ['vsa_volume_2D', 'vsa_price_spread_2D', 'vsa_close_loc_2D', 'vsa_close_change_2D']
-    #selected_features_1D_list = ['vsa_volume_1D', 'vsa_price_spread_1D', 'vsa_close_loc_1D', 'vsa_close_change_1D']
+    # selected_features_1D_list = ['vsa_volume_1D', 'vsa_price_spread_1D', 'vsa_close_loc_1D', 'vsa_close_change_1D']
 
     selected_features_1D = df_vsa[selected_features_1D_list]
 
@@ -228,18 +270,18 @@ def vsa_corr_selection(df):
     plt.clf()
 
     df['sign_of_trend'] = df['outcomes_vsa'].apply(np.sign)
-    #df['sign_of_trend'] = np.where(df['sign_of_trend'] == 0, 1, df['sign_of_trend'])
+    # df['sign_of_trend'] = np.where(df['sign_of_trend'] == 0, 1, df['sign_of_trend'])
 
     df['sign_of_trend'] = df['sign_of_trend'] * 10
 
     sns.pairplot(df,
                  vars=selected_features_1D_list,
                  diag_kind='kde',
-                 #palette='husl',
+                 # palette='husl',
                  palette='bright',
                  hue='sign_of_trend',
-                 #markers=['*', '<', '+'],
-                 #markers=['v', '.', 'x'],
+                 # markers=['*', '<', '+'],
+                 # markers=['v', '.', 'x'],
                  markers=["o", "s", "D"],
                  plot_kws={'alpha': 0.3})  # transparence:0.3
 

@@ -48,5 +48,6 @@ def process_technical_indicators(df, preprocessing):
             df = fdiscretize.data_discretization_unsupervized(df, columns)
         elif preprocess == 'scaling':
             df = fprep.data_scaling(df)
-
+        elif preprocess == 'drop_ohlcv':
+            df = fprep.drop_ohlcv(df)
     return df

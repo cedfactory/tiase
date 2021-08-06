@@ -220,6 +220,9 @@ def data_x2_transformation(df, columns):
 
     return df
 
-
 def data_scaling(df):
+    return df
+
+def drop_ohlcv(df):
+    df = df.drop(['open', 'close','high','low','adj_close','volume'], axis=1)
     return df
