@@ -17,7 +17,7 @@ def data_discretization(df, columns):
 
             d1['dis_' + col] = np.where(condition1, 1, d1['rsi_t'])
             d1['dis_' + col] = np.where((d1['dis_' + col] != 1) | condition2, 0, d1['dis_' + col])
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "roc":
             d1 = pd.DataFrame(df[col])
@@ -29,7 +29,7 @@ def data_discretization(df, columns):
 
             d1['dis_' + col] = np.where(condition1, 1, d1['roc_t'])
             d1['dis_' + col] = np.where((d1['dis_' + col] != 1) | condition2, 0, d1['dis_' + col])
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "adx":
             d1 = pd.DataFrame(df[col])
@@ -41,7 +41,7 @@ def data_discretization(df, columns):
 
             d1['dis_' + col] = np.where(condition1, 1, d1['adx_t'])
             d1['dis_' + col] = np.where((d1['dis_' + col] != 1) | condition2, 0, d1['dis_' + col])
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "stc":
             d1 = pd.DataFrame(df[col])
@@ -53,7 +53,7 @@ def data_discretization(df, columns):
 
             d1['dis_' + col] = np.where(condition1, 1, d1['stc_t'])
             d1['dis_' + col] = np.where((d1['dis_' + col] != 1) | condition2, 0, d1['dis_' + col])
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "cci_30":
             d1 = pd.DataFrame(df[col])
@@ -65,7 +65,7 @@ def data_discretization(df, columns):
 
             d1['dis_' + col] = np.where(condition1, 1, d1['cci_t'])
             d1['dis_' + col] = np.where((d1['dis_' + col] != 1) | condition2, 0, d1['dis_' + col])
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "atr":
             d1 = pd.DataFrame(df[col])
@@ -74,7 +74,7 @@ def data_discretization(df, columns):
 
             condition = (d1['atr_t'] > d1['atr_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "williams_%r":
             d1 = pd.DataFrame(df[col])
@@ -83,7 +83,7 @@ def data_discretization(df, columns):
 
             condition = (d1['wr_t'] > d1['wr_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "stoch_%d":
             d1 = pd.DataFrame(df[col])
@@ -92,7 +92,7 @@ def data_discretization(df, columns):
 
             condition = (d1['d_t'] > d1['d_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "stoch_%k":
             d1 = pd.DataFrame(df[col])
@@ -101,7 +101,7 @@ def data_discretization(df, columns):
 
             condition = (d1['k_t'] > d1['k_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "er":
             d1 = pd.DataFrame(df[col])
@@ -110,7 +110,7 @@ def data_discretization(df, columns):
 
             condition = (d1['er_t'] > d1['er_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "macd":
             d1 = pd.DataFrame(df[col])
@@ -119,7 +119,7 @@ def data_discretization(df, columns):
 
             condition = (d1['macd_t'] > d1['macd_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "mom":
             d1 = pd.DataFrame(df[col])
@@ -128,7 +128,7 @@ def data_discretization(df, columns):
 
             condition = (d1['mom_t'] > d1['mom_t-1'])
             d1['dis_' + col] = np.where(condition, 1, 0)
-            df[col] = d1["dis_" + col].copy()
+            df[col] = d1["dis_" + col].copy().astype(int)
 
         if col == "sma":
             col_sma_lst = [item for item in df.columns if item.startswith(col)]
@@ -138,7 +138,7 @@ def data_discretization(df, columns):
                 d1[col_sma + "_t"] = d1[col_sma].copy()
                 condition = (d1["close_t"] > d1[col_sma + "_t"])
                 d1["dis_" + col_sma] = np.where(condition, 1, 0)
-                df[col_sma] = d1["dis_" + col_sma].copy()
+                df[col_sma] = d1["dis_" + col_sma].copy().astype(int)
 
         if col == "ema":
             col_ema_lst = [item for item in df.columns if item.startswith(col)]
@@ -148,7 +148,7 @@ def data_discretization(df, columns):
                 d1[col_ema + "_t"] = d1[col_ema].copy()
                 condition = (d1["close_t"] > d1[col_ema + "_t"])
                 d1["dis_" + col_ema] = np.where(condition, 1, 0)
-                df[col_ema] = d1["dis_" + col_ema].copy()
+                df[col_ema] = d1["dis_" + col_ema].copy().astype(int)
 
         if col == "wma":
             col_wma_lst = [item for item in df.columns if item.startswith(col)]
@@ -158,7 +158,7 @@ def data_discretization(df, columns):
                 d1[col_wma + "_t"] = d1[col_wma].copy()
                 condition = (d1["close_t"] > d1[col_wma + "_t"])
                 d1["dis_" + col_wma] = np.where(condition, 1, 0)
-                df[col_wma] = d1["dis_" + col_wma].copy()
+                df[col_wma] = d1["dis_" + col_wma].copy().astype(int)
 
     return df
 
