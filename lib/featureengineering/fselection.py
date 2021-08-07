@@ -42,8 +42,6 @@ def kbest_reduction(df, model_type, k_best=0.5):
 
     if k_best < 1:
         k_best = int((len(df.columns) - 2) * k_best)
-    else:
-        k_best = k_best
 
     list_features = df.columns.to_list()
     list_features.remove('simple_rtn')
@@ -70,20 +68,18 @@ def kbest_reduction(df, model_type, k_best=0.5):
     return df_result
 
 
-def correlation_reduction(df, columns):
-    columns = get_sma_ema_wma(df, columns)
+def correlation_reduction(df):
+    list_features = df.columns.to_list()
+    list_features.remove('simple_rtn')
+    list_features.remove('target')
 
+    df_copy_simple_rtn = df['simple_rtn'].copy()
     df_copy_target = df['target'].copy()
-    df_for_feature_eng = df[columns]
-    plt.figure(figsize=(16, 16))
-    heatmap = sns.heatmap(df_for_feature_eng.corr(), vmin=-1, vmax=1, annot=True)
-    plt.savefig("heatmap_before.png")
-    plt.clf()
 
-    data = df[columns]
+    df_for_feature_eng = df[list_features]
 
     # Create correlation matrix
-    corr_matrix = data.corr().abs()
+    corr_matrix = df_for_feature_eng.corr().abs()
 
     # Select upper triangle of correlation matrix
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
@@ -92,36 +88,30 @@ def correlation_reduction(df, columns):
     to_drop = [column for column in upper.columns if any(upper[column] > 0.95)]
 
     # Drop features
-    data = data.drop(data[to_drop], axis=1)
+    selected_features = df_for_feature_eng.drop(df_for_feature_eng[to_drop], axis=1)
 
-    # columns.extend(["target"])
-
-    df_for_feature_eng = df[data.columns]
-    plt.figure(figsize=(16, 16))
-    heatmap = sns.heatmap(df_for_feature_eng.corr(), vmin=-1, vmax=1, annot=True)
-    plt.savefig("heatmap_after.png")
-    plt.clf()
-
-    df = df[data.columns]
-
-    frames = [df, df_copy_target]
+    frames = [df_copy_simple_rtn, df_copy_target, selected_features]
     df_result = pd.concat(frames, axis=1).reindex(df.index)
 
     return df_result
 
 
-def pca_reduction(df, columns):
-    columns = get_sma_ema_wma(df, columns)
+def pca_reduction(df, coef_pca=0.99):
+    list_features = df.columns.to_list()
+    list_features.remove('simple_rtn')
+    list_features.remove('target')
 
-    print("Feature PCA selection...")
+    df_copy_simple_rtn = df['simple_rtn'].copy()
+    df_copy_target = df['target'].copy()
+
+    df_for_feature_eng = df[list_features]
+
     df_index = df.index.tolist()
-    data = df[columns].copy()
-    df = df.drop(columns, axis=1)
 
     scaler = MinMaxScaler()
-    data_rescaled = scaler.fit_transform(data)
+    data_rescaled = scaler.fit_transform(df_for_feature_eng)
 
-    pca = PCA(n_components=0.99)
+    pca = PCA(n_components=coef_pca)
     pca.fit(data_rescaled)
     data_pca = pca.transform(data_rescaled)
 
@@ -132,38 +122,31 @@ def pca_reduction(df, columns):
         pca_col.append("pca_" + str(col))
     df_pca.columns = pca_col
 
-    frames = [df, df_pca]
+    frames = [df_copy_simple_rtn, df_copy_target, df_pca]
     df_result = pd.concat(frames, axis=1).reindex(df.index)
 
     return df_result
 
 
-def drop_missing_columns(df_columns, columns):
-    for feature in columns:
-        if feature not in columns:
-            columns.remove(feature)
-    return df_columns
+def rfecv_reduction(df, model_type, scoring, rfecv_min_features):
+    if rfecv_min_features < 1:
+        rfecv_min_features = int((len(df.columns) - 2) * rfecv_min_features)
 
+    list_features = df.columns.to_list()
+    list_features.remove('simple_rtn')
+    list_features.remove('target')
 
-def rfecv_reduction(df, columns):
-    # model_type = 'XGB'
-    model_type = 'Forest'
-    scoring = 'accuracy'  # 'precision' , 'f1' , 'recall', 'accuracy'
+    df_copy_simple_rtn = df['simple_rtn'].copy()
+    df_copy_target = df['target'].copy()
 
-    # MIN_FEATURE = int(len(columns) * 2 / 3)
-    MIN_FEATURE = 3
+    df_for_feature_eng = df[list_features]
 
     print("RFECV Feature selection...")
     print("model: ", model_type)
     print("scoring: ", scoring)
 
-    columns = get_sma_ema_wma(df, columns)
-    columns = drop_missing_columns(df.columns.tolist(), columns)
-
-    # df_index = df.index.tolist()
-    X = df[columns].copy()
+    X = df_for_feature_eng.copy()
     target = df['target']
-    df = df.drop(columns, axis=1)
 
     if (model_type == 'XGB'):
         rfc = XGBClassifier(random_state=101, verbosity=0)
@@ -173,7 +156,7 @@ def rfecv_reduction(df, columns):
         rfc = SVC(kernel="linear")
 
     # rfecv = RFECV(estimator=rfc, step=1, cv=StratifiedKFold(10), scoring=scoring)
-    rfecv = RFECV(estimator=rfc, scoring=scoring, min_features_to_select=MIN_FEATURE)
+    rfecv = RFECV(estimator=rfc, scoring=scoring, min_features_to_select=rfecv_min_features)
     rfecv.fit(X, target)
 
     print('Optimal number of features: {}'.format(rfecv.n_features_))
@@ -193,12 +176,7 @@ def rfecv_reduction(df, columns):
 
     df_rfecv = X.copy()
 
-    rfecv_col = []
-    for col in X.columns:
-        rfecv_col.append("rfecv_" + str(col))
-    df_rfecv.columns = rfecv_col
-
-    frames = [df, df_rfecv]
+    frames = [df_copy_simple_rtn, df_copy_target, df_rfecv]
     df_result = pd.concat(frames, axis=1).reindex(df.index)
 
     return df_result
