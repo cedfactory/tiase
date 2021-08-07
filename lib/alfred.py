@@ -1,6 +1,7 @@
 import xml.etree.cElementTree as ET
 from lib.fimport import *
 from lib.fdatapreprocessing import *
+from lib.featureengineering import *
 from lib.findicators import *
 from lib.ml import *
 
@@ -44,7 +45,14 @@ def execute(filename):
     if root.tag != "dings":
         return 1
 
+    ding_msg = '''
+   _ _         
+ _| |_|___ ___ 
+| . | |   | . |
+|___|_|_|_|_  |
+          |___|'''
     for ding in root.findall('ding'):
+        print(ding_msg)
 
         # import
         importNode = ding.find('import')
@@ -65,7 +73,7 @@ def execute(filename):
                 target = target.split(',')
                 all = features
                 all.extend(target)
-                print(all)
+                print("Using the following technical indicators : {}".format(all))
                 df = findicators.add_technical_indicators(df, all)
                 df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 # todo implement findicators.keep([])
@@ -79,20 +87,31 @@ def execute(filename):
             outliersNode = preprocessingNode.find('outliers')
             if outliersNode is not None:
                 print(outliersNode.get("method", None))
+                method = outliersNode.get("method", None)
+                if method is not None:
+                    print("[PREPROCESSING] outliers : {}".format(method))
+                    df = fdataprep.process_technical_indicators(df, [method])
+                    print(df.head())
 
             # transformations
             transformationsNode = preprocessingNode.find('transformations')
             if transformationsNode is not None:
                 transformations = transformationsNode.findall('transformation')
                 for transformation in transformations:
-                    print("transformation {} for {}".format(transformation.get("method", None), transformation.get("indicators", None)))
+                    method = transformation.get("method", None)
+                    indicators = transformation.get("indicators", None)
+                    if method is not None and indicators is not None:
+                        print("[PREPROCESSING] transformation {} for {}".format(method, indicators))
 
             # discretizations
             discretizationsNode = preprocessingNode.find('discretizations')
             if discretizationsNode is not None:
                 discretizations = discretizationsNode.findall('discretization')
                 for discretization in discretizations:
-                    print("discretization {} for {}".format(discretization.get("indicator", None), transformation.get("method", None)))
+                    indicator = discretization.get("indicator", None)
+                    method = transformation.get("method", None)
+                    if indicator is not None and method is not None:
+                        print("[PREPROCESSING] discretization {} for {}".format(indicator, method))
 
         # feature engineering
         featureengeineeringNode = ding.find('featureengeineering')
@@ -100,7 +119,9 @@ def execute(filename):
             # reduction
             reductionNode = featureengeineeringNode.find('reduction')
             if reductionNode is not None:
-                print("reduction : {}".format(reductionNode.get("method", None)))
+                method = reductionNode.get("method", None)
+                if method is not None:
+                    print("[FEATURE ENGINEERING] reduction : {}".format(method))
 
         # learning model
         classifierNode = ding.find('classifier')
