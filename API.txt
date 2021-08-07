@@ -1,0 +1,154 @@
+Package: fprocessfeature
+API function access => process_features
+Parameters => 'kbest_reduction'
+function => kbest_reduction(df, model_type, k_best=0.5)
+in => model_type:  regression / classification
+in => df [simple_rtn, target] + [indicators]
+in => k_best: coef reduction [0, 1]% or nb_col to select
+out => df [simple_rtn, target] + [indicators reduced]
+
+Package: fprocessfeature
+API function access => process_features
+Parameters => 'correlation_reduction'
+function => correlation_reduction(df)
+in => df [simple_rtn, target] + [indicators]
+out => df [simple_rtn, target] + [indicators reduced]
+
+Package: fprocessfeature
+API function access => process_features
+Parameters => 'pca_reduction'
+function => pca_reduction(df, coef_pca)
+in => coef_pca: coef reduction [0, 1]%
+in => df [simple_rtn, target] + [indicators]
+out => df [simple_rtn, target] + [indicators reduced]
+
+Package: fprocessfeature
+API function access => process_features
+Parameters => 'rfecv_reduction'
+function => rfecv_reduction(df, coef_pca)
+in => model_type: [Forest, XGBOOST, SVC, tbd]
+in => scoring: [accuracy, precision, f1, recall, accuracy]
+in => rfecv_min_features: coef reduction [0, 1]% or nb_col to select
+in => df [simple_rtn, target] + [indicators]
+out => df [simple_rtn, target] + [indicators reduced]
+
+Package: fprocessfeature
+API function access => process_features
+Parameters => 'smote_balance'
+function => balance_features(df, balance_methode):
+in => balance_methode: [smote]
+in => df [simple_rtn, target] + [indicators]
+out => df (balanced) [simple_rtn, target] + [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'missing_values'
+function => missing_values(df)
+in => df [simple_rtn, target] + [indicators]
+out => df [clean data] nan and inf dropped
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'duplicates'
+function => drop_duplicates(df)
+in => df [simple_rtn, target] + [indicators]
+out => df [clean data] duplicates dropped
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'outliers_cut_stdcutoff'
+function => cut_outliers_std_cutoff(df, n_sigmas)
+in => df [close] [indicators]
+in => n_sigmas: coef * std (threshold)
+out => df (with outliers cutoff) [close] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'outliers_normalize_stdcutoff'
+function => normalize_outliers_std_cutoff(df, n_sigmas)
+in => df [close] [indicators]
+in => n_sigmas: coef * std (threshold)
+out => df [close normalized] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'outliers_normalize_winsorize'
+function => normalize_outliers_winsorize(df, outlier_cutoff)
+in => df [close] [indicators]
+in => outlier_cutoff: outlier threshold
+out => df [close normalized] [simple_rtn normalized] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'outliers_normalize_mam'
+function => normalize_outliers_mam(df, n_sigmas)
+in => df [close] [indicators]
+in => n_sigmas: coef * Moving Average Mean
+out => df [close normalized] [simple_rtn normalized] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'outliers_normalize_ema'
+function => normalize_outliers_ema(df, n_sigmas)
+in => df [close] [indicators]
+in => n_sigmas: coef * EMA
+out => df [close normalized] [simple_rtn normalized] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'transformation_log'
+function => data_log_transformation(df, columns)
+in => df [columns] [indicators]
+in => columns: columns to be transformed log()
+out => df [columns transformed] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'transformation_x2'
+function => data_x2_transformation(df, columns)
+in => df [columns] [indicators]
+in => columns: columns to be transformed x2()
+out => df [columns transformed] [indicators]
+
+Package: fdataprep
+API function access => process_technical_indicators
+Parameters => 'drop_ohlcv'
+function => drop_ohlcv(df)
+in => df [ohlcv] [indicators]
+out => df [indicators]
+
+Package: fdataprep
+API function access => data_discretization
+Parameters => 'discretization_supervised'
+function => data_discretization(df, columns)
+in => df [columns] [indicators]
+in => columns: columns to be discretized
+out => df [columns discretized] [indicators]
+
+Package: fdataprep
+API function access => data_discretization
+Parameters => 'discretization_unsupervised'
+function => data_discretization_unsupervized(df, columns, nb_bins, strategy)
+in => df [columns] [indicators]
+in => columns: columns to be discretized
+in => nb_bins: The number of bins to produce (n_bins < 2)
+in => strategy: ‘uniform’, ‘quantile’, ‘kmeans’
+out => df [columns discretized] [indicators]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
