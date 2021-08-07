@@ -38,6 +38,7 @@ class TestDataProcess:
         df = fdataprep.process_technical_indicators(df, ['discretization'])
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
+        #df.to_csv("./lib/data/test/datapreprocess_discretization_reference.csv")
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_discretization_reference.csv")
         assert(df.equals(expected_df))
 
@@ -52,6 +53,7 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
+        #df.to_csv("./lib/data/test/datapreprocess_discretization_unsupervised_reference.csv")
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_discretization_unsupervised_reference.csv")
 
         assert(df.equals(expected_df))
@@ -64,6 +66,7 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
+        #df.to_csv("./lib/data/test/datapreprocess_outliers_mam_reference.csv")
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_outliers_mam_reference.csv")
         
         array = df['close'].to_numpy()
@@ -78,6 +81,7 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
+        #df.to_csv("./lib/data/test/datapreprocess_outliers_ema_reference.csv")
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_outliers_ema_reference.csv")
         
         array = df['close'].to_numpy()
@@ -95,6 +99,7 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
+        #df.to_csv("./lib/data/test/datapreprocess_transformation_log_reference.csv")
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_transformation_log_reference.csv")
         
         array = df['simple_rtn'].to_numpy()
@@ -112,6 +117,7 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
+        #df.to_csv("./lib/data/test/datapreprocess_transformation_x2_reference.csv")
         expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/datapreprocess_transformation_x2_reference.csv")
         
         array = df['simple_rtn'].to_numpy()

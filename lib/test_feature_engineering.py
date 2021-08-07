@@ -45,7 +45,9 @@ class TestFeatureEngineering:
         for reduction in ["correlation_reduction","pca_reduction","rfecv_reduction"]:
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             
-            expected_df_reduction = fimport.GetDataFrameFromCsv("./lib/data/test/featureengineering_"+reduction+"_reference.csv")
+            ref_file = "./lib/data/test/featureengineering_"+reduction+"_reference.csv"
+            #df.to_csv(ref_file)
+            expected_df_reduction = fimport.GetDataFrameFromCsv(ref_file)
 
             for column in df_reduction.columns:
                 array = df_reduction[column].to_numpy()
