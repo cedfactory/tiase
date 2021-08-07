@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
 from ..fimport import visu
 
-def missing_valures(df):
+def missing_values(df):
     df['inf'] = 0
     for col in df.columns:
         df['inf'] = np.where( (df[col] == np.inf) | (df[col] == -np.inf) , 1 , df['inf'] )
