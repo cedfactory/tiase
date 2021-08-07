@@ -1,7 +1,10 @@
 import xml.etree.cElementTree as ET
 from lib.fimport import *
+from lib.fdatapreprocessing import *
 from lib.findicators import *
 from lib.ml import *
+
+from rich import print,inspect
 
 '''
 process :
@@ -59,7 +62,9 @@ def execute(filename):
                 target = target.split(',')
                 all = features
                 all.extend(target)
+                print(all)
                 df = findicators.add_technical_indicators(df, all)
+                df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 # todo implement findicators.keep([])
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
                 print(df.head())
@@ -71,9 +76,9 @@ def execute(filename):
                 model = classifier_svc.ClassifierSVC(df.copy())
                 model.create_model()
                 model_analysis = model.get_analysis()
-                print("Precision : ", model_analysis["precision"])
-                print("Recall : ", model_analysis["recall"])
-                print("f1_score:", model_analysis["f1_score"])
+                print("Precision : {:.2f}".format(model_analysis["precision"]))
+                print("Recall : {:.2f}".format(model_analysis["recall"]))
+                print("f1_score : {:.2f}".format(model_analysis["f1_score"]))
 
             break
 

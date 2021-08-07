@@ -2,7 +2,20 @@
 <dings>
     <ding>
         <import value="AI.PA"/>
-        <features indicators="close" target="trend_1d"/>
+        <features indicators="rsi_30,williams_%r" target="trend_1d"/>
+        <preprocessing>
+            <outliers method="stdcutoff" />
+            <transformations>
+                <transformation method="log" indicators="rsi_30" />
+                <transformation method="x2" indicators="williams_%r" />
+            </transformations>
+            <discretizations>
+                <discretization indicator="rsi_30" method="usupervised" nbins="2" />
+            </discretizations>
+        </preprocessing>
+        <featureengeineering>
+            <reduction method="correlation" threshold="0.95" />
+        </featureengeineering>
         <classifier name="svc"/>
     </ding>
 </dings>
