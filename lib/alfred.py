@@ -46,15 +46,18 @@ def execute(filename):
 
     for ding in root.findall('ding'):
 
-        for importNode in ding.findall('import'):
+        # import
+        importNode = ding.find('import')
+        if importNode is not None:
             value = importNode.get("value", None)
             if value != None:
                 df = fimport.GetDataFrameFromYahoo(value)
                 print(value)
                 print(df.head())
-            break
 
-        for featuresNode in ding.findall('features'):
+        # indicators
+        featuresNode = ding.find('features')
+        if featuresNode is not None:
             features = featuresNode.get("indicators", None)
             target = featuresNode.get("target", None)
             if features != None and target != None:
@@ -68,9 +71,40 @@ def execute(filename):
                 # todo implement findicators.keep([])
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
                 print(df.head())
-            break
 
-        for classifierNode in ding.findall('classifier'):
+        # preprocessing
+        preprocessingNode = ding.find('preprocessing')
+        if preprocessingNode is not None:
+            # outliers
+            outliersNode = preprocessingNode.find('outliers')
+            if outliersNode is not None:
+                print(outliersNode.get("method", None))
+
+            # transformations
+            transformationsNode = preprocessingNode.find('transformations')
+            if transformationsNode is not None:
+                transformations = transformationsNode.findall('transformation')
+                for transformation in transformations:
+                    print("transformation {} for {}".format(transformation.get("method", None), transformation.get("indicators", None)))
+
+            # discretizations
+            discretizationsNode = preprocessingNode.find('discretizations')
+            if discretizationsNode is not None:
+                discretizations = discretizationsNode.findall('discretization')
+                for discretization in discretizations:
+                    print("discretization {} for {}".format(discretization.get("indicator", None), transformation.get("method", None)))
+
+        # feature engineering
+        featureengeineeringNode = ding.find('featureengeineering')
+        if featureengeineeringNode is not None:
+            # reduction
+            reductionNode = featureengeineeringNode.find('reduction')
+            if reductionNode is not None:
+                print("reduction : {}".format(reductionNode.get("method", None)))
+
+        # learning model
+        classifierNode = ding.find('classifier')
+        if classifierNode is not None:
             classifier_name = classifierNode.get("name", None)
             if classifier_name == 'svc':
                 model = classifier_svc.ClassifierSVC(df.copy())
@@ -79,7 +113,5 @@ def execute(filename):
                 print("Precision : {:.2f}".format(model_analysis["precision"]))
                 print("Recall : {:.2f}".format(model_analysis["recall"]))
                 print("f1_score : {:.2f}".format(model_analysis["f1_score"]))
-
-            break
 
     return 0
