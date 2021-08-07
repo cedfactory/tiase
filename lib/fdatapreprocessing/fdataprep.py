@@ -1,4 +1,5 @@
-from . import fprep,fdiscretize
+from . import fprep, fdiscretize
+
 
 def process_technical_indicators(df, preprocessing):
     """
@@ -13,20 +14,20 @@ def process_technical_indicators(df, preprocessing):
             df = fprep.missing_values(df)
         elif preprocess == 'duplicates':
             df = fprep.drop_duplicates(df)
-        elif preprocess == 'outliers_stdcutoff':
-            n_sigmas = 1
+        elif preprocess == 'outliers_normalize_stdcutoff':
+            n_sigmas = 2
             df = fprep.normalize_outliers_std_cutoff(df, n_sigmas)
         elif preprocess == 'outliers_cut_stdcutoff':
-            n_sigmas = 1
+            n_sigmas = 2
             df = fprep.cut_outliers_std_cutoff(df, n_sigmas)
-        elif preprocess == 'outliers_winsorize':
+        elif preprocess == 'outliers_normalize_winsorize':
             outlier_cutoff = 0.03
             df = fprep.normalize_outliers_winsorize(df, outlier_cutoff)
-        elif preprocess == 'outliers_mam':
+        elif preprocess == 'outliers_normalize_mam':
             # Using Moving Average Mean
             n_sigmas = 2.5
             df = fprep.normalize_outliers_mam(df, n_sigmas)
-        elif preprocess == 'outliers_ema':
+        elif preprocess == 'outliers_normalize_mam':
             # Using EMA
             n_sigmas = 2.5
             df = fprep.normalize_outliers_ema(df, n_sigmas)
@@ -38,14 +39,16 @@ def process_technical_indicators(df, preprocessing):
         elif preprocess == 'transformation_x2':
             columns = ['simple_rtn']
             df = fprep.data_x2_transformation(df, columns)
-        elif preprocess == 'discretization':
+        elif preprocess == 'discretization_supervised':
             columns = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'wma', 'ema', 'sma', 'macd',
                        'stoch_%d', 'williams_%r', 'rsi_30']
             df = fdiscretize.data_discretization(df, columns)
         elif preprocess == 'discretization_unsupervised':
             columns = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'wma', 'ema', 'sma', 'cci_30', 'macd',
                        'stoch_%d', 'williams_%r', 'rsi_30']
-            df = fdiscretize.data_discretization_unsupervized(df, columns)
+            strategy = 'kmeans'
+            nb_bins = 5
+            df = fdiscretize.data_discretization_unsupervized(df, columns, nb_bins, strategy)
         elif preprocess == 'scaling':
             df = fprep.data_scaling(df)
         elif preprocess == 'drop_ohlcv':

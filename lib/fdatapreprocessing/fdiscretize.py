@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import KBinsDiscretizer
+
 from ..featureengineering import fselection
+
 
 def data_discretization(df, columns):
     for col in columns:
@@ -161,13 +163,13 @@ def data_discretization(df, columns):
     return df
 
 
-def data_discretization_unsupervized(df, columns):
+def data_discretization_unsupervized(df, columns, nb_bins, strategy):
     columns = fselection.get_sma_ema_wma(df, columns)
 
     d1 = df[columns].copy()
     d1_index = d1.index.tolist()
 
-    kbins = KBinsDiscretizer(n_bins=4, encode='ordinal', strategy='uniform')
+    kbins = KBinsDiscretizer(n_bins=nb_bins, encode='ordinal', strategy=strategy)
     data_trans = kbins.fit_transform(d1)
 
     d1 = pd.DataFrame(data=data_trans, columns=columns, index=d1_index)
