@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
-
+from lib.fimport import visu
+from rich import print,inspect
 
 def missing_values(df):
     df['inf'] = 0
@@ -22,15 +23,16 @@ def drop_duplicates(df):
     df.drop_duplicates(inplace=True)
     return df
 
-
+# reference : https://python.plainenglish.io/identifying-outliers-part-one-c0a31d9faefa
 def normalize_outliers_std_cutoff(df, n_sigmas):
     d1 = pd.DataFrame(df['close'].copy())
     d1['simple_rtn'] = d1.close.pct_change()
     d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
 
-    mu = d1_mean.loc['mean']
-    sigma = d1_mean.loc['std']
+    mu = d1_mean['mean']
+    sigma = d1_mean['std']
 
+    '''
     cond = (d1['simple_rtn'] > mu + sigma * n_sigmas) | (d1['simple_rtn'] < mu - sigma * n_sigmas)
     d1['outliers'] = np.where(cond, 1, 0)
 
@@ -46,8 +48,17 @@ def normalize_outliers_std_cutoff(df, n_sigmas):
     d1['new_close'] = d1['close_shift'] + d1['new_simple_rtn'] * d1['close_shift']
     d1['test'] = d1['new_close'] - d1['close']
     d1['new_close'][0] = d1['close'][0]
+    '''
+ 
+    # normalize simple_rtn
+    d1["simple_rtn_normalized"] = d1["simple_rtn"].clip(lower = mu - sigma * n_sigmas, upper = mu + sigma * n_sigmas)
+    
+    # revert pct_change to compute new close values
+    d1['close'] = d1['close'][0] * (1. + d1['simple_rtn_normalized']).cumprod()
+    visu.DisplayOutliersFromDataframe(df, d1, './tmp/outliers_normalize_stdcutoff.png')
 
-    df['close'] = d1['new_close'].copy()
+    # update close values in df
+    df['close'] = d1["close"]
 
     return df
 

@@ -32,10 +32,13 @@ def check(action):
         df = fdataprep.process_technical_indicators(df, ['missing_values'])
         print(df.head())
         
-    elif action == "outliers_stdcutoff":
-        df = get_synthetic_dataframe()
+    elif action == "outliers_normalize_stdcutoff":
+        df = get_real_dataframe()
+        df = findicators.add_technical_indicators(df, ['simple_rtn'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens        print(df.head())
+        visu.DisplayFromDataframe(df, "simple_rtn", "./tmp/simple_rtn.png")
         print(df.head())
-        df = fdataprep.process_technical_indicators(df, ['outliers_stdcutoff'])
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'])
         print(df.head())
         
     elif action == "discretization_supervised":
@@ -164,7 +167,7 @@ def cac40():
 _usage_str = """
 Options:
     [--check [ process ] --cac40]
-process in [ missing_values,outliers_stdcutoff,discretization_supervised,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema]
+process in [ missing_values,outliers_normalize_stdcutoff,discretization_supervised,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema]
 """
 
 def _usage():
