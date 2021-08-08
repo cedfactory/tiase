@@ -10,7 +10,7 @@ def process_features(df, featureengineering):
             coef_pca = 0.99
             df = fselection.pca_reduction(df, coef_pca)
         elif process == 'rfecv_reduction':
-            model_type = 'SVC'  # 'Forest'
+            model_type = 'Forest'  # 'SVC'
             scoring = 'accuracy'  # 'precision' , 'f1' , 'recall', 'accuracy'
             rfecv_min_features = 3
             df = fselection.rfecv_reduction(df, model_type, scoring, rfecv_min_features)

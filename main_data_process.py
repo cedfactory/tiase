@@ -38,14 +38,14 @@ def check(action):
         df = fdataprep.process_technical_indicators(df, ['outliers_stdcutoff'])
         print(df.head())
         
-    elif action == "discretization":
+    elif action == "discretization_supervised":
         df = get_real_dataframe()
         df = df.head(200)
         technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
         # todo : integrate ['wma', 'ema', 'sma']
         df = findicators.add_technical_indicators(df, technical_indicators)
         print(df.head())
-        df = fdataprep.process_technical_indicators(df, ['discretization'])
+        df = fdataprep.process_technical_indicators(df, ['discretization_supervised'])
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
         #df.to_csv("./lib/data/test/datapreprocess_discretization_reference.csv")
@@ -164,7 +164,7 @@ def cac40():
 _usage_str = """
 Options:
     [--check [ process ] --cac40]
-process in [ missing_values,outliers_stdcutoff,discretization,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema]
+process in [ missing_values,outliers_stdcutoff,discretization_supervised,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema]
 """
 
 def _usage():

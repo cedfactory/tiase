@@ -23,26 +23,26 @@ class TestFeatureEngineering:
     def test_smote_balance(self):
         df = self.get_real_dataframe()
         df = df.head(200)
-        df = findicators.add_technical_indicators(df, ['trend_1d'])
-        df = df.astype({"trend_1d": int})
-        val_counts = df['trend_1d'].value_counts()
-        assert(val_counts[0] == 92)
-        assert(val_counts[1] == 108)
+        df = findicators.add_technical_indicators(df, ['simple_rtn','target','trend_1d'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        val_counts = df['target'].value_counts()
+        assert(val_counts[0] == 91)
+        assert(val_counts[1] == 107)
 
-        df = fbalance.smote_balance(df, 'trend_1d')
-        val_counts = df['trend_1d'].value_counts()
-        assert(val_counts[0] == 108)
-        assert(val_counts[1] == 108)
+        df = fbalance.balance_features(df, "smote")
+        val_counts = df['target'].value_counts()
+        assert(val_counts[0] == 107)
+        assert(val_counts[1] == 107)
 
     def test_reductions(self):
         df = self.get_real_dataframe()
         df = df.head(200)
-        techindicators = ['rsi_30', 'atr', 'williams_%r', 'macd', 'stoch_%k', 'stoch_%d', 'roc', 'mom', 'adx', 'er', 'cci_30', 'stc', 'target']
+        techindicators = ['simple_rtn', 'target', 'rsi_30', 'atr', 'williams_%r', 'macd', 'stoch_%k', 'stoch_%d', 'roc', 'mom', 'adx', 'er', 'cci_30', 'stc']
         df = findicators.add_technical_indicators(df, techindicators)
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
         df = df.astype({"target": int})
 
-        for reduction in ["correlation_reduction","pca_reduction","rfecv_reduction"]:
+        for reduction in ["kbest_reduction", "correlation_reduction","pca_reduction","rfecv_reduction"]:
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             
             ref_file = "./lib/data/test/featureengineering_"+reduction+"_reference.csv"
