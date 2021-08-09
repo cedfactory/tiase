@@ -24,7 +24,7 @@ def drop_duplicates(df):
     return df
 
 # reference : https://python.plainenglish.io/identifying-outliers-part-one-c0a31d9faefa
-def normalize_outliers_std_cutoff(df, n_sigmas):
+def normalize_outliers_std_cutoff(df, n_sigmas, debug = False):
     d1 = pd.DataFrame(df['close'].copy())
     d1['simple_rtn'] = d1.close.pct_change()
     d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
@@ -32,30 +32,13 @@ def normalize_outliers_std_cutoff(df, n_sigmas):
     mu = d1_mean['mean']
     sigma = d1_mean['std']
 
-    '''
-    cond = (d1['simple_rtn'] > mu + sigma * n_sigmas) | (d1['simple_rtn'] < mu - sigma * n_sigmas)
-    d1['outliers'] = np.where(cond, 1, 0)
-
-    nb_outliers = d1.outliers.value_counts()
-    print("Outliers cutoff: ", nb_outliers)
-
-    d1['sign_simple_rtn'] = np.where(d1['simple_rtn'] > 0, 1, -1)
-    d1['new_simple_rtn'] = np.where(d1['outliers'] == 1, mu + sigma * n_sigmas * d1['sign_simple_rtn'],
-                                    d1['simple_rtn'])
-
-    d1['close_shift'] = d1['close'].shift(1)
-    d1['new_rtn'] = (d1['close'] - d1['close_shift']) / d1['close_shift']
-    d1['new_close'] = d1['close_shift'] + d1['new_simple_rtn'] * d1['close_shift']
-    d1['test'] = d1['new_close'] - d1['close']
-    d1['new_close'][0] = d1['close'][0]
-    '''
- 
     # normalize simple_rtn
     d1["simple_rtn_normalized"] = d1["simple_rtn"].clip(lower = mu - sigma * n_sigmas, upper = mu + sigma * n_sigmas)
     
     # revert pct_change to compute new close values
     d1['close'] = d1['close'][0] * (1. + d1['simple_rtn_normalized']).cumprod()
-    visu.DisplayOutliersFromDataframe(df, d1, './tmp/outliers_normalize_stdcutoff.png')
+    if debug:
+        visu.DisplayOutliersFromDataframe(df, d1, './tmp/outliers_normalize_stdcutoff.png')
 
     # update close values in df
     df['close'] = d1["close"]
