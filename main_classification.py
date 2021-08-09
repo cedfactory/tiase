@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from lib.fimport import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fimport import fimport,synthetic,visu
+from lib.findicators import findicators
+from lib.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis
 
 from rich import print,inspect
 

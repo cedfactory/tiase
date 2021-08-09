@@ -1,4 +1,4 @@
-from lib.fimport import *
+from lib.fimport import fimport,synthetic,visu
 
 ###
 ### AS A SCRIPT

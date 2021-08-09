@@ -1,6 +1,6 @@
-from lib.fimport import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fimport import fimport
+from lib.findicators import findicators
+from lib.ml import toolbox,dr
 
 
 df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")

@@ -1,5 +1,5 @@
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport
+from lib.findicators import findicators,vsa
 from lib.featureengineering import fprocessfeature
 from lib.fdatapreprocessing import fdataprep
 
@@ -15,19 +15,15 @@ def cac40():
             technical_indicators.extend(["sma_5","sma_10","sma_20","ema_5","ema_10","ema_20","wma_5","wma_10","wma_20"])
             technical_indicators.extend(["atr","adx","roc","simple_rtn", "mom", "target"])
 
-            # technical_indicators = ["vsa"]
+            technical_indicators.extend(["vsa"])
 
             df = findicators.add_technical_indicators(df, technical_indicators)
-            trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
-            value = filename[:len(filename)-4]
-            # print("{} ({}),{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(value, fimport.cac40[value], trend_ratio, true_positive, true_negative, false_positive, false_negative))
 
             df = fdataprep.process_technical_indicators(df, ['missing_values'])
             #df = fdataprep.process_technical_indicators(df, ['outliers_cut_stdcutoff'])
             #df = fdataprep.process_technical_indicators(df, ['drop_ohlcv'])
             #df = fprocessfeature.process_features(df, ['kbest_reduction'])
             print(df.head())
-            df = vsa.create_bunch_of_vsa_features(df, [1, 2, 3])
             df = fprocessfeature.process_features(df, ['vsa_reduction'])
 
 

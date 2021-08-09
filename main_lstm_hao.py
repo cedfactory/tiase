@@ -1,14 +1,13 @@
 import pandas as pd
-from lib.fimport import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fimport import fimport
+from lib.findicators import findicators
+from lib.ml import lstm_hao,analysis
 
 #
 # basic lstm
 # Reference : https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
 #
-def HaoBasic():
-    filename = "./lib/data/CAC40/AI.PA.csv"
+def hao_basic():
     filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
 
@@ -33,8 +32,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-def HaoTrend():
-    filename = "./lib/data/test/GOOG.csv"
+def hao_trend():
     filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
 
@@ -65,7 +63,7 @@ def _usage():
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--basic": HaoBasic()
-        elif sys.argv[1] == "--trend": HaoTrend()
+        if sys.argv[1] == "--basic": hao_basic()
+        elif sys.argv[1] == "--trend": hao_trend()
         else: _usage()
     else: _usage()

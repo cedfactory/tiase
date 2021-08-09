@@ -1,5 +1,5 @@
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport,synthetic
+from lib.findicators import findicators
 from lib.featureengineering import fprocessfeature,fbalance
 from lib.fdatapreprocessing import fdataprep
 import numpy as np
