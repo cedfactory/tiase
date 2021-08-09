@@ -1,5 +1,5 @@
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport,visu
+from lib.findicators import findicators
 import pandas as pd
 import os
 
@@ -38,7 +38,7 @@ def stats(value):
     if value in fimport.nasdaq100:
         name = fimport.nasdaq100[value]
     df = fimport.GetDataFrameFromYahoo(value)
-    #print("{} ({})".format(value, name))
+    print("{} ({})".format(value, name))
 
     technical_indicators = findicators.get_all_default_technical_indicators()
     df = findicators.add_technical_indicators(df, technical_indicators)
@@ -56,7 +56,9 @@ def stats(value):
     f.write("<html><body>")
     f.write("<center><h1>"+value+" ("+name+")</h1></Center>")
 
-    f.write("<p>trend ratio : {:.2f}%</p>".format(trend_ratio))
+    f.write("<p>trend ratio d+1 : {:.2f}%</p>".format(trend_ratio_1d))
+    f.write("<p>trend ratio d+7 : {:.2f}%</p>".format(trend_ratio_7d))
+    f.write("<p>trend ratio d+21 : {:.2f}%</p>".format(trend_ratio_21d))
 
     for column in df.columns:
         imgname = value+'_'+column+'.png'
