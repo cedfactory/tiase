@@ -38,13 +38,18 @@ def stats(value):
     if value in fimport.nasdaq100:
         name = fimport.nasdaq100[value]
     df = fimport.GetDataFrameFromYahoo(value)
-    print("{} ({})".format(value, name))
-    print(df.head())
+    #print("{} ({})".format(value, name))
 
     technical_indicators = findicators.get_all_default_technical_indicators()
     df = findicators.add_technical_indicators(df, technical_indicators)
-    trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
-    print("{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(trend_ratio, true_positive, true_negative, false_positive, false_negative))
+
+    trend_ratio_1d = findicators.get_stats_for_trend_up(df, 1)
+    trend_ratio_7d = findicators.get_stats_for_trend_up(df, 7)
+    trend_ratio_21d = findicators.get_stats_for_trend_up(df, 21)
+    print("{} ({});{:.2f};{:.2f};{:.2f}".format(value, name, trend_ratio_1d, trend_ratio_7d, trend_ratio_21d))
+
+    true_positive, true_negative, false_positive, false_negative = findicators.get_stats_on_trend_today_equals_trend_tomorrow(df)
+    print("{:.2f},{:.2f},{:.2f},{:.2f}".format(true_positive, true_negative, false_positive, false_negative))
 
     # output index.html
     f = open("./tmp/index_"+value+".html", "w")
@@ -65,19 +70,23 @@ def stats(value):
 # parse directory cac40
 #
 def cac40():
-    directory = "./lib/data/CAC40/"
+    directory = "./lib/data/NASDAQ100/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
+            value = filename[:len(filename)-4]
+            name = fimport.nasdaq100[value]
+
             df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
             technical_indicators = ["trend_1d","macd","rsi_30","cci_30","williams_%r","stoch_%k","stoch_%d","er","stc"]
             technical_indicators.extend(["sma_5","sma_10","sma_15","sma_20"])
             technical_indicators.extend(["ema_10","ema_20","ema_50"])
             technical_indicators.extend(["atr","adx","roc"])
             df = findicators.add_technical_indicators(df, technical_indicators)
-            trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
-            value = filename[:len(filename)-4]
-            print("{} ({}),{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(value, fimport.cac40[value], trend_ratio, true_positive, true_negative, false_positive, false_negative))
-
+            
+            trend_ratio_1d = findicators.get_stats_for_trend_up(df, 1)
+            trend_ratio_7d = findicators.get_stats_for_trend_up(df, 7)
+            trend_ratio_21d = findicators.get_stats_for_trend_up(df, 21)
+            print("{} ({});{:.2f};{:.2f};{:.2f}".format(value, name, trend_ratio_1d, trend_ratio_7d, trend_ratio_21d))
 
 
 

@@ -56,10 +56,11 @@ class TestIndicators:
         equal = np.array_equal(trend4, [0, 0, 0, 0, 0, 1, 1, 1, 0])
         assert(equal)
 
-    def test_get_trend_ratio(self):
+    def test_get_stats_on_trend_today_equals_trend_tomorrow(self):
         data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27, 28]}
         df = pd.DataFrame(data)
-        trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
+        trend_ratio = findicators.get_stats_for_trend_up(df, 1)
+        true_positive, true_negative, false_positive, false_negative = findicators.get_stats_on_trend_today_equals_trend_tomorrow(df)
         assert(trend_ratio == pytest.approx(66.666, 0.001))
         assert(true_positive == pytest.approx(55.555, 0.001))
         assert(true_negative == pytest.approx(11.111, 0.001))
