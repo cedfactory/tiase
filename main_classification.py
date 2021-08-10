@@ -7,7 +7,6 @@ import os
 from rich import print,inspect
 
 def evaluate_classifiers(df, value, verbose=False):
-    #df = findicators.add_technical_indicators(df, ["macd", "williams_%r", "stoch_%k", "stoch_%d", "trend_1d"])
     df = findicators.add_technical_indicators(df, ["trend_1d"])
     df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
     df.dropna(inplace = True)
@@ -15,7 +14,7 @@ def evaluate_classifiers(df, value, verbose=False):
     if verbose:
         print(df.head())
 
-    gClassifiers = [
+    g_classifiers = [
         { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), params={'epochs': 20})},
         { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 20})},
         { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), params={'epochs': 20})},
@@ -27,10 +26,10 @@ def evaluate_classifiers(df, value, verbose=False):
         { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), params={'class_to_return': 1})}
     ]
 
-    TestVSPred = []
-    for gClassifier in gClassifiers:
-        name = gClassifier["name"]
-        model = gClassifier["classifier"]
+    test_vs_pred = []
+    for g_classifier in g_classifiers:
+        name = g_classifier["name"]
+        model = g_classifier["classifier"]
 
         model.create_model()
         model_analysis = model.get_analysis()
@@ -46,9 +45,9 @@ def evaluate_classifiers(df, value, verbose=False):
         if "history" in model_analysis.keys():
             analysis.export_history(name, model_analysis["history"])
 
-        TestVSPred.append(analysis.testvspred(name, model_analysis["y_test"], model_analysis["y_test_prob"]))
+        test_vs_pred.append(analysis.testvspred(name, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
-    analysis.export_roc_curves(TestVSPred, "roc_curves_"+value+".png", value)
+    analysis.export_roc_curves(test_vs_pred, "roc_curves_"+value+".png", value)
 
 
 def experiment(df):
@@ -56,7 +55,7 @@ def experiment(df):
     filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
 
-    y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
+    #y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
     #df = synthetic.create_dataframe(y, 0.8)
     visu.DisplayFromDataframe(df,"Close", "close.png")
 
@@ -69,6 +68,7 @@ def cac40():
         if filename.endswith(".csv"):
             value = filename[:len(filename)-4]
             name = fimport.cac40[value]
+            print(name)
 
             df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
             evaluate_classifiers(df, value)

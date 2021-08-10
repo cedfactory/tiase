@@ -72,11 +72,11 @@ def stats(value):
 # parse directory cac40
 #
 def cac40():
-    directory = "./lib/data/NASDAQ100/"
+    directory = "./lib/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             value = filename[:len(filename)-4]
-            name = fimport.nasdaq100[value]
+            name = fimport.cac40[value]
 
             df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
             technical_indicators = ["trend_1d","macd","rsi_30","cci_30","williams_%r","stoch_%k","stoch_%d","er","stc"]
