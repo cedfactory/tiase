@@ -1,7 +1,7 @@
 f
 =
 
-![build](https://github.com/cedfactory/f/actions/workflows/build.yml/badge.svg)
+[![Build](https://github.com/cedfactory/f/actions/workflows/build.yml/badge.svg)](https://github.com/cedfactory/f/actions)
 [![Build Status](https://travis-ci.com/cedfactory/f.svg?branch=main)](https://travis-ci.com/cedfactory/f)
 [![codecov](https://codecov.io/gh/cedfactory/f/branch/main/graph/badge.svg)](https://codecov.io/gh/cedfactory/f)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cedfactory_f&metric=alert_status)](https://sonarcloud.io/dashboard?id=cedfactory_f)[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=cedfactory_f&metric=bugs)](https://sonarcloud.io/dashboard?id=cedfactory_f)
