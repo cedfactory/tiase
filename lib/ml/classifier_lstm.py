@@ -6,10 +6,11 @@ from rich import print,inspect
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout
+from keras.layers import Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
-from keras import backend as K
+from keras import backend
+from keras import Model
 # Functional API : https://keras.io/guides/functional_api/
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -19,8 +20,8 @@ from tensorflow.keras import layers
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
 #
 class ClassifierLSTM(classifier.Classifier):
-    def __init__(self, dataframe, params = None):
-        self.df = dataframe
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target)
 
         self.epochs = 170
         self.seq_len = 21
@@ -29,7 +30,7 @@ class ClassifierLSTM(classifier.Classifier):
             self.seq_len = params.get("seq_len", self.seq_len)
 
     def create_model(self):
-        self.set_train_test_data()
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
         self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
         self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
 
@@ -53,9 +54,16 @@ class ClassifierLSTM(classifier.Classifier):
         self.analysis["history"] = getattr(self.model, "history", None)
         return self.analysis
 
+    def load(self, filename):
+        self.model = tf.keras.models.load_model(filename)
+
+    def save(self, filename):
+        self.model.save(filename)
+
+
 class ClassifierLSTM1(ClassifierLSTM):
-    def __init__(self, dataframe, params = None):
-        super().__init__(dataframe, params)
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
     
     def build_model(self):
         print("[Build ClassifierLSTM1]")
@@ -69,8 +77,8 @@ class ClassifierLSTM1(ClassifierLSTM):
 
 
 class ClassifierLSTM2(ClassifierLSTM):
-    def __init__(self, dataframe, params = None):
-        super().__init__(dataframe, params)
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
     
     def build_model(self):
         print("[Build ClassifierLSTM2]")
@@ -88,8 +96,8 @@ class ClassifierLSTM2(ClassifierLSTM):
 
 # Functional API : https://keras.io/guides/functional_api/
 class ClassifierLSTM3(ClassifierLSTM):
-    def __init__(self, dataframe, params = None):
-        super().__init__(dataframe, params)
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
     
     def build_model(self):
         print("[Build ClassifierLSTM3]")
@@ -110,8 +118,8 @@ class ClassifierLSTM3(ClassifierLSTM):
 # https://www.researchgate.net/publication/342045600_Predicting_the_Trend_of_Stock_Market_Index_Using_the_Hybrid_Neural_Network_Based_on_Multiple_Time_Scale_Feature_Learning
 #
 class ClassifierLSTM_Hao2020(ClassifierLSTM):
-    def __init__(self, dataframe, params = None):
-        super().__init__(dataframe, params)
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
     
     def build_model(self):
         print("[Build ClassifierLSTM_Hao2020]")
@@ -120,10 +128,10 @@ class ClassifierLSTM_Hao2020(ClassifierLSTM):
         shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
 
         inputs = keras.Input(shape=(1, shapeDim2), name="Input")
-        convmax2 = layers.Conv1D(10, 3, activation="relu", padding='same')(inputs)
+        convmax2 = Conv1D(10, 3, activation="relu", padding='same')(inputs)
         convmax2 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax2)
         
-        convmax3 = layers.Conv1D(20, 3, activation="relu", padding='same')(convmax2)
+        convmax3 = Conv1D(20, 3, activation="relu", padding='same')(convmax2)
         convmax3 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax3)
         F3 = layers.LSTM(10, activation="sigmoid")(convmax3)
 
@@ -138,15 +146,13 @@ class ClassifierLSTM_Hao2020(ClassifierLSTM):
 
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
-        K.set_value(self.model.optimizer.learning_rate, 0.001)
-
-        self.model.save("lstm.hdf5")
+        backend.set_value(self.model.optimizer.learning_rate, 0.001)
 
 
 # Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
 class ClassifierBiLSTM(ClassifierLSTM):
-    def __init__(self, dataframe, params = None):
-        super().__init__(dataframe, params)
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
     
     def build_model(self):
         print("[Build ClassifierBiLSTM]")
@@ -169,3 +175,130 @@ class ClassifierBiLSTM(ClassifierLSTM):
         self.model = keras.Model(inputs=in_seq, outputs=out)
         self.model.compile(loss="mse", optimizer="adam", metrics=['mse', 'mae', 'mape'])    
 
+#
+# Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
+#
+# CNN + Bi-LSTM model
+#
+class ClassifierCNNBiLSTM(ClassifierLSTM):
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
+    
+    def inception_a(self, layer_in, c7):
+        branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
+        branch1x1 = BatchNormalization()(branch1x1_1)
+        branch1x1 = ReLU()(branch1x1)
+
+        branch5x5_1 = Conv1D(c7, kernel_size=1, padding='same', use_bias=False)(layer_in)
+        branch5x5 = BatchNormalization()(branch5x5_1)
+        branch5x5 = ReLU()(branch5x5)
+        branch5x5 = Conv1D(c7, kernel_size=5, padding='same', use_bias=False)(branch5x5)
+        branch5x5 = BatchNormalization()(branch5x5)
+        branch5x5 = ReLU()(branch5x5)  
+
+        branch3x3_1 = Conv1D(c7, kernel_size=1, padding='same', use_bias=False)(layer_in)
+        branch3x3 = BatchNormalization()(branch3x3_1)
+        branch3x3 = ReLU()(branch3x3)
+        branch3x3 = Conv1D(c7, kernel_size=3, padding='same', use_bias=False)(branch3x3)
+        branch3x3 = BatchNormalization()(branch3x3)
+        branch3x3 = ReLU()(branch3x3)
+        branch3x3 = Conv1D(c7, kernel_size=3, padding='same', use_bias=False)(branch3x3)
+        branch3x3 = BatchNormalization()(branch3x3)
+        branch3x3 = ReLU()(branch3x3) 
+
+        branch_pool = AveragePooling1D(pool_size=(3), strides=1, padding='same')(layer_in)
+        branch_pool = Conv1D(c7, kernel_size=1, padding='same', use_bias=False)(branch_pool)
+        branch_pool = BatchNormalization()(branch_pool)
+        branch_pool = ReLU()(branch_pool)
+        outputs = Concatenate(axis=-1)([branch1x1, branch5x5, branch3x3, branch_pool])
+        return outputs
+
+
+    def inception_b(self, layer_in, c7):
+        branch3x3 = Conv1D(c7, kernel_size=3, padding="same", strides=2, use_bias=False)(layer_in)
+        branch3x3 = BatchNormalization()(branch3x3)
+        branch3x3 = ReLU()(branch3x3)  
+
+        branch3x3dbl = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
+        branch3x3dbl = BatchNormalization()(branch3x3dbl)
+        branch3x3dbl = ReLU()(branch3x3dbl)  
+        branch3x3dbl = Conv1D(c7, kernel_size=3, padding="same", use_bias=False)(branch3x3dbl)  
+        branch3x3dbl = BatchNormalization()(branch3x3dbl)
+        branch3x3dbl = ReLU()(branch3x3dbl)  
+        branch3x3dbl = Conv1D(c7, kernel_size=3, padding="same", strides=2, use_bias=False)(branch3x3dbl)    
+        branch3x3dbl = BatchNormalization()(branch3x3dbl)
+        branch3x3dbl = ReLU()(branch3x3dbl)   
+
+        branch_pool = MaxPooling1D(pool_size=3, strides=2, padding="same")(layer_in)
+
+        outputs = Concatenate(axis=-1)([branch3x3, branch3x3dbl, branch_pool])
+        return outputs
+
+
+    def inception_c(self, layer_in, c7):
+        branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
+        branch1x1 = BatchNormalization()(branch1x1_1)
+        branch1x1 = ReLU()(branch1x1)   
+
+        branch7x7_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
+        branch7x7 = BatchNormalization()(branch7x7_1)
+        branch7x7 = ReLU()(branch7x7)   
+        branch7x7 = Conv1D(c7, kernel_size=(7), padding="same", use_bias=False)(branch7x7)
+        branch7x7 = BatchNormalization()(branch7x7)
+        branch7x7 = ReLU()(branch7x7)  
+        branch7x7 = Conv1D(c7, kernel_size=(1), padding="same", use_bias=False)(branch7x7)  
+        branch7x7 = BatchNormalization()(branch7x7)
+        branch7x7 = ReLU()(branch7x7)   
+
+        branch7x7dbl_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)  
+        branch7x7dbl = BatchNormalization()(branch7x7dbl_1)
+        branch7x7dbl = ReLU()(branch7x7dbl)  
+        branch7x7dbl = Conv1D(c7, kernel_size=(7), padding="same", use_bias=False)(branch7x7dbl)  
+        branch7x7dbl = BatchNormalization()(branch7x7dbl)
+        branch7x7dbl = ReLU()(branch7x7dbl) 
+        branch7x7dbl = Conv1D(c7, kernel_size=(1), padding="same", use_bias=False)(branch7x7dbl)  
+        branch7x7dbl = BatchNormalization()(branch7x7dbl)
+        branch7x7dbl = ReLU()(branch7x7dbl)  
+        branch7x7dbl = Conv1D(c7, kernel_size=(7), padding="same", use_bias=False)(branch7x7dbl)  
+        branch7x7dbl = BatchNormalization()(branch7x7dbl)
+        branch7x7dbl = ReLU()(branch7x7dbl)  
+        branch7x7dbl = Conv1D(c7, kernel_size=(1), padding="same", use_bias=False)(branch7x7dbl)  
+        branch7x7dbl = BatchNormalization()(branch7x7dbl)
+        branch7x7dbl = ReLU()(branch7x7dbl)  
+
+        branch_pool = AveragePooling1D(pool_size=3, strides=1, padding='same')(layer_in)
+        branch_pool = Conv1D(c7, kernel_size=1, padding='same', use_bias=False)(branch_pool)
+        branch_pool = BatchNormalization()(branch_pool)
+        branch_pool = ReLU()(branch_pool)  
+
+        outputs = Concatenate(axis=-1)([branch1x1, branch7x7, branch7x7dbl, branch_pool])
+        return outputs
+
+    def build_model(self):
+        print("[Build ClassifierCNNBiLSTM]")
+
+        # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
+        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+
+        in_seq = keras.Input(shape=(1, shapeDim2))
+        c7 = int(self.seq_len/4)
+
+        x = self.inception_a(in_seq, c7)
+        x = self.inception_a(x, c7)
+        x = self.inception_b(x, c7)
+        x = self.inception_b(x, c7)
+        x = self.inception_c(x, c7)
+        x = self.inception_c(x, c7)    
+            
+        x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+        x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+        x = layers.Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x) 
+            
+        avg_pool = GlobalAveragePooling1D()(x)
+        max_pool = GlobalMaxPooling1D()(x)
+        conc = concatenate([avg_pool, max_pool])
+        conc = Dense(64, activation="relu")(conc)
+        out = Dense(1, activation="sigmoid")(conc)      
+
+        self.model = Model(inputs=in_seq, outputs=out)
+        self.model.compile(loss="mse", optimizer="adam", metrics=['mae', 'mape'])     

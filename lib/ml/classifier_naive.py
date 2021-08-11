@@ -4,10 +4,10 @@ import numpy as np
 from rich import print,inspect
 
 class ClassifierAlwaysSameClass(classifier.Classifier):
-    def __init__(self, dataframe, params = None):
-        self.df = dataframe
-        self.seq_len = 50
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target)
         self.class_to_return = 1
+        self.seq_len = 50
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
             self.class_to_return = params.get("class_to_return", 1)
@@ -16,7 +16,7 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         pass
 
     def create_model(self):
-        self.set_train_test_data()
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
 
     def get_analysis(self):
         self.y_test_pred = np.empty(len(self.y_test))
@@ -29,9 +29,16 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis
 
+    def save(self, filename):
+        pass
+
+    def load(self, filename):
+        pass
+
+
 class ClassifierAlwaysAsPrevious(classifier.Classifier):
-    def __init__(self, dataframe, params = None):
-        self.df = dataframe
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target)
         self.seq_len = 50
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
@@ -40,7 +47,7 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         pass
 
     def create_model(self):
-        self.set_train_test_data()
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
 
     def get_analysis(self):
         self.y_test_pred = np.roll(self.y_test, 1)
@@ -49,3 +56,9 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
 
         self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis
+
+    def save(self, filename):
+        pass
+
+    def load(self, filename):
+        pass

@@ -18,7 +18,6 @@ class TestIndicators:
 
     def test_number_colums(self):
         df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
-        print(list(df.columns))
         assert(len(list(df.columns)) == 6)
 
         # first set of technical indicators
@@ -46,21 +45,28 @@ class TestIndicators:
         assert(len(list(df.columns)) == 3)
 
     def test_get_trend_close(self):
-        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 16]}
+        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 16, -10, -15, -18, -15, -8]}
         df = pd.DataFrame(data)
         df = findicators.add_technical_indicators(df, ["trend_1d","trend_4d"])
         trend1 = df.loc[:,'trend_1d'].values
-        equal = np.array_equal(trend1, [0, 1, 1, 0, 0, 1, 1, 1, 0])
+        equal = np.array_equal(trend1, [0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1])
         assert(equal)
         trend4 = df.loc[:,'trend_4d'].values
-        equal = np.array_equal(trend4, [0, 0, 0, 0, 0, 1, 1, 1, 0])
+        equal = np.array_equal(trend4, [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1])
         assert(equal)
 
-    def test_get_stats_on_trend_today_equals_trend_tomorrow(self):
+    def test_get_target(self):
+        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 16, -10, -15, -18, -15, -8]}
+        df = pd.DataFrame(data)
+        df = findicators.add_technical_indicators(df, ["target"])
+        target = df.loc[:,'target'].values
+        equal = np.allclose(target, [1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, np.nan], equal_nan=True)
+        assert(equal)
+
+    def test_get_trend_ratio(self):
         data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27, 28]}
         df = pd.DataFrame(data)
-        trend_ratio = findicators.get_stats_for_trend_up(df, 1)
-        true_positive, true_negative, false_positive, false_negative = findicators.get_stats_on_trend_today_equals_trend_tomorrow(df)
+        trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
         assert(trend_ratio == pytest.approx(66.666, 0.001))
         assert(true_positive == pytest.approx(55.555, 0.001))
         assert(true_negative == pytest.approx(11.111, 0.001))

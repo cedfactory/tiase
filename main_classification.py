@@ -7,7 +7,7 @@ import os
 from rich import print,inspect
 
 def evaluate_classifiers(df, value, verbose=False):
-    df = findicators.add_technical_indicators(df, ["trend_1d"])
+    df = findicators.add_technical_indicators(df, ["target"])
     df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
     df.dropna(inplace = True)
 
@@ -15,15 +15,15 @@ def evaluate_classifiers(df, value, verbose=False):
         print(df.head())
 
     g_classifiers = [
-        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), params={'epochs': 20})},
-        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), params={'epochs': 20})},
-        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), params={'epochs': 20})},
-        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), params={'epochs': 40})},
-        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy())},
-        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy())},
-        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy())},
-        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), params={'class_to_return': 1})}
+        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), "target", params={'epochs': 20})},
+        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), "target", params={'epochs': 20})},
+        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), "target", params={'epochs': 20})},
+        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), "target", params={'epochs': 40})},
+        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), "target", params={'epochs': 20})},
+        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), "target")},
+        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), "target")},
+        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), "target")},
+        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), "target", params={'class_to_return': 1})}
     ]
 
     test_vs_pred = []

@@ -1,7 +1,8 @@
 from parse import parse
 import numpy as np
-from rich import print,inspect
+
 import pandas as pd
+
 from . import vsa
 
 # https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
@@ -191,47 +192,39 @@ def add_technical_indicators(df, indicators):
             df = vsa.create_bunch_of_vsa_features(df, days)
             df['outcomes_vsa'] = df.close.pct_change(-1)
 
+        # 'target' is trend_1d with a shift applied in order tp place on the same row the features and the expected trend for the next day
         elif indicator == 'target':
-            df['target'] = df['close'].pct_change()
-            df['target'] = np.where(df['target'] > 0, 1, 0)
-            df['target'] = df['target'].shift(-1)
+            diff = df["close"] - df["close"].shift(1)
+            df["target"] = diff.gt(0).map({False: 0, True: 1}).shift(-1)
+            #df['target'] = df['close'].pct_change()
+            #df['target'] = np.where(df['target'] > 0, 1, 0)
+            #df['target'] = df['target'].shift(-1)
         else:
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     
     return df
 
-# get stats for trend up comparing with d + n forward days
-def get_stats_for_trend_up(df, n_forward_days):
-    tmp = pd.concat([df['close']], axis=1, keys=['close'])
-
-    indicator = "trend_"+str(n_forward_days)+"d"
-    if indicator not in tmp.columns:
-        tmp = add_technical_indicators(tmp, [indicator])
-
-    tmp['shift_trend'] = tmp[indicator].shift(-n_forward_days)
-    tmp.dropna(inplace=True)
-
-    # how many times the trend is up for d+1
-    trend_counted = tmp[indicator].value_counts(normalize=True)
-    trend_ratio = 100 * trend_counted[1]
-
-    return trend_ratio
-
-def get_stats_on_trend_today_equals_trend_tomorrow(df):
+def get_trend_info(df):
     tmp = pd.concat([df['close']], axis=1, keys=['close'])
     tmp = add_technical_indicators(tmp, ["trend_1d"])
-    tmp['shift_trend'] = tmp["trend_1d"].shift(-1)
+    tmp['shift_trend_1d'] = tmp['trend_1d'].shift(-1)
     tmp.dropna(inplace=True)
 
-    tmp['true_positive'] = np.where((tmp["trend_1d"] == 1) & (tmp['shift_trend'] == 1), 1, 0)
-    tmp['true_negative'] = np.where((tmp["trend_1d"] == 0) & (tmp['shift_trend'] == 0), 1, 0)
-    tmp['false_positive'] = np.where((tmp["trend_1d"] == 1) & (tmp['shift_trend'] == 0), 1, 0)
-    tmp['false_negative'] = np.where((tmp["trend_1d"] == 0) & (tmp['shift_trend'] == 1), 1, 0)
+    tmp['true_positive'] = np.where((tmp['trend_1d'] == 1) & (tmp['shift_trend_1d'] == 1), 1, 0)
+    tmp['true_negative'] = np.where((tmp['trend_1d'] == 0) & (tmp['shift_trend_1d'] == 0), 1, 0)
+    tmp['false_positive'] = np.where((tmp['trend_1d'] == 1) & (tmp['shift_trend_1d'] == 0), 1, 0)
+    tmp['false_negative'] = np.where((tmp['trend_1d'] == 0) & (tmp['shift_trend_1d'] == 1), 1, 0)
+
+    # how many times the trend is up
+    trend_counted = tmp['trend_1d'].value_counts(normalize=True)
+    trend_ratio = 100 * trend_counted[1]
 
     # how many times trend today = trend tomorrow
     true_positive = 100*tmp['true_positive'].value_counts(normalize=True)[1]
     true_negative = 100*tmp['true_negative'].value_counts(normalize=True)[1]
     false_positive = 100*tmp['false_positive'].value_counts(normalize=True)[1]
     false_negative = 100*tmp['false_negative'].value_counts(normalize=True)[1]
-    
-    return true_positive, true_negative, false_positive, false_negative
+
+    return trend_ratio, true_positive, true_negative, false_positive, false_negative
+
+ 
