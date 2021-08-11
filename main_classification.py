@@ -50,7 +50,7 @@ def evaluate_classifiers(df, value, verbose=False):
     analysis.export_roc_curves(test_vs_pred, "roc_curves_"+value+".png", value)
 
 
-def experiment(df):
+def experiment(value):
 
     filename = "./lib/data/test/google_stocks_data.csv"
     df = fimport.GetDataFrameFromCsv(filename)
