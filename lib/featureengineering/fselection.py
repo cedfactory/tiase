@@ -96,6 +96,16 @@ def correlation_reduction(df):
     return df_result
 
 
+def sort_df_by_corr(df, col, method="corr"):
+    if method == "corr":
+        corr_with = df.corrwith(df[col])
+        corr_with = corr_with.sort_values(ascending=False)
+        corr_with_col = corr_with.index.tolist()
+        results = df[corr_with_col].copy()
+
+        return results
+
+
 def pca_reduction(df, coef_pca=0.99):
     list_features = df.columns.to_list()
     list_features.remove('simple_rtn')

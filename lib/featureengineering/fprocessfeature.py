@@ -1,4 +1,4 @@
-from . import fselection, fbalance
+from . import fselection, fbalance, fstationary, flabeling
 
 
 def process_features(df, featureengineering):
@@ -24,6 +24,14 @@ def process_features(df, featureengineering):
             df = fselection.kbest_reduction(df, model_type, k_best)
         elif process == 'vsa_reduction':
             df = fselection.vsa_corr_selection(df)
+        elif process == 'stationary_transform':
+            df = fstationary.stationary_transform(df)
+        elif process == 'data_labeling':
+            df = flabeling.data_labeling(df)
+        elif process == 'sort_df_by_corr':
+            col = 'close'
+            method = 'corr'
+            df = fselection.sort_df_by_corr(df, col, method)
         else:
             print(":fix: process {} is unknown".format(process))
 
