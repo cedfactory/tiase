@@ -27,7 +27,7 @@ def process_technical_indicators(df, preprocessing):
             # Using Moving Average Mean
             n_sigmas = 2.5
             df = fprep.normalize_outliers_mam(df, n_sigmas)
-        elif preprocess == 'outliers_normalize_mam':
+        elif preprocess == 'outliers_normalize_ema':
             # Using EMA
             n_sigmas = 2.5
             df = fprep.normalize_outliers_ema(df, n_sigmas)
