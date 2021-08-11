@@ -86,7 +86,7 @@ class TestMlClassifier:
         assert(model_analysis["recall"] == pytest.approx(0.985185, 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(0.992537, 0.00001))
 
-    def test_classifier_bilstm(self):
+    def notest_classifier_bilstm(self):
         df = self.get_dataframe()
 
         model = classifier_lstm.ClassifierBiLSTM(df)
