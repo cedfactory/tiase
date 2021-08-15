@@ -5,6 +5,14 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 from sklearn import preprocessing
 import joblib
+from ..fdatapreprocessing import fdataprep
+
+def make_target(df, method, n_days):
+    diff = df["close"] - df["close"].shift(n_days)
+    df["target"] = diff.gt(0).map({False: 0, True: 1})
+    df["target"] = df["target"].shift(-n_days)
+    df = fdataprep.process_technical_indicators(df, ["missing_values"])
+    return df
 
 # filename should have one of the following extension : ['.z', '.gz', '.bz2', '.xz', '.lzma']
 def serialize(scaler, filename):
