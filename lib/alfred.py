@@ -1,5 +1,5 @@
 import xml.etree.cElementTree as ET
-from lib.fimport import *
+from lib.fimport import fimport
 from lib.fdatapreprocessing import fdataprep
 from lib.findicators import findicators
 from lib.ml import classifier_svc
@@ -117,9 +117,9 @@ def execute(filename):
         featureengeineering_node = ding.find('featureengeineering')
         if featureengeineering_node is not None:
             # reduction
-            reductionNode = featureengeineering_node.find('reduction')
-            if reductionNode is not None:
-                method = reductionNode.get("method", None)
+            reduction_node = featureengeineering_node.find('reduction')
+            if reduction_node is not None:
+                method = reduction_node.get("method", None)
                 if method is not None:
                     print("[FEATURE ENGINEERING] reduction : {}".format(method))
 

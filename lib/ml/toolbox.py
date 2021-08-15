@@ -34,7 +34,7 @@ def get_train_test_data_from_dataframe0(df, seq_len, column_target, train_split)
     train_normalised_data = x_normaliser.fit_transform(train_data)
     test_normalised_data = x_normaliser.transform(test_data)
 
-    X_train = np.array([train_normalised_data[:,0:][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
+    x_train = np.array([train_normalised_data[:,0:][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
 
     y_train = np.array([train_normalised_data[:,0][i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
     y_train = np.expand_dims(y_train, -1)
@@ -46,14 +46,14 @@ def get_train_test_data_from_dataframe0(df, seq_len, column_target, train_split)
     y_normaliser.fit(next_day_close_values)
 
      
-    X_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
+    x_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
     
 
     y_test = np.array([test_data[column_target][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
     
     y_test = np.expand_dims(y_test, -1)
 
-    return X_train, y_train, X_test, y_test, x_normaliser, y_normaliser
+    return x_train, y_train, x_test, y_test, x_normaliser, y_normaliser
 
 def get_train_test_data_from_dataframe1(df, seq_len, column_target, train_split):
     #Preparation of train test set.
@@ -73,15 +73,15 @@ def get_train_test_data_from_dataframe1(df, seq_len, column_target, train_split)
     train_normalised_data = x_normaliser.fit_transform(train_data)
     test_normalised_data = x_normaliser.transform(test_data)
 
-    X_train = np.array([train_normalised_data[:,0][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
+    x_train = np.array([train_normalised_data[:,0][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
     y_train = np.array([train_data[column_target][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
     y_train = np.expand_dims(y_train, 1)
 
-    X_test = np.array([test_normalised_data[:,0][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
+    x_test = np.array([test_normalised_data[:,0][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
     y_test = np.array([test_data[column_target][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
     y_test = np.expand_dims(y_test, 1)
 
-    return X_train, y_train, X_test, y_test, x_normaliser
+    return x_train, y_train, x_test, y_test, x_normaliser
 
 
 '''
@@ -92,34 +92,34 @@ Warnings :
 '''
 def _get_train_test_data_from_dataframe2(features, target, seq_len):
     nFeatures = features.shape[1]
-    X_train = []
+    x_train = []
     for i in range(len(features) - seq_len):
         seq = []
         for j in range(nFeatures):
             seq.extend(features[:,j][i : i + seq_len].flatten())
-        X_train.append(seq)
-    X_train = np.array(X_train)
+        x_train.append(seq)
+    x_train = np.array(x_train)
 
     y_train = np.array([target["target"][i + seq_len].copy() for i in range(len(target) - seq_len)])
     y_train = np.expand_dims(y_train, 1)
     
-    return X_train, y_train
+    return x_train, y_train
 
 def get_train_test_data_from_dataframe2(df, seq_len, column_target, train_split, debug=False):
 
-    splitIndex = int(df.shape[0] * train_split)
+    split_index = int(df.shape[0] * train_split)
 
     # Preparation of train test set.
     features = df.copy().drop(column_target, axis=1)
     target = pd.DataFrame({'target': df[column_target]})
 
-    train_features = features[:splitIndex]
-    train_target = target[:splitIndex]
+    train_features = features[:split_index]
+    train_target = target[:split_index]
     train_target = train_target.reset_index(drop=True)
     #train_target = train_target.drop(columns = ['Date'])
 
-    test_features = features[splitIndex:]
-    test_target = target[splitIndex:]
+    test_features = features[split_index:]
+    test_target = target[split_index:]
     test_target = test_target.reset_index(drop=True)
     #test_target = test_features.drop(columns = ['Date'])
 
@@ -128,24 +128,24 @@ def get_train_test_data_from_dataframe2(df, seq_len, column_target, train_split,
     train_normalised_features = features_normaliser.fit_transform(train_features)
     test_normalised_features = features_normaliser.transform(test_features)
 
-    X_train, y_train = _get_train_test_data_from_dataframe2(train_normalised_features, train_target, seq_len)
-    X_test, y_test = _get_train_test_data_from_dataframe2(test_normalised_features, test_target, seq_len)
+    x_train, y_train = _get_train_test_data_from_dataframe2(train_normalised_features, train_target, seq_len)
+    x_test, y_test = _get_train_test_data_from_dataframe2(test_normalised_features, test_target, seq_len)
 
     if debug:
         df.to_csv("df.csv")
 
-        df_X_train = pd.DataFrame(X_train)
+        df_x_train = pd.DataFrame(x_train)
         df_y_train = pd.DataFrame(y_train)
-        df_X_test = pd.DataFrame(X_test)
+        df_x_test = pd.DataFrame(x_test)
         df_y_test = pd.DataFrame(y_test)
 
-        df_X_train.to_csv("X_train.csv")
+        df_x_train.to_csv("x_train.csv")
         df_y_train.to_csv("y_train.csv")
 
-        df_X_test.to_csv("X_test.csv")
+        df_x_test.to_csv("x_test.csv")
         df_y_test.to_csv("y_test.csv")
 
-    return X_train, y_train, X_test, y_test, features_normaliser
+    return x_train, y_train, x_test, y_test, features_normaliser
 
 '''
 build train & test data from a dataframe
@@ -154,21 +154,21 @@ Warning :
 '''
 def _get_train_test_data_from_dataframe(features, target, seq_len):
     nFeatures = features.shape[1]
-    X_train = []
+    x_train = []
     for i in range(len(features) - seq_len + 1):
         seq = []
         for j in range(nFeatures):
             seq.extend(features[:,j][i : i + seq_len].flatten())
-        X_train.append(seq)
-    X_train = np.array(X_train)
+        x_train.append(seq)
+    x_train = np.array(x_train)
 
     y_train = np.array([target["target"][i + seq_len - 1].copy() for i in range(len(target) - seq_len + 1)]).astype(int)
     y_train = np.expand_dims(y_train, 1)
     
-    return X_train, y_train
+    return x_train, y_train
 
 def get_train_test_data_from_dataframe(df, seq_len, column_target, train_split, debug=False):
-    splitIndex = int(df.shape[0] * train_split)
+    split_index = int(df.shape[0] * train_split)
 
     # separate features and targets
     features = df.copy().drop(column_target, axis=1)
@@ -177,13 +177,13 @@ def get_train_test_data_from_dataframe(df, seq_len, column_target, train_split, 
     #target = pd.DataFrame({'target': df[column_target]})
 
     # split training & testing data
-    train_features = features[:splitIndex]
-    train_target = target[:splitIndex]
+    train_features = features[:split_index]
+    train_target = target[:split_index]
     train_target = train_target.reset_index(drop=True)
     #train_target = train_target.drop(columns = ['Date'])
 
-    test_features = features[splitIndex:]
-    test_target = target[splitIndex:]
+    test_features = features[split_index:]
+    test_target = target[split_index:]
     test_target = test_target.reset_index(drop=True)
     #test_target = test_features.drop(columns = ['Date'])
     '''
@@ -197,19 +197,19 @@ def get_train_test_data_from_dataframe(df, seq_len, column_target, train_split, 
     train_normalised_features = features_normaliser.fit_transform(train_features)
     test_normalised_features = features_normaliser.transform(test_features)
 
-    X_train, y_train = _get_train_test_data_from_dataframe(train_normalised_features, train_target, seq_len)
-    X_test, y_test = _get_train_test_data_from_dataframe(test_normalised_features, test_target, seq_len)
+    x_train, y_train = _get_train_test_data_from_dataframe(train_normalised_features, train_target, seq_len)
+    x_test, y_test = _get_train_test_data_from_dataframe(test_normalised_features, test_target, seq_len)
 
     if debug:
-        df_X_train = pd.DataFrame(X_train)
+        df_x_train = pd.DataFrame(x_train)
         df_y_train = pd.DataFrame(y_train)
-        df_X_test = pd.DataFrame(X_test)
+        df_x_test = pd.DataFrame(x_test)
         df_y_test = pd.DataFrame(y_test)
 
-        df_X_train.to_csv("X_train.csv")
+        df_x_train.to_csv("x_train.csv")
         df_y_train.to_csv("y_train.csv")
 
-        df_X_test.to_csv("X_test.csv")
+        df_x_test.to_csv("x_test.csv")
         df_y_test.to_csv("y_test.csv")
 
-    return X_train, y_train, X_test, y_test, features_normaliser
+    return x_train, y_train, x_test, y_test, features_normaliser

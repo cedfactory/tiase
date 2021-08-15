@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport
+from lib.findicators import findicators
 from lib.fdatapreprocessing import fdataprep
 from lib.featureengineering import fbalance,fprocessfeature
 import pytest

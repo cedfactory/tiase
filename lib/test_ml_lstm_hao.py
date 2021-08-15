@@ -1,7 +1,7 @@
 import pandas as pd
-from lib.fimport import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fimport import fimport
+from lib.findicators import findicators
+from lib.ml import lstm_hao
 import pytest
 
 class TestMlLstmHao:
@@ -32,7 +32,6 @@ class TestMlLstmHao:
 
         analysis = model.get_analysis()
 
-        #assert(analysis["mape"] == inf)
         assert(analysis["rmse"] == pytest.approx(22.41, 0.01))
         assert(analysis["mse"] == pytest.approx(502.38, 0.01))
 

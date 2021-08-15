@@ -1,5 +1,5 @@
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport
+from lib.findicators import findicators
 import pandas as pd
 #from pandas._testing import assert_frame_equal
 import numpy as np

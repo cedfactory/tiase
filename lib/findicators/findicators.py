@@ -97,9 +97,6 @@ def add_technical_indicators(df, indicators):
             seq = int(trend_parsed[0])
             diff = df["close"] - df["close"].shift(seq)
             df["trend_"+str(seq)+"d"] = diff.gt(0).map({False: 0, True: 1})
-            #diff = df["close"] - df["close"].shift(1)
-            #trend_1d = diff.gt(0).map({False: 0, True: 1})
-            #df["trend_"+str(seq)+"d"] = trend_1d.rolling(seq).mean()
 
         elif sma_parsed != None and sma_parsed[0].isdigit():
             seq = int(sma_parsed[0])
