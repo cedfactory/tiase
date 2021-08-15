@@ -36,7 +36,7 @@ def check(action):
         df = get_real_dataframe()
         df = findicators.add_technical_indicators(df, ['simple_rtn'])
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens        print(df.head())
-        visu.DisplayFromDataframe(df, "simple_rtn", "./tmp/simple_rtn.png")
+        visu.display_from_dataframe(df, "simple_rtn", "./tmp/simple_rtn.png")
         print(df.head())
         df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'])
         print(df.head())
@@ -139,7 +139,7 @@ def cac40():
             print("{} ({}),{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(value, fimport.cac40[value], trend_ratio, true_positive, true_negative, false_positive, false_negative))
 
             df = fdataprep.process_technical_indicators(df, ['missing_values'])
-            visu.DisplayHistogramFromDataframe(df, 'simple_rtn', './tmp/' + value + '_close.png')
+            visu.display_histogram_from_dataframe(df, 'simple_rtn', './tmp/' + value + '_close.png')
 
             df_copy = df.copy()
             df = fdataprep.process_technical_indicators(df, ['outliers_winsorize'])

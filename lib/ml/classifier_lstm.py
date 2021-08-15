@@ -1,4 +1,4 @@
-from ..findicators import *
+from ..findicators import findicators
 from . import toolbox,analysis,classifier
 
 from rich import print,inspect
@@ -68,10 +68,10 @@ class ClassifierLSTM1(ClassifierLSTM):
     def build_model(self):
         print("[Build ClassifierLSTM1]")
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
-        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+        shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
         self.model = Sequential()
-        self.model.add(LSTM(100, input_shape=(1, shapeDim2)))
+        self.model.add(LSTM(100, input_shape=(1, shape_dim2)))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -83,10 +83,10 @@ class ClassifierLSTM2(ClassifierLSTM):
     def build_model(self):
         print("[Build ClassifierLSTM2]")
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
-        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+        shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
         self.model = Sequential()
-        self.model.add(LSTM(100, input_shape=(1, shapeDim2)))
+        self.model.add(LSTM(100, input_shape=(1, shape_dim2)))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(100, activation='sigmoid'))
         self.model.add(Dropout(0.5))
@@ -103,11 +103,10 @@ class ClassifierLSTM3(ClassifierLSTM):
         print("[Build ClassifierLSTM3]")
 
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
-        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+        shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
-        inputs = keras.Input(shape=(1, shapeDim2))
+        inputs = keras.Input(shape=(1, shape_dim2))
         x = layers.LSTM(100, activation="sigmoid")(inputs)
-        #x = layers.Dense(64, activation="sigmoid")(x)
         outputs = layers.Dense(1)(x)
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
@@ -117,17 +116,17 @@ class ClassifierLSTM3(ClassifierLSTM):
 # https://www.mdpi.com/2076-3417/10/11/3961
 # https://www.researchgate.net/publication/342045600_Predicting_the_Trend_of_Stock_Market_Index_Using_the_Hybrid_Neural_Network_Based_on_Multiple_Time_Scale_Feature_Learning
 #
-class ClassifierLSTM_Hao2020(ClassifierLSTM):
+class ClassifierLSTMHao2020(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
     
     def build_model(self):
-        print("[Build ClassifierLSTM_Hao2020]")
+        print("[Build ClassifierLSTMHao2020]")
         
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
-        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+        shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
-        inputs = keras.Input(shape=(1, shapeDim2), name="Input")
+        inputs = keras.Input(shape=(1, shape_dim2), name="Input")
         convmax2 = Conv1D(10, 3, activation="relu", padding='same')(inputs)
         convmax2 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax2)
         
@@ -158,9 +157,9 @@ class ClassifierBiLSTM(ClassifierLSTM):
         print("[Build ClassifierBiLSTM]")
 
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
-        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+        shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
-        in_seq = keras.Input(shape=(1, shapeDim2))
+        in_seq = keras.Input(shape=(1, shape_dim2))
       
         x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(in_seq)
         x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
@@ -278,9 +277,9 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
         print("[Build ClassifierCNNBiLSTM]")
 
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
-        shapeDim2 = self.seq_len * (self.df.shape[1] - 1)
+        shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
-        in_seq = keras.Input(shape=(1, shapeDim2))
+        in_seq = keras.Input(shape=(1, shape_dim2))
         c7 = int(self.seq_len/4)
 
         x = self.inception_a(in_seq, c7)

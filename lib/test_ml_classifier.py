@@ -77,7 +77,7 @@ class TestMlClassifier:
     def test_classifier_lstm_hao2020(self):
         df = self.get_dataframe()
         
-        model = classifier_lstm.ClassifierLSTM_Hao2020(df, "target", params={'epochs': 20})
+        model = classifier_lstm.ClassifierLSTMHao2020(df, "target", params={'epochs': 20})
         model.create_model()
 
         model_analysis = model.get_analysis()

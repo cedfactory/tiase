@@ -1,9 +1,8 @@
 import xml.etree.cElementTree as ET
 from lib.fimport import *
-from lib.fdatapreprocessing import *
-from lib.featureengineering import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fdatapreprocessing import fdataprep
+from lib.findicators import findicators
+from lib.ml import classifier_svc
 
 from rich import print,inspect
 
@@ -55,48 +54,49 @@ def execute(filename):
         print(ding_msg)
 
         # import
-        importNode = ding.find('import')
-        if importNode is not None:
-            value = importNode.get("value", None)
+        import_node = ding.find('import')
+        if import_node is not None:
+            value = import_node.get("value", None)
             if value != None:
-                df = fimport.GetDataFrameFromYahoo(value)
+                df = fimport.get_dataframe_from_yahoo(value)
                 print(value)
                 print(df.head())
 
         # indicators
-        featuresNode = ding.find('features')
-        if featuresNode is not None:
-            features = featuresNode.get("indicators", None)
-            target = featuresNode.get("target", None)
+        features_node = ding.find('features')
+        if features_node is not None:
+            features = features_node.get("indicators", None)
+            target = features_node.get("target", None)
             if features != None and target != None:
                 features = features.split(',')
                 target = target.split(',')
-                all = features
-                all.extend(target)
-                print("Using the following technical indicators : {}".format(all))
-                df = findicators.add_technical_indicators(df, all)
+                all_features = features
+                all_features.extend(target)
+                target = target[0] # keep the only one target
+                print("Using the following technical indicators : {}".format(all_features))
+                df = findicators.add_technical_indicators(df, all_features)
                 df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 # todo implement findicators.keep([])
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
                 print(df.head())
 
         # preprocessing
-        preprocessingNode = ding.find('preprocessing')
-        if preprocessingNode is not None:
+        preprocessing_node = ding.find('preprocessing')
+        if preprocessing_node is not None:
             # outliers
-            outliersNode = preprocessingNode.find('outliers')
-            if outliersNode is not None:
-                print(outliersNode.get("method", None))
-                method = outliersNode.get("method", None)
+            outliers_node = preprocessing_node.find('outliers')
+            if outliers_node is not None:
+                print(outliers_node.get("method", None))
+                method = outliers_node.get("method", None)
                 if method is not None:
                     print("[PREPROCESSING] outliers : {}".format(method))
                     df = fdataprep.process_technical_indicators(df, [method])
                     print(df.head())
 
             # transformations
-            transformationsNode = preprocessingNode.find('transformations')
-            if transformationsNode is not None:
-                transformations = transformationsNode.findall('transformation')
+            transformations_node = preprocessing_node.find('transformations')
+            if transformations_node is not None:
+                transformations = transformations_node.findall('transformation')
                 for transformation in transformations:
                     method = transformation.get("method", None)
                     indicators = transformation.get("indicators", None)
@@ -104,9 +104,9 @@ def execute(filename):
                         print("[PREPROCESSING] transformation {} for {}".format(method, indicators))
 
             # discretizations
-            discretizationsNode = preprocessingNode.find('discretizations')
-            if discretizationsNode is not None:
-                discretizations = discretizationsNode.findall('discretization')
+            discretizations_node = preprocessing_node.find('discretizations')
+            if discretizations_node is not None:
+                discretizations = discretizations_node.findall('discretization')
                 for discretization in discretizations:
                     indicator = discretization.get("indicator", None)
                     method = transformation.get("method", None)
@@ -114,21 +114,21 @@ def execute(filename):
                         print("[PREPROCESSING] discretization {} for {}".format(indicator, method))
 
         # feature engineering
-        featureengeineeringNode = ding.find('featureengeineering')
-        if featureengeineeringNode is not None:
+        featureengeineering_node = ding.find('featureengeineering')
+        if featureengeineering_node is not None:
             # reduction
-            reductionNode = featureengeineeringNode.find('reduction')
+            reductionNode = featureengeineering_node.find('reduction')
             if reductionNode is not None:
                 method = reductionNode.get("method", None)
                 if method is not None:
                     print("[FEATURE ENGINEERING] reduction : {}".format(method))
 
         # learning model
-        classifierNode = ding.find('classifier')
-        if classifierNode is not None:
-            classifier_name = classifierNode.get("name", None)
+        classifier_node = ding.find('classifier')
+        if classifier_node is not None:
+            classifier_name = classifier_node.get("name", None)
             if classifier_name == 'svc':
-                model = classifier_svc.ClassifierSVC(df.copy())
+                model = classifier_svc.ClassifierSVC(df.copy(), target=target)
                 model.create_model()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))

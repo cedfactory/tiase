@@ -43,11 +43,11 @@ def add_temporal_indicators(df, field_name, time=False):
         return df
 
     # if the datefield is the index of the dataframe, we create a temporary column
-    FieldToDrop = False
+    field_to_drop = False
     if field_name == df.index.name:
         field_name = 'DateTmp'
         df[field_name] = df.index
-        FieldToDrop = True
+        field_to_drop = True
 
     make_date(df, field_name)
 
@@ -61,7 +61,7 @@ def add_temporal_indicators(df, field_name, time=False):
     for n in attr: df[prefix + n] = getattr(field.dt, n.lower()) if n != 'Week' else week
     mask = ~field.isna()
     df[prefix + 'Elapsed'] = np.where(mask, field.values.astype(np.int64) // 10 ** 9, np.nan)
-    if FieldToDrop: df.drop(field_name, axis=1, inplace=True)
+    if field_to_drop: df.drop(field_name, axis=1, inplace=True)
 
     return df
 

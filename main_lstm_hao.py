@@ -9,7 +9,7 @@ from lib.ml import lstm_hao,analysis
 #
 def hao_basic():
     filename = "./lib/data/test/google_stocks_data.csv"
-    df = fimport.GetDataFrameFromCsv(filename)
+    df = fimport.get_dataframe_from_csv(filename)
 
     model = lstm_hao.LSTMHaoBasic(df)
     model.create_model()
@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 
 def hao_trend():
     filename = "./lib/data/test/google_stocks_data.csv"
-    df = fimport.GetDataFrameFromCsv(filename)
+    df = fimport.get_dataframe_from_csv(filename)
 
     model = lstm_hao.LSTMHaoTrend(df)
     model.create_model()

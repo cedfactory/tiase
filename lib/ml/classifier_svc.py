@@ -1,6 +1,6 @@
 from sklearn.svm import SVC
 from . import classifier,toolbox,analysis
-from ..findicators import *
+from ..findicators import findicators
 
 class ClassifierSVC(classifier.Classifier):
     def __init__(self, dataframe, target, name = ""):

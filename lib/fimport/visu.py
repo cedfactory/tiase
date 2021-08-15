@@ -1,28 +1,28 @@
 import matplotlib.pyplot as plt
 
-def DisplayFromDataframe(df, name, exportName=""):
+def display_from_dataframe(df, name, export_name=""):
     plt.figure(figsize=(15, 5))
     plt.plot(df[name])
     #plt.xticks(range(0, df.shape[0], 2000), df['Date'].loc[::2000], rotation=0)
     plt.ylabel(name, fontsize=18)
     plt.title(name, fontsize=20)
     plt.legend([name], fontsize='x-large', loc='best')
-    if exportName == "":
+    if export_name == "":
         plt.show()
     else:
-        plt.savefig(exportName)
+        plt.savefig(export_name)
 
-def DisplayHistogramFromDataframe(df, name, exportName=""):
+def display_histogram_from_dataframe(df, name, export_name=""):
     fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 4))
     axes.hist(df[name])
 
-    if exportName == "":
+    if export_name == "":
         plt.show()
     else:
-        fig.savefig(exportName)
+        fig.savefig(export_name)
     plt.clf()
 
-def DisplayOutliersFromDataframe(df, d1, exportName=""):
+def display_outliers_from_dataframe(df, d1, export_name=""):
     df['simple_rtn'] = df.close.pct_change()
     d1['simple_rtn'] = d1.close.pct_change()
 
@@ -34,5 +34,5 @@ def DisplayOutliersFromDataframe(df, d1, exportName=""):
     #ax.set_title(str(len(df)))
     ax.legend(loc='lower right')
 
-    fig.savefig(exportName)
+    fig.savefig(export_name)
     plt.clf()

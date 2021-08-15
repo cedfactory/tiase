@@ -2,7 +2,7 @@
 <dings>
     <ding>
         <import value="AI.PA"/>
-        <features indicators="simple_rtn,rsi_30,williams_%r" target="trend_1d"/>
+        <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
         <preprocessing>
             <outliers method="outliers_stdcutoff" />
             <transformations>

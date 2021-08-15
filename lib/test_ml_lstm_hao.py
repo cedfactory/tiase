@@ -8,7 +8,7 @@ class TestMlLstmHao:
 
     def test_lstml_hao_basic(self):
         filename = "./lib/data/test/google_stocks_data.csv"
-        df = fimport.GetDataFrameFromCsv(filename)
+        df = fimport.get_dataframe_from_csv(filename)
 
         model = lstm_hao.LSTMHaoBasic(df)
         model.create_model(epochs = 10)
@@ -25,7 +25,7 @@ class TestMlLstmHao:
 
     def test_lstml_hao_trend(self):
         filename = "./lib/data/test/google_stocks_data.csv"
-        df = fimport.GetDataFrameFromCsv(filename)
+        df = fimport.get_dataframe_from_csv(filename)
 
         model = lstm_hao.LSTMHaoTrend(df)
         model.create_model(epochs = 10)
