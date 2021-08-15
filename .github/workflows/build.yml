@@ -27,7 +27,7 @@ jobs:
           pip install pytest-cov
 
       - name: Run pytest
-        run: pytest --cov=./lib --cov-report=xml:coverage.xml
+        run: pytest --cov=./lib --cov-report=xml:./lib/coverage.xml
 
       - name: Coverage report
         run: bash <(curl -s https://codecov.io/bash)
