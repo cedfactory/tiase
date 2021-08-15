@@ -91,11 +91,11 @@ Warnings :
 - normalization is performed
 '''
 def _get_train_test_data_from_dataframe2(features, target, seq_len):
-    nFeatures = features.shape[1]
+    n_features = features.shape[1]
     x_train = []
     for i in range(len(features) - seq_len):
         seq = []
-        for j in range(nFeatures):
+        for j in range(n_features):
             seq.extend(features[:,j][i : i + seq_len].flatten())
         x_train.append(seq)
     x_train = np.array(x_train)
@@ -116,12 +116,10 @@ def get_train_test_data_from_dataframe2(df, seq_len, column_target, train_split,
     train_features = features[:split_index]
     train_target = target[:split_index]
     train_target = train_target.reset_index(drop=True)
-    #train_target = train_target.drop(columns = ['Date'])
 
     test_features = features[split_index:]
     test_target = target[split_index:]
     test_target = test_target.reset_index(drop=True)
-    #test_target = test_features.drop(columns = ['Date'])
 
     features_normaliser = preprocessing.MinMaxScaler()
 
@@ -153,11 +151,11 @@ Warning :
 - when the X data is computed wih rows \in [ i ... i+seq_len-1 ], y is computed with i+seq_len-1 (same row)
 '''
 def _get_train_test_data_from_dataframe(features, target, seq_len):
-    nFeatures = features.shape[1]
+    n_features = features.shape[1]
     x_train = []
     for i in range(len(features) - seq_len + 1):
         seq = []
-        for j in range(nFeatures):
+        for j in range(n_features):
             seq.extend(features[:,j][i : i + seq_len].flatten())
         x_train.append(seq)
     x_train = np.array(x_train)

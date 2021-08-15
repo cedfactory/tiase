@@ -4,7 +4,7 @@ import pytest
 
 class TestFImport:
 
-    def test_GetDataFrameFromYahoo(self):
+    def test_get_dataframe_from_yahoo(self):
         df = fimport.get_dataframe_from_yahoo('AI.PA')
         assert(df.at["2000-01-03",'Close'] == pytest.approx(18.313592, 0.00001))
 

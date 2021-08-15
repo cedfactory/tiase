@@ -1,7 +1,7 @@
 import pandas as pd
-from lib.fimport import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fimport import synthetic
+from lib.findicators import findicators
+from lib.ml import classifier_naive,classifier_lstm
 import pytest
 
 class TestMlClassifier:
