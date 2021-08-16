@@ -34,11 +34,11 @@ def normalize_outliers_std_cutoff(df, n_sigmas, debug = False):
 
     # normalize simple_rtn
     d1["simple_rtn_normalized"] = d1["simple_rtn"].clip(lower = mu - sigma * n_sigmas, upper = mu + sigma * n_sigmas)
-    
     # revert pct_change to compute new close values
-    d1['close'] = d1['close'][0] * (1. + d1['simple_rtn_normalized']).cumprod()
+    d1['close'] = df['close'][0] * (1. + d1['simple_rtn_normalized']).cumprod()
+    d1['close'][0] = df['close'][0]
     if debug:
-        visu.DisplayOutliersFromDataframe(df, d1, './tmp/outliers_normalize_stdcutoff.png')
+        visu.display_outliers_from_dataframe(df, d1, './tmp/outliers_normalize_stdcutoff.png')
 
     # update close values in df
     df['close'] = d1["close"]
