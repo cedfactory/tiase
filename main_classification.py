@@ -2,28 +2,31 @@ import pandas as pd
 import numpy as np
 from lib.fimport import fimport,synthetic,visu
 from lib.findicators import findicators
-from lib.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis
+from lib.fdatapreprocessing import fdataprep
+from lib.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis,toolbox
 import os
 from rich import print,inspect
 
 def evaluate_classifiers(df, value, verbose=False):
-    df = findicators.add_technical_indicators(df, ["target"])
+    df = findicators.normalize_column_headings(df)
+    df = toolbox.make_target(df, "pct_change", 7)
     df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
-    df.dropna(inplace = True)
 
     if verbose:
         print(df.head())
 
+    target = "target"
     g_classifiers = [
-        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), "target", params={'epochs': 20})},
-        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), "target", params={'epochs': 20})},
-        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), "target", params={'epochs': 20})},
-        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTM_Hao2020(df.copy(), "target", params={'epochs': 40})},
-        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), "target", params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), "target")},
-        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), "target")},
-        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), "target")},
-        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), "target", params={'class_to_return': 1})}
+        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, params={'epochs': 20})},
+        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, params={'epochs': 20})},
+        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, params={'epochs': 20})},
+        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, params={'epochs': 20})},
+        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), target, params={'epochs': 40})},
+        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), target, params={'epochs': 20})},
+        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target)},
+        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), target)},
+        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), target)},
+        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), target, params={'class_to_return': 1})}
     ]
 
     test_vs_pred = []
@@ -53,11 +56,11 @@ def evaluate_classifiers(df, value, verbose=False):
 def experiment(value):
 
     filename = "./lib/data/test/google_stocks_data.csv"
-    df = fimport.GetDataFrameFromCsv(filename)
+    df = fimport.get_dataframe_from_csv(filename)
 
     #y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
     #df = synthetic.create_dataframe(y, 0.8)
-    visu.DisplayFromDataframe(df,"Close", "close.png")
+    visu.display_from_dataframe(df,"Close", "close.png")
 
     evaluate_classifiers(df, "experiment")
 
@@ -70,7 +73,7 @@ def cac40():
             name = fimport.cac40[value]
             print(name)
 
-            df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
+            df = fimport.get_dataframe_from_csv(directory+"/"+filename)
             evaluate_classifiers(df, value)
 
 

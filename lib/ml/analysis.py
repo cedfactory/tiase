@@ -30,10 +30,10 @@ def get_rmse(y_true, y_pred):
 
 
 
-def classification_analysis(X_test, y_test, y_test_pred, y_test_prob):
+def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
     result = {}
 
-    result["X_test"] = X_test
+    result["X_test"] = x_test
     result["y_test"] = y_test
     result["y_test_pred"] = y_test_pred
     result["y_test_prob"] = y_test_prob
@@ -46,10 +46,10 @@ def classification_analysis(X_test, y_test, y_test_pred, y_test_prob):
 
     return result
 
-def regression_analysis(model, X_test, y_test, y_normaliser = None):
+def regression_analysis(model, x_test, y_test, y_normaliser = None):
     result = {}
 
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(x_test)
     if y_normaliser != None:
         y_pred = y_normaliser.inverse_transform(y_pred)
     result["y_pred"] = y_pred

@@ -1,7 +1,7 @@
 import pandas as pd
-from lib.fimport import *
-from lib.findicators import *
-from lib.ml import *
+from lib.fimport import synthetic
+from lib.findicators import findicators
+from lib.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
 import pytest
 
 class TestMlClassifier:
@@ -77,7 +77,7 @@ class TestMlClassifier:
     def test_classifier_lstm_hao2020(self):
         df = self.get_dataframe()
         
-        model = classifier_lstm.ClassifierLSTM_Hao2020(df, "target", params={'epochs': 20})
+        model = classifier_lstm.ClassifierLSTMHao2020(df, "target", params={'epochs': 20})
         model.create_model()
 
         model_analysis = model.get_analysis()

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport
+from lib.findicators import findicators
 from lib.fdatapreprocessing import fdataprep
 from lib.featureengineering import fbalance,fprocessfeature
 import pytest
@@ -10,7 +10,7 @@ class TestFeatureEngineering:
 
     def get_real_dataframe(self):
         filename = "./lib/data/test/google_stocks_data.csv"
-        df = fimport.GetDataFrameFromCsv(filename)
+        df = fimport.get_dataframe_from_csv(filename)
         df = findicators.normalize_column_headings(df)
         return df
 
@@ -47,7 +47,7 @@ class TestFeatureEngineering:
             
             ref_file = "./lib/data/test/featureengineering_"+reduction+"_reference.csv"
             #df.to_csv(ref_file)
-            expected_df_reduction = fimport.GetDataFrameFromCsv(ref_file)
+            expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
             for column in df_reduction.columns:
                 array = df_reduction[column].to_numpy()

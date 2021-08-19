@@ -43,11 +43,11 @@ def add_temporal_indicators(df, field_name, time=False):
         return df
 
     # if the datefield is the index of the dataframe, we create a temporary column
-    FieldToDrop = False
+    field_to_drop = False
     if field_name == df.index.name:
         field_name = 'DateTmp'
         df[field_name] = df.index
-        FieldToDrop = True
+        field_to_drop = True
 
     make_date(df, field_name)
 
@@ -61,7 +61,7 @@ def add_temporal_indicators(df, field_name, time=False):
     for n in attr: df[prefix + n] = getattr(field.dt, n.lower()) if n != 'Week' else week
     mask = ~field.isna()
     df[prefix + 'Elapsed'] = np.where(mask, field.values.astype(np.int64) // 10 ** 9, np.nan)
-    if FieldToDrop: df.drop(field_name, axis=1, inplace=True)
+    if field_to_drop: df.drop(field_name, axis=1, inplace=True)
 
     return df
 
@@ -97,9 +97,6 @@ def add_technical_indicators(df, indicators):
             seq = int(trend_parsed[0])
             diff = df["close"] - df["close"].shift(seq)
             df["trend_"+str(seq)+"d"] = diff.gt(0).map({False: 0, True: 1})
-            #diff = df["close"] - df["close"].shift(1)
-            #trend_1d = diff.gt(0).map({False: 0, True: 1})
-            #df["trend_"+str(seq)+"d"] = trend_1d.rolling(seq).mean()
 
         elif sma_parsed != None and sma_parsed[0].isdigit():
             seq = int(sma_parsed[0])
@@ -196,9 +193,6 @@ def add_technical_indicators(df, indicators):
         elif indicator == 'target':
             diff = df["close"] - df["close"].shift(1)
             df["target"] = diff.gt(0).map({False: 0, True: 1}).shift(-1)
-            #df['target'] = df['close'].pct_change()
-            #df['target'] = np.where(df['target'] > 0, 1, 0)
-            #df['target'] = df['target'].shift(-1)
         else:
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     

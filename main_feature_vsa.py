@@ -10,7 +10,7 @@ def cac40():
     directory = "./lib/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
-            df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
+            df = fimport.get_dataframe_from_csv(directory+"/"+filename)
             technical_indicators = ["trend_1d","macd","rsi_30","cci_30","williams_%r","stoch_%k","stoch_%d","er","stc"]
             technical_indicators.extend(["sma_5","sma_10","sma_20","ema_5","ema_10","ema_20","wma_5","wma_10","wma_20"])
             technical_indicators.extend(["atr","adx","roc","simple_rtn", "mom", "target"])

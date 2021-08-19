@@ -14,8 +14,8 @@ def various():
     print(trend1)
     print(trend4)
 
-    df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
-    visu.DisplayFromDataframe(df,"Close","close.png")
+    df = fimport.get_dataframe_from_csv("./lib/data/CAC40/AI.PA.csv")
+    visu.display_from_dataframe(df,"Close","close.png")
     print(df.head())
 
     #technical_indicators = ["trend_1d", "ema", "bbands", "dx_30", "on_balance_volume", "williams_%r", "stoch_%k", "stoch_%d"]
@@ -37,7 +37,7 @@ def stats(value):
         name = fimport.cac40[value]
     if value in fimport.nasdaq100:
         name = fimport.nasdaq100[value]
-    df = fimport.GetDataFrameFromYahoo(value)
+    df = fimport.get_dataframe_from_yahoo(value)
     print("{} ({})".format(value, name))
 
     technical_indicators = findicators.get_all_default_technical_indicators()
@@ -62,7 +62,7 @@ def stats(value):
 
     for column in df.columns:
         imgname = value+'_'+column+'.png'
-        visu.DisplayFromDataframe(df, column, './tmp/'+imgname)
+        visu.display_from_dataframe(df, column, './tmp/'+imgname)
         f.write('<img width=50% src='+imgname+' />')
 
     f.write("</body></html>")
@@ -78,7 +78,7 @@ def cac40():
             value = filename[:len(filename)-4]
             name = fimport.cac40[value]
 
-            df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
+            df = fimport.get_dataframe_from_csv(directory+"/"+filename)
             technical_indicators = ["trend_1d","macd","rsi_30","cci_30","williams_%r","stoch_%k","stoch_%d","er","stc"]
             technical_indicators.extend(["sma_5","sma_10","sma_15","sma_20"])
             technical_indicators.extend(["ema_10","ema_20","ema_50"])

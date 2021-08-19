@@ -11,7 +11,7 @@ from rich import print,inspect
 
 def get_real_dataframe():
     filename = "./lib/data/test/google_stocks_data.csv"
-    df = fimport.GetDataFrameFromCsv(filename)
+    df = fimport.get_dataframe_from_csv(filename)
     df = findicators.normalize_column_headings(df)
     return df
 

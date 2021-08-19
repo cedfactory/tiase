@@ -503,8 +503,7 @@ prices = './lib/data/IBM_Prices.csv'
 value = "IBM"
 df = read_data(prices)
 
-visu.DisplayFromDataframe(df, 'Close', 'close.png')
-#visu.DisplayFromDataframe(df, 'Volume')
+visu.display_from_dataframe(df, 'Close', 'close.png')
 #df.head()
 
 bilstm = BiLSTM()
@@ -516,8 +515,8 @@ bilstm.save_model('bi_lstm_'+value)
 xmlfile = "./bi_lstm_"+value+".xml"
 df = read_data(prices)
 
-#importers.DisplayFromDataframe(df, 'Close')
-#importers.DisplayFromDataframe(df, 'Volume')
+#importers.display_from_dataframe(df, 'Close')
+#importers.display_from_dataframe(df, 'Volume')
 #df.head()
 
 bilstm = BiLSTM()

@@ -1,6 +1,6 @@
 from xgboost import XGBClassifier
 from . import classifier,toolbox,analysis
-from ..findicators import *
+from ..findicators import findicators
 
 class ClassifierXGBoost(classifier.Classifier):
     def __init__(self, dataframe, target, name = ""):

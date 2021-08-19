@@ -1,5 +1,5 @@
-from lib.fimport import *
-from lib.findicators import *
+from lib.fimport import fimport
+from lib.findicators import findicators
 import pandas as pd
 #from pandas._testing import assert_frame_equal
 import numpy as np
@@ -17,7 +17,7 @@ class TestIndicators:
         assert(ti == expected_ti)
 
     def test_number_colums(self):
-        df = fimport.GetDataFrameFromCsv("./lib/data/CAC40/AI.PA.csv")
+        df = fimport.get_dataframe_from_csv("./lib/data/CAC40/AI.PA.csv")
         assert(len(list(df.columns)) == 6)
 
         # first set of technical indicators
@@ -78,6 +78,6 @@ class TestIndicators:
         df = pd.DataFrame([1]*10, columns=["Foobar"], index=idx)
         df = findicators.add_temporal_indicators(df, "Date")
 
-        expected_df = fimport.GetDataFrameFromCsv("./lib/data/test/temporal_indicators_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./lib/data/test/temporal_indicators_reference.csv")
         #assert_frame_equal(df, expected_df, check_dtype=False) // don't work :(
         assert(df.equals(expected_df))

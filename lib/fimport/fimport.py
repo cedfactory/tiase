@@ -148,23 +148,21 @@ nasdaq100 = {
     "XLNX": "Xilinx, Inc."  # https://finance.yahoo.com/quote/XLNX/?p=XLNX
 }
 
-def DownloadFromYahoo(values, folder = ""):
+def download_from_yahoo(values, folder = ""):
     for value in values:
         data_df = yf.download(value, period="max")
         filename = './' + folder + '/' + value + '.csv'
         print(filename)
         data_df.to_csv(filename)
 
-def GetDataFrameFromYahoo(value):
+def get_dataframe_from_yahoo(value):
     result = yf.Ticker(value)
     #print(result.info)
     hist = result.history(period="max")
     return hist
 
-def GetDataFrameFromCsv(csvfile):
+def get_dataframe_from_csv(csvfile):
     dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
     dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
-    #df.index.rename('Time',inplace=True)
-    #openValues2 = df.sort_values(by='Time')['open'].to_numpy()
     dataframe.dropna(inplace=True) # remove incoherent values (null, NaN, ...)
     return dataframe

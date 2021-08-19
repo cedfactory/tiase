@@ -18,8 +18,7 @@ def process_features(df, featureengineering):
             balance_methode = 'smote'
             df = fbalance.balance_features(df, balance_methode)
         elif process == 'kbest_reduction':
-            # model_type = classification
-            model_type = 'regression'
+            model_type = 'regression' # classification
             k_best = 0.7
             df = fselection.kbest_reduction(df, model_type, k_best)
         elif process == 'vsa_reduction':

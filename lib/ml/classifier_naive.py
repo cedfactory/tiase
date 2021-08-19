@@ -13,6 +13,7 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
             self.class_to_return = params.get("class_to_return", 1)
 
     def build_model(self):
+        # nothing to build
         pass
 
     def create_model(self):
@@ -30,9 +31,11 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         return self.analysis
 
     def save(self, filename):
+        # nothing to save
         pass
 
     def load(self, filename):
+        # nothing to load
         pass
 
 
@@ -44,6 +47,7 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
             self.seq_len = params.get("seq_len", self.seq_len)
 
     def build_model(self):
+        # nothing to build
         pass
 
     def create_model(self):
@@ -58,7 +62,9 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         return self.analysis
 
     def save(self, filename):
+        # nothing to save
         pass
 
     def load(self, filename):
+        # nothing to load
         pass

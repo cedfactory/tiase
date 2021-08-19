@@ -1,4 +1,4 @@
-from ..findicators import *
+from ..findicators import findicators
 from . import toolbox,analysis
 
 import tensorflow as tf
@@ -43,7 +43,7 @@ class LSTMHaoBasic:
     def create_model(self, epochs = 170):
 
         # split the data
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, 'adj_close', .7)
+        self.x_train, self.y_train, self.x_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, 'adj_close', .7)
 
         # build the model
         tf.random.set_seed(20)
@@ -60,16 +60,16 @@ class LSTMHaoBasic:
         self.model.compile(optimizer=adam, loss='mse')
 
         # training
-        self.history = self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
+        self.history = self.model.fit(x=self.x_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
 
     def get_analysis(self):
-        self.analysis = analysis.regression_analysis(self.model, self.X_test, self.y_test, self.y_normaliser)
+        self.analysis = analysis.regression_analysis(self.model, self.x_test, self.y_test, self.y_normaliser)
         self.analysis["history"] = self.history
         return self.analysis
 
 
     def export_predictions(self, filename):
-        y_pred = self.model.predict(self.X_test)
+        y_pred = self.model.predict(self.x_test)
         y_pred = self.y_normaliser.inverse_transform(y_pred)
         
         real = plt.plot(self.y_test, label='Actual Price')
@@ -111,7 +111,6 @@ class LSTMHaoBasic:
         root = tree.getroot()
         
         self.model = tf.keras.models.load_model(root[0].text)
-        #self.min_return = float(root[1].text)
         print("Load model from {} : {}".format(name, root[0].text))
         self.x_normaliser = toolbox.deserialize(name+"_x_normalizer.gz")
         self.y_normaliser = toolbox.deserialize(name+"_y_normalizer.gz")
@@ -120,8 +119,8 @@ class LSTMHaoBasic:
     def predict(self):
         normalised_df = self.x_normaliser.transform(self.df)
 
-        iStart = len(normalised_df) - self.seq_len
-        X = np.array([normalised_df[iStart : iStart + self.seq_len].copy()])
+        i_start = len(normalised_df) - self.seq_len
+        X = np.array([normalised_df[i_start : i_start + self.seq_len].copy()])
         y_normalized = self.model.predict(X)
         y_normalized = np.expand_dims(y_normalized, -1)
         y = self.y_normaliser.inverse_transform(y_normalized[0])
@@ -144,7 +143,7 @@ class LSTMHaoTrend:
         np.random.seed(10)
 
         # Train test split
-        self.X_train, self.y_train, self.X_test, self.y_test, self.test_data = self.train_test_split_preparation(0.7)
+        self.x_train, self.y_train, self.x_test, self.y_test, self.test_data = self.train_test_split_preparation(0.7)
 
         # Build the LSTM model
         lstm_input = Input(shape=(self.seq_len, 1), name='input_for_lstm')
@@ -162,15 +161,15 @@ class LSTMHaoTrend:
         adam = optimizers.Adam(lr = 0.002)
 
         self.model.compile(optimizer=adam, loss='mse')
-        self.history = self.model.fit(x=self.X_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
+        self.history = self.model.fit(x=self.x_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
 
     def get_analysis(self):
-        self.analysis = analysis.regression_analysis(self.model, self.X_test, self.y_test)
+        self.analysis = analysis.regression_analysis(self.model, self.x_test, self.y_test)
         self.analysis["history"] = self.history
         return self.analysis
 
     def export_predictions(self, filename):
-        y_pred = self.model.predict(self.X_test)
+        y_pred = self.model.predict(self.x_test)
         y_pred = y_pred.flatten()
         
         # actual represents the test set's actual stock prices
@@ -191,8 +190,8 @@ class LSTMHaoTrend:
         plt.savefig(filename)
 
     def predict(self):
-        iStart = len(self.df) - (self.seq_len + 1) - 1
-        df_temp = self.df[iStart : iStart + self.seq_len + 1].copy()
+        i_start = len(self.df) - (self.seq_len + 1) - 1
+        df_temp = self.df[i_start : i_start + self.seq_len + 1].copy()
         X = np.array([np.diff(df_temp.loc[:, ['Adj Close']].values, axis = 0)])
         y = self.model.predict(X)
         return df_temp['Adj Close'].iloc[-1] + y[0][0]
@@ -210,12 +209,12 @@ class LSTMHaoTrend:
         train_arr = np.diff(train_data.loc[:, ['Adj Close']].values, axis = 0)
         test_arr = np.diff(test_data.loc[:, ['Adj Close']].values, axis = 0)
 
-        X_train = np.array([train_arr[i : i + self.seq_len] for i in range(len(train_arr) - self.seq_len)])
+        x_train = np.array([train_arr[i : i + self.seq_len] for i in range(len(train_arr) - self.seq_len)])
 
         y_train = np.array([train_arr[i + self.seq_len] for i in range(len(train_arr) - self.seq_len)])
 
-        X_test = np.array([test_arr[i : i + self.seq_len] for i in range(len(test_arr) - self.seq_len)])
+        x_test = np.array([test_arr[i : i + self.seq_len] for i in range(len(test_arr) - self.seq_len)])
 
         y_test = np.array([test_arr[i + self.seq_len] for i in range(len(test_arr) - self.seq_len)])
 
-        return X_train, y_train, X_test, y_test, test_data
+        return x_train, y_train, x_test, y_test, test_data

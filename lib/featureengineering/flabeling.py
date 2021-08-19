@@ -86,7 +86,7 @@ def plot_barriers_dynamic(barriers, filename="barriers_dynamic"):
 
     fig.savefig(OUT_DIR + filename + '_2.png')
 
-def getDailyVol(close,span0=100):
+def get_daily_vol(close,span0=100):
     # daily vol, reindexed to close
     df0=close.index.searchsorted(close.index-pd.Timedelta(days=1))
     df0=df0[df0>0]
@@ -98,7 +98,7 @@ def getDailyVol(close,span0=100):
     df0=df0.ewm(span=span0).std()
     return df0
 
-def get_Daily_Volatility(close,span0=20):
+def get_daily_volatility(close,span0=20):
     # simple percentage returns
     df0=close.pct_change()
     # 20 days, a month EWM's std as boundary
@@ -187,12 +187,12 @@ def get_labels(barriers):
 def data_labeling(df):
     price = df["close"].copy()
 
-    df0 = get_Daily_Volatility(price)
+    df0 = get_daily_volatility(price)
 
     df_atr = get_atr(df, 14)
 
     #set the boundary of barriers, based on 20 days EWM
-    daily_volatility = get_Daily_Volatility(price)
+    daily_volatility = get_daily_volatility(price)
     # how many days we hold the stock which set the vertical barrier
     t_final = 10
     #the up and low boundary multipliers

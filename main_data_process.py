@@ -11,7 +11,7 @@ from rich import print,inspect
 
 def get_real_dataframe():
     filename = "./lib/data/test/google_stocks_data.csv"
-    df = fimport.GetDataFrameFromCsv(filename)
+    df = fimport.get_dataframe_from_csv(filename)
     df = findicators.normalize_column_headings(df)
     return df
 
@@ -35,12 +35,21 @@ def check(action):
     elif action == "outliers_normalize_stdcutoff":
         df = get_real_dataframe()
         df = findicators.add_technical_indicators(df, ['simple_rtn'])
-        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens        print(df.head())
-        visu.DisplayFromDataframe(df, "simple_rtn", "./tmp/simple_rtn.png")
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        visu.display_from_dataframe(df, "simple_rtn", "./tmp/simple_rtn.png")
         print(df.head())
         df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'])
         print(df.head())
         
+    elif action == "outliers_winsorize":
+        df = get_real_dataframe()
+        df = findicators.add_technical_indicators(df, ['simple_rtn'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        visu.display_from_dataframe(df, "simple_rtn", "./tmp/simple_rtn.png")
+        print(df.head())
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'])
+        print(df.head())
+
     elif action == "discretization_supervised":
         df = get_real_dataframe()
         df = df.head(200)
@@ -125,7 +134,7 @@ def cac40():
     directory = "./lib/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
-            df = fimport.GetDataFrameFromCsv(directory+"/"+filename)
+            df = fimport.get_dataframe_from_csv(directory+"/"+filename)
             technical_indicators = ["trend_1d","macd","rsi_30","cci_30","williams_%r","stoch_%k","stoch_%d","er","stc"]
             technical_indicators.extend(["sma_5","sma_10","sma_20"])
             technical_indicators.extend(["ema_5","ema_10","ema_20"])
@@ -139,7 +148,7 @@ def cac40():
             print("{} ({}),{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(value, fimport.cac40[value], trend_ratio, true_positive, true_negative, false_positive, false_negative))
 
             df = fdataprep.process_technical_indicators(df, ['missing_values'])
-            visu.DisplayHistogramFromDataframe(df, 'simple_rtn', './tmp/' + value + '_close.png')
+            visu.display_histogram_from_dataframe(df, 'simple_rtn', './tmp/' + value + '_close.png')
 
             df_copy = df.copy()
             df = fdataprep.process_technical_indicators(df, ['outliers_winsorize'])
@@ -167,7 +176,7 @@ def cac40():
 _usage_str = """
 Options:
     [--check [ process ] --cac40]
-process in [ missing_values,outliers_normalize_stdcutoff,discretization_supervised,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema]
+process in [ missing_values,outliers_normalize_stdcutoff,discretization_supervised,discretization_unsupervised,transformation_log,transformation_x2,outliers_mam,outliers_ema,outliers_winsorize]
 """
 
 def _usage():
