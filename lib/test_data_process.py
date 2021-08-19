@@ -104,11 +104,11 @@ class TestDataProcess:
         array_expected = expected_df['close'].to_numpy()
         assert(np.allclose(array, array_expected))
 
-    def test_normalize_outliers_mam(self):
+    def test_normalize_outliers_normalize_mam(self):
         df = self.get_real_dataframe()
         df = df.head(200)
 
-        df = fdataprep.process_technical_indicators(df, ['outliers_mam'])
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_mam'])
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
@@ -119,11 +119,11 @@ class TestDataProcess:
         array_expected = expected_df['close'].to_numpy()
         assert(np.allclose(array, array_expected))
 
-    def test_normalize_outliers_ema(self):
+    def test_normalize_outliers_normalize_ema(self):
         df = self.get_real_dataframe()
         df = df.head(200)
 
-        df = fdataprep.process_technical_indicators(df, ['outliers_ema'])
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_ema'])
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
