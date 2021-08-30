@@ -109,6 +109,7 @@ class TestDataProcess:
         df = df.head(200)
 
         df = fdataprep.process_technical_indicators(df, ['outliers_normalize_mam'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
@@ -124,6 +125,7 @@ class TestDataProcess:
         df = df.head(200)
 
         df = fdataprep.process_technical_indicators(df, ['outliers_normalize_ema'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
