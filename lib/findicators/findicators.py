@@ -193,6 +193,7 @@ def add_technical_indicators(df, indicators):
         elif indicator == 'target':
             diff = df["close"] - df["close"].shift(1)
             df["target"] = diff.gt(0).map({False: 0, True: 1}).shift(-1)
+            
         else:
             print("!!! add_technical_indicators !!! unknown indicator : {}".format(indicator))
     

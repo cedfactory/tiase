@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def create_HLCV(df, i):
+def create_hlcv(df, i):
     '''
     #i: days
     '''
@@ -15,7 +15,7 @@ def create_HLCV(df, i):
 
 
 def create_vsa_features(df, i):
-    df = create_HLCV(df, i)
+    df = create_hlcv(df, i)
     high = df[f'high_{i}D']
     low = df[f'low_{i}D']
     close = df[f'close_{i}D']

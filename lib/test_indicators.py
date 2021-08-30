@@ -1,5 +1,6 @@
 from lib.fimport import fimport
 from lib.findicators import findicators
+from lib.fdatapreprocessing import fdataprep
 import pandas as pd
 #from pandas._testing import assert_frame_equal
 import numpy as np
@@ -7,6 +8,13 @@ import pytest
 import datetime
 
 class TestIndicators:
+    
+    def get_real_dataframe(self):
+        filename = "./lib/data/test/google_stocks_data.csv"
+        df = fimport.get_dataframe_from_csv(filename)
+        df = findicators.normalize_column_headings(df)
+        return df
+
     def test_get_all_default_technical_indicators(self):
         ti = findicators.get_all_default_technical_indicators()
         assert(len(ti) == 28)
@@ -73,11 +81,27 @@ class TestIndicators:
         assert(false_positive == pytest.approx(11.111, 0.001))
         assert(false_negative == pytest.approx(22.222, 0.001))
 
+    def test_vsa(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+        df = findicators.add_technical_indicators(df, ['vsa'])
+
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+
+        #df.to_csv("./lib/data/test/findicators_vsa_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./lib/data/test/findicators_vsa_reference.csv")
+
+        for column in ["vsa_volume_1D","vsa_price_spread_1D","vsa_close_loc_1D","vsa_close_change_1D","vsa_volume_2D","vsa_price_spread_2D","vsa_close_loc_2D","vsa_close_change_2D","vsa_volume_3D","vsa_price_spread_3D","vsa_close_loc_3D","vsa_close_change_3D","vsa_volume_5D","vsa_price_spread_5D","vsa_close_loc_5D","vsa_close_change_5D","vsa_volume_20D","vsa_price_spread_20D","vsa_close_loc_20D","vsa_close_change_20D","vsa_volume_40D","vsa_price_spread_40D","vsa_close_loc_40D","vsa_close_change_40D","vsa_volume_60D","vsa_price_spread_60D","vsa_close_loc_60D","vsa_close_change_60D","outcomes_vsa"]:
+            array = df[column].to_numpy()
+            array_expected = expected_df[column].to_numpy()
+            assert(np.allclose(array, array_expected))
+
+
     def test_temporal_indicators(self):
         idx = pd.Index(pd.date_range("19991231", periods=10), name='Date')
         df = pd.DataFrame([1]*10, columns=["Foobar"], index=idx)
         df = findicators.add_temporal_indicators(df, "Date")
 
-        expected_df = fimport.get_dataframe_from_csv("./lib/data/test/temporal_indicators_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./lib/data/test/findicators_temporal_indicators_reference.csv")
         #assert_frame_equal(df, expected_df, check_dtype=False) // don't work :(
         assert(df.equals(expected_df))
