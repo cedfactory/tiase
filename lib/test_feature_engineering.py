@@ -46,7 +46,7 @@ class TestFeatureEngineering:
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             
             ref_file = "./lib/data/test/featureengineering_"+reduction+"_reference.csv"
-            #df.to_csv(ref_file)
+            #df_reduction.to_csv(ref_file)
             expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
             for column in df_reduction.columns:
