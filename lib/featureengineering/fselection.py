@@ -210,29 +210,33 @@ def get_outliers(df, n_sigmas):
     return df
 
 
-def vsa_corr_selection(df):
-    folder = './vsa_traces'
-    if (os.path.isdir("vsa_traces") == False):
-        print("new vsa traces directory")
-        os.mkdir(folder)
+def vsa_corr_selection(df, debug=False):
+    if debug == True:
+        folder = './vsa_traces/'
+        if (os.path.isdir("vsa_traces") == False):
+            print("new vsa traces directory")
+            os.mkdir(folder)
 
     vsa_columns = [feature for feature in df.columns if feature.startswith("vsa_")]
     # check the correlation
     df_vsa = df[vsa_columns]
     corr_vsa = df_vsa.corrwith(df.outcomes_vsa)
 
-    plt.figure(figsize=(15, 5))
-    corr_vsa.sort_values(ascending=False).plot.barh(title='Strength of Correlation')
-    plt.savefig(folder + 'vsa_corr.png')
-    plt.clf()
+    if debug == True:
+        plt.figure(figsize=(15, 5))
+        corr_vsa.sort_values(ascending=False).plot.barh(title='Strength of Correlation')
+        plt.savefig(folder + 'vsa_corr.png')
+        plt.clf()
 
-    plt.figure(figsize=(15, 5))
+        plt.figure(figsize=(15, 5))
 
     corr_matrix_vsa = df_vsa.corr()
     corr_matrix_vsa = corr_matrix_vsa.sort_values(ascending=False, by=df_vsa.columns[0])
-    sns.clustermap(corr_matrix_vsa, cmap='coolwarm', linewidth=1, method='ward')
-    plt.savefig(folder + 'vsa_cluster_map.png')
-    plt.clf()
+
+    if debug == True:
+        sns.clustermap(corr_matrix_vsa, cmap='coolwarm', linewidth=1, method='ward')
+        plt.savefig(folder + 'vsa_cluster_map.png')
+        plt.clf()
 
     deselected_features_v1 = ['vsa_close_loc_3D', 'vsa_close_loc_60D',
                               'vsa_volume_3D', 'vsa_volume_60D',
@@ -246,33 +250,39 @@ def vsa_corr_selection(df):
 
     selected_features_1D.replace([np.inf, -np.inf], np.nan)
     selected_features_1D.dropna(axis=0, how='any', inplace=True)
-    sns.pairplot(selected_features_1D)
-    plt.savefig(folder + 'vsa_pairplot_1D_map_with_outliers.png')
-    plt.clf()
+
+    if debug == True:
+        sns.pairplot(selected_features_1D)
+        plt.savefig(folder + 'vsa_pairplot_1D_map_with_outliers.png')
+        plt.clf()
 
     df = get_outliers(df, 2.5)
 
     df.drop(df[df['outliers'] == 1].index, inplace=True)
 
-    sns.pairplot(df, vars=selected_features_1D_list);
-    plt.savefig(folder + 'vsa_pairplot_1D_map_with_no_outliers.png')
-    plt.clf()
+    if debug == True:
+        sns.pairplot(df, vars=selected_features_1D_list);
+        plt.savefig(folder + 'vsa_pairplot_1D_map_with_no_outliers.png')
+        plt.clf()
 
     df['sign_of_trend'] = df['outcomes_vsa'].apply(np.sign)
     # df['sign_of_trend'] = np.where(df['sign_of_trend'] == 0, 1, df['sign_of_trend'])
 
     df['sign_of_trend'] = df['sign_of_trend'] * 10
 
-    sns.pairplot(df,
-                 vars=selected_features_1D_list,
-                 diag_kind='kde',
-                 # palette='husl',
-                 palette='bright',
-                 hue='sign_of_trend',
-                 # markers=['*', '<', '+'],
-                 # markers=['v', '.', 'x'],
-                 markers=["o", "s", "D"],
-                 plot_kws={'alpha': 0.3})  # transparence:0.3
+    if debug == True:
+        sns.pairplot(df,
+                    vars=selected_features_1D_list,
+                    diag_kind='kde',
+                    # palette='husl',
+                    palette='bright',
+                    hue='sign_of_trend',
+                    # markers=['*', '<', '+'],
+                    # markers=['v', '.', 'x'],
+                    markers=["o", "s", "D"],
+                    plot_kws={'alpha': 0.3})  # transparence:0.3
 
-    plt.savefig(folder + 'vsa_pairplot_2D_final.png')
-    plt.clf()
+        plt.savefig(folder + 'vsa_pairplot_2D_final.png')
+        plt.clf()
+
+    return df

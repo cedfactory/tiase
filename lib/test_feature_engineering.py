@@ -55,3 +55,19 @@ class TestFeatureEngineering:
                 assert(np.allclose(array, array_expected))
 
 
+    def test_reduction_vsa(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+        df = findicators.add_technical_indicators(df, ["vsa"])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        df_reduction = fprocessfeature.process_features(df.copy(), ["vsa_reduction"])
+
+        ref_file = "./lib/data/test/featureengineering_vsa_reduction_reference.csv"
+        df_reduction.to_csv(ref_file)
+        expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
+
+        for column in df_reduction.columns:
+            array = df_reduction[column].to_numpy()
+            array_expected = expected_df_reduction[column].to_numpy()
+            assert(np.allclose(array, array_expected))
+
