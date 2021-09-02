@@ -1,5 +1,5 @@
 import xml.etree.cElementTree as ET
-from lib.fimport import fimport
+from lib.fimport import fimport,visu
 from lib.fdatapreprocessing import fdataprep
 from lib.findicators import findicators
 from lib.ml import classifier_svc
@@ -90,7 +90,10 @@ def execute(filename):
                 method = outliers_node.get("method", None)
                 if method is not None:
                     print("[PREPROCESSING] outliers : {}".format(method))
+                    df_original = df.copy()
                     df = fdataprep.process_technical_indicators(df, [method])
+                    visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_'+method+'.png')
+                    df = fdataprep.process_technical_indicators(df, ['missing_values'])
                     print(df.head())
 
             # transformations

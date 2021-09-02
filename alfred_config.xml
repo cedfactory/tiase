@@ -4,7 +4,7 @@
         <import value="AI.PA"/>
         <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
         <preprocessing>
-            <outliers method="outliers_stdcutoff" />
+            <outliers method="outliers_normalize_stdcutoff" />
             <transformations>
                 <transformation method="log" indicators="rsi_30" />
                 <transformation method="x2" indicators="williams_%r" />
