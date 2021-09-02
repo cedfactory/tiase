@@ -12,9 +12,9 @@ def display_from_dataframe(df, name, export_name=""):
     else:
         plt.savefig(export_name)
 
-def display_histogram_from_dataframe(df, name, export_name=""):
+def display_histogram_from_dataframe(df, name, nbins=10, export_name=""):
     fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 4))
-    axes.hist(df[name])
+    axes.hist(df[name], bins=nbins)
 
     if export_name == "":
         plt.show()

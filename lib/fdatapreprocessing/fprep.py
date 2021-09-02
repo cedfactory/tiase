@@ -24,7 +24,7 @@ def drop_duplicates(df):
     return df
 
 # reference : https://python.plainenglish.io/identifying-outliers-part-one-c0a31d9faefa
-def normalize_outliers_std_cutoff(df, n_sigmas, debug = False):
+def normalize_outliers_std_cutoff(df, n_sigmas):
     d1 = pd.DataFrame(df['close'].copy())
     d1['simple_rtn'] = d1.close.pct_change()
     d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
@@ -37,8 +37,6 @@ def normalize_outliers_std_cutoff(df, n_sigmas, debug = False):
     # revert pct_change to compute new close values
     d1['close'] = df['close'][0] * (1. + d1['simple_rtn_normalized']).cumprod()
     d1['close'][0] = df['close'][0]
-    if debug:
-        visu.display_outliers_from_dataframe(df, d1, './tmp/outliers_normalize_stdcutoff.png')
 
     # update close values in df
     df['close'] = d1["close"]
@@ -65,26 +63,26 @@ def cut_outliers_std_cutoff(df, n_sigmas):
 
     return df
 
-
+# reference : https://python.plainenglish.io/identifying-outliers-part-one-c0a31d9faefa
 def normalize_outliers_winsorize(df, outlier_cutoff):
     d1 = pd.DataFrame(df['close'].copy())
     d1['simple_rtn'] = d1.close.pct_change()
 
     d2 = pd.DataFrame(d1['simple_rtn'].copy())
 
+    # normalize simple_rtn
     d2.pipe(lambda x: x.clip(lower=x.quantile(outlier_cutoff),
                              upper=x.quantile(1 - outlier_cutoff),
                              axis=1, inplace=True))
 
-    d1['close_shift'] = d1['close'].shift(1)
-    d1['new_rtn'] = d2['simple_rtn'].copy()
-    d1['new_close'] = d1['close_shift'] + d1['new_rtn'] * d1['close_shift']
-    d1['new_close'][0] = d1['close'][0]
-    df['close'] = d1['new_close'].copy()
-    df['simple_rtn'] = d1['new_rtn'].copy()
+    # revert pct_change to compute new close values
+    d2['close'] = df['close'][0] * (1. + d2['simple_rtn']).cumprod()
+    d2['close'][0] = df['close'][0]
+
+    # update close values in df
+    df['close'] = d2["close"]
 
     return df
-
 
 def normalize_outliers_mam(df, n_sigmas):
     # Using Moving Average Mean and Standard Deviation as the Boundary

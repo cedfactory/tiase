@@ -148,12 +148,17 @@ def cac40():
             print("{} ({}),{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(value, fimport.cac40[value], trend_ratio, true_positive, true_negative, false_positive, false_negative))
 
             df = fdataprep.process_technical_indicators(df, ['missing_values'])
-            visu.display_histogram_from_dataframe(df, 'simple_rtn', './tmp/' + value + '_close.png')
+            visu.display_histogram_from_dataframe(df, 'simple_rtn', 100, './tmp/' + value + '_close.png')
 
-            df_copy = df.copy()
-            df = fdataprep.process_technical_indicators(df, ['outliers_winsorize'])
-            visu.DisplayOutliersFromDataframe(df_copy, df, './tmp/' + value + '_outliers.png')
+            df_original = df.copy()
+            df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'])
+            visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_stdcutoff.png')
 
+            df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'])
+            visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_winsorize.png')
+
+
+            break
             df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
             df = fprocessfeature.process_features(df, ['correlation_reduction'])
             df = fprocessfeature.process_features(df, ['smote'])
