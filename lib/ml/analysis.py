@@ -31,19 +31,34 @@ def get_rmse(y_true, y_pred):
 
 
 def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
+    n_split = 4
     result = {}
 
     result["X_test"] = x_test
     result["y_test"] = y_test
+    result["test_size"] = len(x_test)
+
     result["y_test_pred"] = y_test_pred
     result["y_test_prob"] = y_test_prob
 
     result["confusion_matrix"] = metrics.confusion_matrix(y_test, y_test_pred)
 
+    result["pred_pos_rate"] = y_test_pred.sum() / len(y_test_pred)
+    result["accuracy"] = metrics.accuracy_score(y_test, y_test_pred)
     result["precision"] = metrics.precision_score(y_test, y_test_pred)
     result["recall"] = metrics.recall_score(y_test, y_test_pred)
     result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average="binary")
 
+    y_split_len = int(len(y_test)/n_split)
+    for i in range(0, n_split, 1):
+        y_test_split = y_test[i*y_split_len:(i+1)*(y_split_len)]
+        y_test_pred_split = y_test_pred[i*y_split_len:(i+1)*(y_split_len)]
+
+        result["pred_pos_rate_" + str(i)] = y_test_pred_split.sum() / y_split_len
+        result["accuracy_" + str(i)] = metrics.accuracy_score(y_test_split, y_test_pred_split)
+        result["precision_" + str(i)] = metrics.precision_score(y_test_split, y_test_pred_split)
+        result["recall_" + str(i)] = metrics.recall_score(y_test_split, y_test_pred_split)
+        result["f1_score_" + str(i)] = metrics.f1_score(y_test_split, y_test_pred_split, average="binary")
     return result
 
 def regression_analysis(model, x_test, y_test, y_normaliser = None):

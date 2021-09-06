@@ -17,7 +17,7 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         pass
 
     def create_model(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 200, self.target)
 
     def get_analysis(self):
         self.y_test_pred = np.empty(len(self.y_test))
@@ -51,7 +51,7 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         pass
 
     def create_model(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.8, self.target)
 
     def get_analysis(self):
         self.y_test_pred = np.roll(self.y_test, 1)

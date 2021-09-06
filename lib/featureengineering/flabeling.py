@@ -38,15 +38,13 @@ def plot_barriers_out(barriers, filename="barriers_out"):
     # fig = plt.figure(figsize=(20, 16))
     # fig = plt.figure(figsize=(16, 9), dpi=300)
 
-
     # setup_plot_display()
-
     plt.plot(barriers.out, 'bo')
 
     plt.savefig(OUT_DIR + filename + '.png')
     plt.clf()
 
-def plot_barriers_dynamic(barriers, filename="barriers_dynamic"):
+def plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic"):
     OUT_DIR = "./tmp_data_labeling/"
     if (os.path.isdir(OUT_DIR) == False):
         print("new results directory: ", OUT_DIR)
@@ -211,6 +209,6 @@ def data_labeling(df):
 
     plot_barriers_out(barriers, filename="barriers_out")
 
-    plot_barriers_dynamic(barriers, filename="barriers_dynamic")
+    plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic")
 
 

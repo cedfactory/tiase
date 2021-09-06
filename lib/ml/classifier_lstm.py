@@ -4,6 +4,7 @@ from . import toolbox,analysis,classifier
 from rich import print,inspect
 
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
@@ -15,6 +16,12 @@ from keras import Model
 from tensorflow import keras
 from tensorflow.keras import layers
 
+dump_data_to_df = ["model", "tic", "train_size", "test_size", "sum_pred", "threshold",
+                   "pred_pos_rate","accuracy", "precision", "recall", "f1_score",
+                   "pred_pos_rate_0","accuracy_0", "precision_0", "recall_0", "f1_score_0",
+                   "pred_pos_rate_1","accuracy_1", "precision_1", "recall_1", "f1_score_1",
+                   "pred_pos_rate_2","accuracy_2", "precision_2", "recall_2", "f1_score_2",
+                   "pred_pos_rate_3","accuracy_3", "precision_3", "recall_3", "f1_score_3"]
 #
 # Simple LSTM for Sequence Classification
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
@@ -30,10 +37,12 @@ class ClassifierLSTM(classifier.Classifier):
             self.seq_len = params.get("seq_len", self.seq_len)
 
     def create_model(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 50, self.target)
         self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
         self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
 
+        # creat df to store results
+        self.dump_results = pd.DataFrame(columns=dump_data_to_df)
         # create the model
         tf.random.set_seed(20)
         np.random.seed(10)
@@ -44,9 +53,9 @@ class ClassifierLSTM(classifier.Classifier):
         self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
 
         # Final evaluation of the model
-        scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
-        print("Accuracy: %.2f%%" % (scores[1]*100))
-    
+        # scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
+        # print("Accuracy: %.2f%%" % (scores[1]*100))
+
     def get_analysis(self):
         self.y_test_prob = self.model.predict(self.X_test)
         self.y_test_pred = (self.y_test_prob > 0.5).astype("int32")
@@ -54,11 +63,126 @@ class ClassifierLSTM(classifier.Classifier):
         self.analysis["history"] = getattr(self.model, "history", None)
         return self.analysis
 
+    def get_optimized_analysis(self):
+        self.y_test_prob = self.model.predict(self.X_test)
+
+        #self.y_test_pred = (self.y_test_prob > 0.5).astype("int32")
+        self.threshold = toolbox.get_classification_threshold(self.y_test, self.y_test_prob)
+        self.y_test_pred = (self.y_test_prob > self.threshold).astype("int32")
+
+        df_tmp = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
+
+        lst_y_test_prob = []
+        for item in self.y_test_prob:
+            item = item[0]
+            lst_y_test_prob.append(item)
+        lst_y_test = []
+        for item in self.y_test:
+            item = item[0]
+            lst_y_test.append(item)
+        lst_y_test_pred = []
+        for item in self.y_test_pred:
+            item = item[0]
+            lst_y_test_pred.append(item)
+
+        df_tmp['y_test_prob'] = lst_y_test_prob
+        df_tmp['y_test'] = lst_y_test
+        df_tmp['y_test_pred'] = lst_y_test_pred
+
+        self.df_store_results = pd.concat([self.df_store_results, df_tmp], axis=0)
+        self.df_store_results.reset_index(drop=True, inplace=True)
+
+        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis["history"] = getattr(self.model, "history", None)
+        return self.analysis
+
+
     def load(self, filename):
         self.model = tf.keras.models.load_model(filename)
 
     def save(self, filename):
         self.model.save(filename)
+
+    def evaluate_cv(self):
+        self.lst_cv_splits = classifier.set_train_test_cv_list(self.df)
+
+        for index_lst_split in range(0, len(self.lst_cv_splits[0]), 1):
+            self.split_index = len(self.lst_cv_splits[0][index_lst_split])
+            frames = [self.lst_cv_splits[0][index_lst_split], self.lst_cv_splits[1][index_lst_split]]
+            self.df_cv = pd.concat(frames)
+
+            self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df_cv, self.seq_len, self.split_index, self.target)
+            self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
+            self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
+
+            # create the model
+            tf.random.set_seed(20)
+            np.random.seed(10)
+
+            self.build_model()
+
+            # print(self.model.summary())
+            self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
+
+            # self.get_analysis()
+            self.get_optimized_analysis()
+            self.save_results()
+
+            # Final evaluation of the model
+            #scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
+            #print("Accuracy cv: %.2f%%" % (scores[1] * 100))
+
+        self.df_store_results.insert(0, "model", self.id)
+        self.df_store_results.insert(0, "tic", self.tic)
+        filename = './test_results/' + self.tic + '_' + self.id + '_results.csv'
+        self.df_store_results.to_csv(filename)
+        #toolbox.proto_classification_threshold(self.df_store_results)
+
+    def set_info(self, model, tic):
+        self.id = model
+        self.tic = tic
+        self.df_store_results = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
+
+    def save_results(self):
+        list_results = [self.id,
+                        self.tic,
+                        len(self.y_train),
+                        round(self.analysis['test_size'],2),
+                        self.y_test_pred.sum(),
+                        self.threshold,
+
+                        round(self.analysis['pred_pos_rate'],2),
+                        round(self.analysis['accuracy'],2),
+                        round(self.analysis['precision'],2),
+                        round(self.analysis['recall'],2),
+                        round(self.analysis['f1_score'],2),
+
+                        round(self.analysis['pred_pos_rate_0'], 2),
+                        round(self.analysis['accuracy_0'], 2),
+                        round(self.analysis['precision_0'], 2),
+                        round(self.analysis['recall_0'], 2),
+                        round(self.analysis['f1_score_0'], 2),
+
+                        round(self.analysis['pred_pos_rate_1'], 2),
+                        round(self.analysis['accuracy_1'], 2),
+                        round(self.analysis['precision_1'], 2),
+                        round(self.analysis['recall_1'], 2),
+                        round(self.analysis['f1_score_1'], 2),
+
+                        round(self.analysis['pred_pos_rate_2'], 2),
+                        round(self.analysis['accuracy_2'], 2),
+                        round(self.analysis['precision_2'], 2),
+                        round(self.analysis['recall_2'], 2),
+                        round(self.analysis['f1_score_2'], 2),
+
+                        round(self.analysis['pred_pos_rate_3'], 2),
+                        round(self.analysis['accuracy_3'], 2),
+                        round(self.analysis['precision_3'], 2),
+                        round(self.analysis['recall_3'], 2),
+                        round(self.analysis['f1_score_3'], 2)
+                        ]
+
+        self.dump_results = toolbox.add_row_to_df(self.dump_results, list_results)
 
 
 class ClassifierLSTM1(ClassifierLSTM):
