@@ -96,7 +96,7 @@ class TestMlClassifier:
 
         assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
         assert(model_analysis["recall"] == pytest.approx(0.985185, 0.00001))
-        assert(model_analysis["f1_score"] == pytest.approx(0.996282, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.992537, 0.00001))
 
     def test_classifier_cnnbilstm(self):
         df = self.get_dataframe()
@@ -106,7 +106,7 @@ class TestMlClassifier:
 
         model_analysis = model.get_analysis()
 
-        assert(model_analysis["precision"] == pytest.approx(0.985294, 0.00001))
+        assert(model_analysis["precision"] == pytest.approx(0.977443, 0.00001))
         assert(model_analysis["recall"] == pytest.approx(0.992592, 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(0.988929, 0.00001))
 
