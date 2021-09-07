@@ -107,7 +107,7 @@ class TestMlClassifier:
         model_analysis = model.get_analysis()
 
         assert(model_analysis["precision"] == pytest.approx(0.977443, 0.00001))
-        assert(model_analysis["recall"] == pytest.approx(0.992592, 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.962962, 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(0.988929, 0.00001))
 
     def test_classifier_svc(self):
