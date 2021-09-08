@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 MAINTAINER cedfactory
 LABEL version="0.2"
 
@@ -6,8 +6,8 @@ LABEL version="0.2"
 RUN echo "Acquire::Check-Valid-Until \"false\";\nAcquire::Check-Date \"false\";" | cat > /etc/apt/apt.conf.d/10no--check-valid-until
 
 RUN apt-get update
-RUN apt-get install -y wget python3-pip python3.8-dev
-RUN pip3 install --upgrade pip
+RUN apt-get install -y wget python3-pip
+#RUN pip install --upgrade pip
 
 # TA-Lib
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
