@@ -2,10 +2,15 @@ from xgboost import XGBClassifier
 from . import classifier,toolbox,analysis
 from ..findicators import findicators
 
+'''
+XGBoost
+
+Input:
+- seq_len = 21
+'''
 class ClassifierXGBoost(classifier.Classifier):
-    def __init__(self, dataframe, target, name = ""):
-        super().__init__(dataframe, target)
-        self.seq_len = 50
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
 
     def build_model(self):
         self.model = XGBClassifier(use_label_encoder=False)

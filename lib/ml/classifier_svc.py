@@ -2,13 +2,26 @@ from sklearn.svm import SVC
 from . import classifier,toolbox,analysis
 from ..findicators import findicators
 
+'''
+SVC
+
+Input:
+- seq_len = 21
+- kernel = "linear"
+- c = 0.025
+'''       
 class ClassifierSVC(classifier.Classifier):
-    def __init__(self, dataframe, target, name = ""):
-        super().__init__(dataframe, target)
-        self.seq_len = 50
+    def __init__(self, dataframe, target, params = None):
+        super().__init__(dataframe, target, params)
+
+        self.kernel = "linear"
+        self.c = 0.025
+        if params:
+            self.kernel = params.get("kernel", self.kernel)
+            self.c = params.get("c", self.c)
 
     def build_model(self):
-        self.model = SVC(kernel="linear", C=0.025, probability=True)
+        self.model = SVC(kernel=self.kernel, C=self.c, probability=True)
 
     def create_model(self):
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)

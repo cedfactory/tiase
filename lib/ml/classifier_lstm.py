@@ -24,10 +24,10 @@ class ClassifierLSTM(classifier.Classifier):
         super().__init__(dataframe, target)
 
         self.epochs = 170
-        self.seq_len = 21
+        self.batch_size = 10
         if params:
             self.epochs = params.get("epochs", self.epochs)
-            self.seq_len = params.get("seq_len", self.seq_len)
+            self.batch_size = params.get("batch_size", self.batch_size)
 
     def create_model(self):
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
@@ -41,7 +41,7 @@ class ClassifierLSTM(classifier.Classifier):
         self.build_model()
 
         #print(self.model.summary())
-        self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
+        self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=self.batch_size, verbose=0)
 
         # Final evaluation of the model
         scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
@@ -60,10 +60,22 @@ class ClassifierLSTM(classifier.Classifier):
     def save(self, filename):
         self.model.save(filename)
 
+'''
+LSTM1
 
+Input:
+- epochs = 170
+- seq_len = 21
+- lstm_size = 100
+- batch_size = 10
+'''        
 class ClassifierLSTM1(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
+
+        self.lstm_size = 100
+        if params:
+            self.lstm_size = params.get("lstm_size", self.lstm_size)
     
     def build_model(self):
         print("[Build ClassifierLSTM1]")
@@ -71,33 +83,57 @@ class ClassifierLSTM1(ClassifierLSTM):
         shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
         self.model = Sequential()
-        self.model.add(LSTM(100, input_shape=(1, shape_dim2)))
+        self.model.add(LSTM(self.lstm_size, input_shape=(1, shape_dim2)))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+'''
+LSTM2
 
+Input:
+- epochs = 170
+- seq_len = 21
+- lstm_size = 100
+- batch_size = 10
+'''  
 class ClassifierLSTM2(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
     
+        self.lstm_size = 100
+        if params:
+            self.lstm_size = params.get("lstm_size", self.lstm_size)
+
     def build_model(self):
         print("[Build ClassifierLSTM2]")
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
         shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
         self.model = Sequential()
-        self.model.add(LSTM(100, input_shape=(1, shape_dim2)))
+        self.model.add(LSTM(self.lstm_size, input_shape=(1, shape_dim2)))
         self.model.add(Dropout(0.5))
-        self.model.add(Dense(100, activation='sigmoid'))
+        self.model.add(Dense(self.lstm_size, activation='sigmoid'))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+'''
+LSTM3
+ref : Functional API : https://keras.io/guides/functional_api/
 
-# Functional API : https://keras.io/guides/functional_api/
+Input:
+- epochs = 170
+- seq_len = 21
+- lstm_size = 100
+- batch_size = 10
+'''  
 class ClassifierLSTM3(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
+    
+        self.lstm_size = 100
+        if params:
+            self.lstm_size = params.get("lstm_size", self.lstm_size)
     
     def build_model(self):
         print("[Build ClassifierLSTM3]")
@@ -106,16 +142,23 @@ class ClassifierLSTM3(ClassifierLSTM):
         shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
 
         inputs = keras.Input(shape=(1, shape_dim2))
-        x = layers.LSTM(100, activation="sigmoid")(inputs)
+        x = layers.LSTM(self.lstm_size, activation="sigmoid")(inputs)
         outputs = layers.Dense(1)(x)
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
 
-#
-# "Predicting the Trend of Stock Market Index Using the Hybrid Neural Network Based on Multiple Time Scale Feature Learning", Yaping Hao - Qiang Gao, 2020
-# https://www.mdpi.com/2076-3417/10/11/3961
-# https://www.researchgate.net/publication/342045600_Predicting_the_Trend_of_Stock_Market_Index_Using_the_Hybrid_Neural_Network_Based_on_Multiple_Time_Scale_Feature_Learning
-#
+'''
+LSTMHao2020
+ref : 
+"Predicting the Trend of Stock Market Index Using the Hybrid Neural Network Based on Multiple Time Scale Feature Learning", Yaping Hao - Qiang Gao, 2020
+https://www.mdpi.com/2076-3417/10/11/3961
+https://www.researchgate.net/publication/342045600_Predicting_the_Trend_of_Stock_Market_Index_Using_the_Hybrid_Neural_Network_Based_on_Multiple_Time_Scale_Feature_Learning
+
+Input:
+- epochs = 170
+- seq_len = 21
+- batch_size = 10
+'''
 class ClassifierLSTMHao2020(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
@@ -147,8 +190,15 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
         self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
         backend.set_value(self.model.optimizer.learning_rate, 0.001)
 
+'''
+BiLSTM
+ref : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
 
-# Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
+Input:
+- epochs = 170
+- seq_len = 21
+- batch_size = 10
+'''
 class ClassifierBiLSTM(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
@@ -174,11 +224,15 @@ class ClassifierBiLSTM(ClassifierLSTM):
         self.model = keras.Model(inputs=in_seq, outputs=out)
         self.model.compile(loss="mse", optimizer="adam", metrics=['mse', 'mae', 'mape'])    
 
-#
-# Source : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
-#
-# CNN + Bi-LSTM model
-#
+'''
+CNN + Bi-LSTM model
+ref : https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
+
+Input:
+- epochs = 170
+- seq_len = 21
+- batch_size = 10
+'''
 class ClassifierCNNBiLSTM(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)

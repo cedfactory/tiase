@@ -113,7 +113,7 @@ class TestMlClassifier:
     def test_classifier_svc(self):
         df = self.get_dataframe()
 
-        model = classifier_svc.ClassifierSVC(df, "target")
+        model = classifier_svc.ClassifierSVC(df, "target", params={'seq_len': 50})
         model.create_model()
 
         model_analysis = model.get_analysis()

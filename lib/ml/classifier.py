@@ -11,10 +11,14 @@ def set_train_test_data(dataframe, seq_len, target):
 
 class Classifier(metaclass = ABCMeta):
     
-    def __init__(self, dataframe, target):
+    def __init__(self, dataframe, target, params = None):
         self.df = dataframe
-        self.seq_len = 21
         self.target = target
+
+        self.seq_len = 21
+        if params:
+            self.seq_len = params.get("seq_len", self.seq_len)
+
 
     @abstractmethod
     def build_model(self):
