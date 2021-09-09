@@ -1,11 +1,17 @@
 import pandas as pd
 import numpy as np
+
+from matplotlib import pyplot as plt
 from lib.fimport import fimport,synthetic,visu
 from lib.findicators import findicators
 from lib.fdatapreprocessing import fdataprep
 from lib.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis,toolbox
 import os
 from rich import print,inspect
+
+import warnings
+warnings.simplefilter("ignore")
+
 
 def evaluate_classifiers(df, value, verbose=False):
     df = findicators.normalize_column_headings(df)
@@ -35,6 +41,22 @@ def evaluate_classifiers(df, value, verbose=False):
 
         model.create_model()
         model_analysis = model.get_analysis()
+
+        debug = False
+        if debug:
+            history = model.get_history()
+            print("history loss: ",history.history["loss"])
+            print("history accuracy: ", history.history["accuracy"])
+            print("history val_loss: ", history.history["val_accuracy"])
+            print("history val_accuracy: ", history.history["val_accuracy"])
+
+            plt.plot(history.history['loss'])
+            plt.plot(history.history['val_loss'])
+            plt.title('model train vs validation loss')
+            plt.ylabel('loss')
+            plt.xlabel('epoch')
+            plt.legend(['train', 'validation'], loc='upper right')
+            plt.savefig("test.png")
 
         if verbose:
             print(name)

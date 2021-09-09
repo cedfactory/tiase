@@ -24,7 +24,7 @@ class ClassifierSVC(classifier.Classifier):
         self.model = SVC(kernel=self.kernel, C=self.c, probability=True)
 
     def create_model(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, self.target)
+        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
         self.build_model()
         self.model.fit(self.X_train,self.y_train)
 
