@@ -13,7 +13,8 @@ def get_mape(y_true, y_pred):
     mape - Mean Absolute Percentage Error (%)
     """
     y_true, y_pred = np.array(y_true), np.array(y_pred)
-    mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+    mask = y_true != 0
+    mape = np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
     return mape
 
 def get_rmse(y_true, y_pred):
