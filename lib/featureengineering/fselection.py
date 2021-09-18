@@ -16,17 +16,17 @@ from xgboost import XGBClassifier
 
 def get_sma_ema_wma(df, columns):
     if "sma" in columns:
-        columns = [x for x in columns if x is not "sma"]
+        columns = [x for x in columns if x != "sma"]
         col_sma_lst = [item for item in df.columns if item.startswith("sma")]
         columns.extend(col_sma_lst)
 
     if "ema" in columns:
-        columns = [x for x in columns if x is not "ema"]
+        columns = [x for x in columns if x != "ema"]
         col_ema_lst = [item for item in df.columns if item.startswith("ema")]
         columns.extend(col_ema_lst)
 
     if "wma" in columns:
-        columns = [x for x in columns if x is not "wma"]
+        columns = [x for x in columns if x != "wma"]
         col_wma_lst = [item for item in df.columns if item.startswith("wma")]
         columns.extend(col_wma_lst)
 
