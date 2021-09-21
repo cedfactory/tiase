@@ -37,7 +37,6 @@ def kbest_reduction(df, model_type, k_best=0.5):
     if model_type == 'regression':
         selection_type = f_regression
     else:
-        # selection_type = f_classif
         selection_type = chi2
 
     if k_best < 1:
@@ -193,7 +192,7 @@ def rfecv_reduction(df, model_type, scoring, rfecv_min_features):
 
 
 def get_outliers(df, n_sigmas):
-    # i is number of sigma, which define the boundary along mean
+    # n_sigmas is number of sigma, which define the boundary along mean
 
     df['outliers'] = 0
 
@@ -201,7 +200,7 @@ def get_outliers(df, n_sigmas):
         mu = df[col].mean()
         sigma = df[col].std()
 
-        # condition = (df[col] > mu + sigma * i) | (df[col] < mu - sigma * i)
+        # condition = (df[col] > mu + sigma * n_sigmas) | (df[col] < mu - sigma * n_sigmas)
         # outliers[f'{col}_outliers'] = df[col][condition]
 
         cond = (df[col] > mu + sigma * n_sigmas) | (df[col] < mu - sigma * n_sigmas)

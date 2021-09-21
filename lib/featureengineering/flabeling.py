@@ -187,18 +187,15 @@ def get_labels(barriers):
 def data_labeling(df):
     price = df["close"].copy()
 
-    df0 = get_daily_volatility(price)
-
-    df_atr = get_atr(df, 14)
-
     #set the boundary of barriers, based on 20 days EWM
     daily_volatility = get_daily_volatility(price)
-    # how many days we hold the stock which set the vertical barrier
-    t_final = 10
+
     #the up and low boundary multipliers
     upper_lower_multipliers = [2, 2]
-    #allign the index
+
+    #align the index
     prices = price[daily_volatility.index]
+    
     # how many days we hold the stock which set the vertical barrier
     t_final = 10
 
@@ -206,8 +203,6 @@ def data_labeling(df):
     print(barriers.info())
 
     barriers = get_labels(barriers)
-
-
 
     plot_barriers_out(barriers, filename="barriers_out")
 
