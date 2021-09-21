@@ -81,8 +81,25 @@ class TestMlToolbox:
         os.remove("./tmp/normalizer.gz")
 
 
-    def test_get_classification_threshold(self):
-        y_test = np.array([1, 1, 1, 1, 1, 0, 0, 0, 0, 0])
-        y_test_prob = np.array([.7, .6, .4, .8, .5, .4, .2, .7, .3, .3])
-        threshold = toolbox.get_classification_threshold(y_test, y_test_prob)
+    def test_get_classification_threshold_unknown(self):
+        y_test = np.array(([1], [1], [1], [1], [1], [0], [0], [0], [0], [0]))
+        y_test_prob = np.array(([.7], [.6], [.4], [.8], [.5], [.4], [.2], [.7], [.3], [.3]))
+        threshold, y_test_pred = toolbox.get_classification_threshold("foobar", y_test, y_test_prob)
+        assert(threshold == -1.)
+        assert(len(y_test_pred) == 0)
+
+    def test_get_classification_threshold_naive(self):
+        y_test = np.array(([1], [1], [1], [1], [1], [0], [0], [0], [0], [0]))
+        y_test_prob = np.array(([.7], [.6], [.4], [.8], [.5], [.4], [.2], [.7], [.3], [.3]))
+        threshold, y_test_pred = toolbox.get_classification_threshold("naive", y_test, y_test_prob)
+        assert(threshold == .5)
+        y_test_pred_expected = np.array(([1], [1], [0], [1], [0], [0], [0], [1], [0], [0]))
+        np.testing.assert_allclose(y_test_pred, np.array(y_test_pred_expected), 0.00001)
+
+    def test_get_classification_threshold_best_accuracy_score(self):
+        y_test = np.array(([1], [1], [1], [1], [1], [0], [0], [0], [0], [0]))
+        y_test_prob = np.array(([.7], [.6], [.4], [.8], [.5], [.4], [.2], [.7], [.3], [.3]))
+        threshold, y_test_pred = toolbox.get_classification_threshold("best_accuracy_score", y_test, y_test_prob)
         assert(threshold == .4)
+        y_test_pred_expected = np.array(([1], [1], [0], [1], [1], [0], [0], [1], [0], [0]))
+        np.testing.assert_allclose(y_test_pred, np.array(y_test_pred_expected), 0.00001)

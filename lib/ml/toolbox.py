@@ -313,7 +313,7 @@ https://towardsdatascience.com/optimal-threshold-for-imbalanced-classification-5
 https://machinelearningmastery.com/threshold-moving-for-imbalanced-classification/
 '''
 
-def get_classification_threshold(y_test, y_test_prob):
+def get_classification_threshold(method, y_test, y_test_prob):
     """
     Given y_test and y_test_prob
 
@@ -322,22 +322,35 @@ def get_classification_threshold(y_test, y_test_prob):
     :return: best threshold
     """
 
-    df = pd.DataFrame()
-    df['test'] = y_test.tolist()
-    df['pred'] = y_test_prob.tolist()
+    threshold = -1.
+    y_test_pred =  []
 
-    df = df.sort_values(by='pred', ascending=False)
-    pred_list = df['pred'].copy()
-    best_accuracy = 0
+    if method == "naive":
+        threshold = .5
 
-    for threshold in pred_list:
-        y_test_tmp_pred = (y_test_prob > threshold).astype("int32")
-        accuracy = metrics.accuracy_score(y_test, y_test_tmp_pred)
-        if accuracy > best_accuracy:
-            best_accuracy = accuracy
-            best_threshold = threshold
+    elif method == "best_accuracy_score":
+        df = pd.DataFrame()
+        df['test'] = y_test.tolist()
+        df['pred'] = y_test_prob.tolist()
 
-    return best_threshold
+        df = df.sort_values(by='pred', ascending=False)
+        pred_list = df['pred'].copy()
+        best_accuracy = 0
+
+        for threshold in pred_list:
+            y_test_tmp_pred = (y_test_prob > threshold[0]).astype("int32")
+            accuracy = metrics.accuracy_score(y_test, y_test_tmp_pred)
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_threshold = threshold[0]
+
+        threshold = best_threshold
+    
+    if threshold >= 0.:
+        y_test_pred = (y_test_prob > threshold).astype("int32")
+
+    return threshold, y_test_pred
+
 
 def proto_classification_threshold(df):
     split_index = len(df) - 21

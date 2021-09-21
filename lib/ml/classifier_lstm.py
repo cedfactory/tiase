@@ -58,44 +58,22 @@ class ClassifierLSTM(classifier.Classifier):
 
     def get_analysis(self):
         self.y_test_prob = self.model.predict(self.X_test)
-        self.y_test_pred = (self.y_test_prob > 0.5).astype("int32")
-        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
-        self.analysis["history"] = getattr(self.model, "history", None)
-        return self.analysis
 
-    def get_optimized_analysis(self):
-        self.y_test_prob = self.model.predict(self.X_test)
-
-        #self.y_test_pred = (self.y_test_prob > 0.5).astype("int32")
-        self.threshold = toolbox.get_classification_threshold(self.y_test, self.y_test_prob)
-        self.y_test_pred = (self.y_test_prob > self.threshold).astype("int32")
+        self.threshold, self.y_test_pred = toolbox.get_classification_threshold("naive", self.y_test, self.y_test_prob)
 
         df_tmp = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
 
-        lst_y_test_prob = []
-        for item in self.y_test_prob:
-            item = item[0]
-            lst_y_test_prob.append(item)
-        lst_y_test = []
-        for item in self.y_test:
-            item = item[0]
-            lst_y_test.append(item)
-        lst_y_test_pred = []
-        for item in self.y_test_pred:
-            item = item[0]
-            lst_y_test_pred.append(item)
+        df_tmp['y_test_prob'] = [x[0] for x in self.y_test_prob]
+        df_tmp['y_test'] = [x[0] for x in self.y_test]
+        df_tmp['y_test_pred'] = [x[0] for x in self.y_test_pred]
 
-        df_tmp['y_test_prob'] = lst_y_test_prob
-        df_tmp['y_test'] = lst_y_test
-        df_tmp['y_test_pred'] = lst_y_test_pred
-
+        self.df_store_results = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
         self.df_store_results = pd.concat([self.df_store_results, df_tmp], axis=0)
         self.df_store_results.reset_index(drop=True, inplace=True)
 
         self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         self.analysis["history"] = getattr(self.model, "history", None)
         return self.analysis
-
 
     def load(self, filename):
         self.model = tf.keras.models.load_model(filename)
@@ -125,7 +103,7 @@ class ClassifierLSTM(classifier.Classifier):
             self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
 
             # self.get_analysis()
-            self.get_optimized_analysis()
+            self.get_analysis()
             self.save_results()
 
             # Final evaluation of the model
