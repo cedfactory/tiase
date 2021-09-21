@@ -305,7 +305,23 @@ def merge_csv(extension):
     # export to csv
     combined_csv.to_csv("combined_results.csv", index=False, encoding='utf-8-sig')
 
+'''
+Optimal threshold
+references :
+https://www.sciencedirect.com/science/article/abs/pii/S2214579615000611
+https://towardsdatascience.com/optimal-threshold-for-imbalanced-classification-5884e870c293
+https://machinelearningmastery.com/threshold-moving-for-imbalanced-classification/
+'''
+
 def get_classification_threshold(y_test, y_test_prob):
+    """
+    Given y_test and y_test_prob
+
+    :y_test df: np.array of expected targets
+    :y_test_prob ls: np.array of probabilities
+    :return: best threshold
+    """
+
     df = pd.DataFrame()
     df['test'] = y_test.tolist()
     df['pred'] = y_test_prob.tolist()
@@ -315,11 +331,11 @@ def get_classification_threshold(y_test, y_test_prob):
     best_accuracy = 0
 
     for threshold in pred_list:
-        y_test_tmp_pred = (y_test_prob > threshold[0]).astype("int32")
+        y_test_tmp_pred = (y_test_prob > threshold).astype("int32")
         accuracy = metrics.accuracy_score(y_test, y_test_tmp_pred)
         if accuracy > best_accuracy:
             best_accuracy = accuracy
-            best_threshold = threshold[0]
+            best_threshold = threshold
 
     return best_threshold
 

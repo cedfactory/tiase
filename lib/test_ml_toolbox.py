@@ -81,3 +81,8 @@ class TestMlToolbox:
         os.remove("./tmp/normalizer.gz")
 
 
+    def test_get_classification_threshold(self):
+        y_test = np.array([1, 1, 1, 1, 1, 0, 0, 0, 0, 0])
+        y_test_prob = np.array([.7, .6, .4, .8, .5, .4, .2, .7, .3, .3])
+        threshold = toolbox.get_classification_threshold(y_test, y_test_prob)
+        assert(threshold == .4)
