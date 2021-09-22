@@ -23,7 +23,7 @@ def create_dataframe(y, mult=1):
     hi = np.maximum(op, cl) + np.array(mult*np.abs(np.random.randn(len(y))))
     lo = np.minimum(op, cl) - np.array(mult*np.abs(np.random.randn(len(y))))
     vol = np.array(100 + mult*np.abs(np.random.randn(len(y))))
-    dti = pd.date_range('2000-01-01', periods=len(y), freq='H')
+    dti = pd.date_range('2000-01-01', periods=len(y), freq='D')
     idx = np.arange(len(y))
 
     data = {'Date': dti ,

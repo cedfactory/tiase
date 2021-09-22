@@ -95,12 +95,10 @@ def get_train_test_data_from_dataframe1(df, seq_len, column_target, train_split)
     return x_train, y_train, x_test, y_test, x_normaliser
 
 
-'''
-build train & test data from a dataframe
-Warnings :
-- when the X data is computed wih rows \in [ i ... i+seq_len [, y is computed with i+seq_len (next row)
-- normalization is performed
-'''
+# build train & test data from a dataframe
+# Warnings :
+# - when the X data is computed wih rows \in [ i ... i+seq_len [, y is computed with i+seq_len (next row)
+# - normalization is performed
 def _get_train_test_data_from_dataframe2(features, target, seq_len):
     n_features = features.shape[1]
     x_train = []
@@ -156,11 +154,10 @@ def get_train_test_data_from_dataframe2(df, seq_len, column_target, train_split,
 
     return x_train, y_train, x_test, y_test, features_normaliser
 
-'''
-build train & test data from a dataframe
-Warning :
-- when the X data is computed wih rows \in [ i ... i+seq_len-1 ], y is computed with i+seq_len-1 (same row)
-'''
+
+# build train & test data from a dataframe
+# Warning :
+# - when the X data is computed wih rows \in [ i ... i+seq_len-1 ], y is computed with i+seq_len-1 (same row)
 def _get_train_test_data_from_dataframe(features, target, seq_len):
     n_features = features.shape[1]
     x_train = []
@@ -226,43 +223,29 @@ def get_train_test_data_from_dataframe(df, seq_len, column_target, train_split, 
 
     return x_train, y_train, x_test, y_test, features_normaliser
 
-def get_train_test_data_list_from_CV_WF_split_dataframe(df, nb_split=5):
+def get_train_test_data_list_from_CV_WF_split_dataframe(df, nb_split=5, debug=False):
+    """
+
+    """
     #tscv = TimeSeriesSplit(gap=0, max_train_size=int(len(df)/2), n_splits=nb_split, test_size=100)
     tscv = TimeSeriesSplit(gap=0, max_train_size=500, n_splits=nb_split, test_size=100)
 
     list_df_training = []
     list_df_testing = []
     for split_index in tscv.split(df):
-        debug = False
-        #debug = True
-        if(debug):
+        if debug:
             print("df size: ", len(df))
             print("TRAIN:", split_index[0][0]," -> ", split_index[0][len(split_index[0])-1], " Size: ", split_index[0][len(split_index[0])-1] - split_index[0][0])
             print("TEST: ", split_index[1][0], " -> ", split_index[1][len(split_index[1]) - 1], " Size: ", split_index[1][len(split_index[1])-1] - split_index[1][0])
             print(" ")
-        train = []
-        for i in range(0,
-                       split_index[0][0],
-                       1):
-            train.append(-1)
+
+        train = [-1] * split_index[0][0]
         train.extend(split_index[0].tolist().copy())
+        train.extend([-1] * (len(df) - len(train)))
 
-        for i in range(len(train),
-                       len(df),
-                       1):
-            train.append(-1)
-
-        test = []
-        for i in range(0,
-                       split_index[1][0],
-                       1):
-            test.append(-1)
+        test = [-1] * split_index[1][0]
         test.extend(split_index[1].tolist().copy())
-
-        for i in range(len(test),
-                       len(df),
-                       1):
-            test.append(-1)
+        test.extend([-1] * (len(df) - len(test)))
 
         df['train'] = train
         df['test']  = test

@@ -1,9 +1,19 @@
 import pandas as pd
 import numpy as np
-from lib.fimport import fimport
+from lib.fimport import fimport,synthetic
+from lib.findicators import findicators
 from lib.ml import toolbox
 from sklearn import preprocessing
 import os
+
+def compare_dataframes(df1, df2, columns):
+    for column in columns:
+        array1 = df1[column].to_numpy()
+        array2 = df2[column].to_numpy()
+        if np.allclose(array1, array2) == False:
+            return False
+    return True
+
 
 class TestMlToolbox:
 
@@ -103,3 +113,20 @@ class TestMlToolbox:
         assert(threshold == .4)
         y_test_pred_expected = np.array(([1], [1], [0], [1], [1], [0], [0], [1], [0], [0]))
         np.testing.assert_allclose(y_test_pred, np.array(y_test_pred_expected), 0.00001)
+
+    def test_get_train_test_data_list_from_CV_WF_split_dataframe(self):
+        y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
+        df = synthetic.create_dataframe(y, 0.)
+        df = findicators.add_technical_indicators(df, ["target"])
+        df = findicators.remove_features(df, ["open","low","high","volume"])
+        df.dropna(inplace = True)
+
+        list_df_training, list_df_testing = toolbox.get_train_test_data_list_from_CV_WF_split_dataframe(df, 3)
+
+        assert(len(list_df_training) == 3)
+        assert(len(list_df_testing) == 3)
+        for idx,df_computed in enumerate(list_df_training + list_df_testing):
+            ref_file = "./lib/data/test/get_train_test_data_list_from_CV_WF_split_dataframe_{}_reference.csv".format(idx)
+            #df_computed.to_csv(ref_file)
+            df_expected = fimport.get_dataframe_from_csv(ref_file)
+            assert(compare_dataframes(df_computed, df_expected, df_expected.columns))
