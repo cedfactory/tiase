@@ -41,8 +41,6 @@ class ClassifierLSTM(classifier.Classifier):
         self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
         self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
 
-        # creat df to store results
-        self.dump_results = pd.DataFrame(columns=dump_data_to_df)
         # create the model
         tf.random.set_seed(20)
         np.random.seed(10)
@@ -82,8 +80,12 @@ class ClassifierLSTM(classifier.Classifier):
         self.model.save(filename)
 
     def evaluate_cv(self):
+        self.set_info("id", "tic")
         self.lst_cv_splits = classifier.set_train_test_cv_list(self.df)
-
+        # create df to store results
+        self.dump_results = pd.DataFrame(columns=dump_data_to_df)
+        
+        print(len(self.lst_cv_splits[0]))
         for index_lst_split in range(0, len(self.lst_cv_splits[0]), 1):
             self.split_index = len(self.lst_cv_splits[0][index_lst_split])
             frames = [self.lst_cv_splits[0][index_lst_split], self.lst_cv_splits[1][index_lst_split]]
@@ -325,7 +327,7 @@ class ClassifierBiLSTM(ClassifierLSTM):
         out = layers.Dense(1, activation="sigmoid")(conc)      
 
         self.model = keras.Model(inputs=in_seq, outputs=out)
-        self.model.compile(loss="mse", optimizer="adam", metrics=['mse', 'mae', 'mape'])    
+        self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])    
 
 '''
 CNN + Bi-LSTM model
@@ -457,4 +459,4 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
         out = Dense(1, activation="sigmoid")(conc)      
 
         self.model = Model(inputs=in_seq, outputs=out)
-        self.model.compile(loss="mse", optimizer="adam", metrics=['mae', 'mape'])     
+        self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])     
