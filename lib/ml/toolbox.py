@@ -33,8 +33,6 @@ def get_train_test_data_from_dataframe0(df, seq_len, column_target, train_split)
     train_indices = int(df.shape[0] * train_split)
 
     train_data = df[:train_indices]
-    #train_data = train_data.reset_index()
-    #train_data = train_data.drop(columns = ['Date'])
 
     test_data = df[train_indices:]
     test_data = test_data.reset_index()
@@ -72,8 +70,6 @@ def get_train_test_data_from_dataframe1(df, seq_len, column_target, train_split)
     train_indices = int(df.shape[0] * train_split)
 
     train_data = df[:train_indices]
-    #train_data = train_data.reset_index()
-    #train_data = train_data.drop(columns = ['Date'])
 
     test_data = df[train_indices:]
     test_data = test_data.reset_index()
@@ -182,19 +178,15 @@ def get_train_test_data_from_dataframe(df, seq_len, column_target, train_split, 
     # separate features and targets
     features = df.copy().drop(column_target, axis=1)
     target = pd.DataFrame({'target': df[column_target]})
-    #features = df.drop(column_target, axis=1)
-    #target = pd.DataFrame({'target': df[column_target]})
 
     # split training & testing data
     train_features = features[:split_index]
     train_target = target[:split_index]
     train_target = train_target.reset_index(drop=True)
-    #train_target = train_target.drop(columns = ['Date'])
 
     test_features = features[split_index:]
     test_target = target[split_index:]
     test_target = test_target.reset_index(drop=True)
-    #test_target = test_features.drop(columns = ['Date'])
     '''
     train_features.drop(train_features.tail(1).index,inplace=True)
     train_target.drop(train_target.tail(1).index,inplace=True)
@@ -271,11 +263,11 @@ def add_row_to_df(df,ls):
     :return: <DataFrame> The dataframe with the newly appended row
     """
 
-    numEl = len(ls)
+    num_el = len(ls)
 
-    newRow = pd.DataFrame(np.array(ls).reshape(1,numEl), columns = list(df.columns))
+    new_row = pd.DataFrame(np.array(ls).reshape(1,num_el), columns = list(df.columns))
 
-    df = df.append(newRow, ignore_index=True)
+    df = df.append(new_row, ignore_index=True)
 
     return df
 
@@ -350,7 +342,6 @@ def proto_classification_threshold(df):
     best_accuracy = 0
     for threshold in train_pred_list:
         y_train_tmp_pred = (np.array(y_train_prob) > threshold).astype("int32")
-        #toto = np.array(y_train)
         toto = y_train.tolist()
         titi = y_train_tmp_pred.tolist()
         accuracy = metrics.accuracy_score(toto, titi)

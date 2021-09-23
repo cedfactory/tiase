@@ -2,7 +2,7 @@ from lib.fimport import fimport
 from lib.findicators import findicators
 from lib.fdatapreprocessing import fdataprep
 import pandas as pd
-#from pandas._testing import assert_frame_equal
+# todo : try to use from pandas._testing import assert_frame_equal
 import numpy as np
 import pytest
 import datetime

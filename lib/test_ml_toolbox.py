@@ -80,15 +80,16 @@ class TestMlToolbox:
         normalizer = preprocessing.MinMaxScaler()
         normalizer.fit(data)
 
-        toolbox.serialize(normalizer, "./tmp/normalizer.gz")
-        normalizer_loaded = toolbox.deserialize("./tmp/normalizer.gz")
+        filename = "./tmp/normalizer.gz"
+        toolbox.serialize(normalizer, filename)
+        normalizer_loaded = toolbox.deserialize(filename)
         normalized_data = normalizer_loaded.transform(data)
 
         expected_data = np.array([[1, 1], [0.2, 0], [0.3, 0.2], [0.2, 0.6], [0.2, 0], [0., 0.4], [0.1, 0.6], [0.3, 0], [0.5, 0.8], [0.7, 1]])
         np.testing.assert_allclose(normalized_data, expected_data, 0.00001)
 
         # cleaning
-        os.remove("./tmp/normalizer.gz")
+        os.remove(filename)
 
 
     def test_get_classification_threshold_unknown(self):
@@ -114,7 +115,7 @@ class TestMlToolbox:
         y_test_pred_expected = np.array(([1], [1], [0], [1], [1], [0], [0], [1], [0], [0]))
         np.testing.assert_allclose(y_test_pred, np.array(y_test_pred_expected), 0.00001)
 
-    def test_get_train_test_data_list_from_CV_WF_split_dataframe(self):
+    def test_get_train_test_data_list_from_cv_wf_split_dataframe(self):
         y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
         df = synthetic.create_dataframe(y, 0.)
         df = findicators.add_technical_indicators(df, ["target"])
