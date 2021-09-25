@@ -21,7 +21,12 @@ class TestMlLstmHao:
 
         prediction = model.predict()
         assert(prediction == pytest.approx(1423.31, 0.0001))
-        
+
+        model.save_model("hao")
+
+        model2 = lstm_hao.LSTMHaoBasic(df, name="hao")
+        prediction2 = model2.predict()
+        assert(prediction2 == pytest.approx(1423.31, 0.0001))
 
     def test_lstml_hao_trend(self):
         filename = "./lib/data/test/google_stocks_data.csv"

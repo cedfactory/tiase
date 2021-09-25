@@ -82,29 +82,26 @@ class LSTMHaoBasic:
         plt.legend(['Actual Price', 'Predicted Price'])
         plt.savefig(filename)
 
-
-
     def save_model(self, name):
-            filename = name+'.hdf5'
-            self.model.save(filename)
+        filename = name+'.hdf5'
+        self.model.save(filename)
 
-            toolbox.serialize(self.x_normaliser, name+"_x_normalizer.gz")
-            toolbox.serialize(self.y_normaliser, name+"_y_normalizer.gz")
+        toolbox.serialize(self.x_normaliser, name+"_x_normalizer.gz")
+        toolbox.serialize(self.y_normaliser, name+"_y_normalizer.gz")
 
+        root = ET.Element("model")
+        ET.SubElement(root, "file").text = name+'.hdf5'
+        ET.SubElement(root, "x_normaliser").text = name+"_x_normalizer.gz"
+        ET.SubElement(root, "y_normaliser").text = name+"_y_normalizer.gz"
+        ET.SubElement(root, "mape").text = "{:.2f}".format(self.analysis["mape"])
+        ET.SubElement(root, "rmse").text = "{:.2f}".format(self.analysis["rmse"])
 
-            root = ET.Element("model")
-            ET.SubElement(root, "file").text = name+'.hdf5'
-            ET.SubElement(root, "x_normaliser").text = name+"_x_normalizer.gz"
-            ET.SubElement(root, "y_normaliser").text = name+"_y_normalizer.gz"
-            ET.SubElement(root, "mape").text = "{:.2f}".format(self.analysis["mape"])
-            ET.SubElement(root, "rmse").text = "{:.2f}".format(self.analysis["rmse"])
+        xmlfilename = name+'.xml'
 
-            xmlfilename = name+'.xml'
+        tree = ET.ElementTree(root)
 
-            tree = ET.ElementTree(root)
-
-            tree.write(xmlfilename)
-            print(xmlfilename)
+        tree.write(xmlfilename)
+        print(xmlfilename)
 
     def load_model(self, name):
         tree = ET.parse(name+".xml")
