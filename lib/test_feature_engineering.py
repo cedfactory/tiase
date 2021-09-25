@@ -63,11 +63,28 @@ class TestFeatureEngineering:
         df_reduction = fprocessfeature.process_features(df.copy(), ["vsa_reduction"])
 
         ref_file = "./lib/data/test/featureengineering_vsa_reduction_reference.csv"
-        df_reduction.to_csv(ref_file)
+        #df_reduction.to_csv(ref_file)
         expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
         for column in df_reduction.columns:
             array = df_reduction[column].to_numpy()
             array_expected = expected_df_reduction[column].to_numpy()
             assert(np.allclose(array, array_expected))
+
+    def test_data_labeling(self):
+        df = self.get_real_dataframe()
+        df = df.head(150)
+        df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"])
+        df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
+
+        ref_file = "./lib/data/test/featureengineering_data_labeling_reference.csv"
+        #df_labeling.to_csv(ref_file)
+        expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
+
+        for column in df_labeling.columns:
+            print(column)
+            array_expected = expected_df_labeling[column].to_numpy()
+            if array_expected.dtype != object:
+                array = df_labeling[column].to_numpy(dtype = array_expected.dtype)
+                assert(np.allclose(array, array_expected))
 

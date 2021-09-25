@@ -59,6 +59,13 @@ def check(action):
         df_reduction = fprocessfeature.process_features(df.copy(), ["vsa_reduction"])
         print(df_reduction.head())
             
+    elif action == "labeling":
+        df = get_real_dataframe()
+        #df = df.head(200)
+        print()
+
+        df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"])
+        print()
 
     else:
         print("action {} is unknown".format(action))
@@ -67,7 +74,7 @@ def check(action):
 _usage_str = """
 Options:
     [--check [ process ]]
-process in [ smote,reductions ]
+process in [ smote,reductions,labeling ]
 """
 
 def _usage():

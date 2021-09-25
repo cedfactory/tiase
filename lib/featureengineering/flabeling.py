@@ -46,7 +46,7 @@ def plot_barriers_out(barriers, filename="barriers_out"):
     plt.savefig(OUT_DIR + filename + '.png')
     plt.clf()
 
-def plot_barriers_dynamic(barriers, filename="barriers_dynamic"):
+def plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic"):
     OUT_DIR = "./tmp_data_labeling/"
     if (os.path.isdir(OUT_DIR) == False):
         print("new results directory: ", OUT_DIR)
@@ -86,7 +86,8 @@ def plot_barriers_dynamic(barriers, filename="barriers_dynamic"):
 
     fig.savefig(OUT_DIR + filename + '_2.png')
 
-def get_daily_vol(close,span0=100):
+# for intraday data
+def get_daily_volatility_for_intraday_data(close,span0=100):
     # daily vol, reindexed to close
     df0=close.index.searchsorted(close.index-pd.Timedelta(days=1))
     df0=df0[df0>0]
@@ -98,27 +99,14 @@ def get_daily_vol(close,span0=100):
     df0=df0.ewm(span=span0).std()
     return df0
 
-def get_daily_volatility(close,span0=20):
+# for daily data
+def get_daily_volatility_for_daily_data(close,span0=20):
     # simple percentage returns
     df0=close.pct_change()
     # 20 days, a month EWM's std as boundary
     df0=df0.ewm(span=span0).std()
     df0.dropna(inplace=True)
     return df0
-
-
-def get_atr(stock, win=14):
-    atr_df = pd.Series(index=stock.index)
-    high = pd.Series(stock.high.rolling(win, min_periods=win))
-    low = pd.Series(stock.low.rolling(win, min_periods=win))
-    close = pd.Series(stock.close.rolling(win, min_periods=win))
-
-    for i in range(len(stock.index)):
-        tr = np.max([(high[i] - low[i]), np.abs(high[i] - close[i]), np.abs(low[i] - close[i])], axis=0)
-        atr_df[i] = tr.sum() / win
-
-    return atr_df
-
 
 def get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers):
     #create a container
@@ -188,7 +176,7 @@ def data_labeling(df):
     price = df["close"].copy()
 
     #set the boundary of barriers, based on 20 days EWM
-    daily_volatility = get_daily_volatility(price)
+    daily_volatility = get_daily_volatility_for_daily_data(price)
 
     #the up and low boundary multipliers
     upper_lower_multipliers = [2, 2]
@@ -200,12 +188,11 @@ def data_labeling(df):
     t_final = 10
 
     barriers = get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers)
-    print(barriers.info())
 
     barriers = get_labels(barriers)
 
     plot_barriers_out(barriers, filename="barriers_out")
 
-    plot_barriers_dynamic(barriers, filename="barriers_dynamic")
+    plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic")
 
-
+    return barriers
