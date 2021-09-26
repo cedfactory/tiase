@@ -9,6 +9,9 @@ import numpy as np
 import xml.etree.cElementTree as ET
 import matplotlib.pyplot as plt
 
+label_actual_price = "Actual Price"
+label_predicted_price = "Predicted Price"
+
 #
 # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
 #
@@ -72,27 +75,29 @@ class LSTMHaoBasic:
         y_pred = self.model.predict(self.x_test)
         y_pred = self.y_normaliser.inverse_transform(y_pred)
         
-        real = plt.plot(self.y_test, label='Actual Price')
-        pred = plt.plot(y_pred, label='Predicted Price')
+        plt.plot(self.y_test, label=label_actual_price)
+        plt.plot(y_pred, label=label_predicted_price)
 
         plt.gcf().set_size_inches(12, 8, forward=True)
         plt.title('Plot of real price and predicted price against number of days')
         plt.xlabel('Number of days')
         plt.ylabel('Adjusted Close Price($)')
-        plt.legend(['Actual Price', 'Predicted Price'])
+        plt.legend([label_actual_price, label_predicted_price])
         plt.savefig(filename)
 
     def save_model(self, name):
         filename = name+'.hdf5'
         self.model.save(filename)
 
-        toolbox.serialize(self.x_normaliser, name+"_x_normalizer.gz")
-        toolbox.serialize(self.y_normaliser, name+"_y_normalizer.gz")
+        x_normalizer_filename = name+"_x_normalizer.gz"
+        y_normalizer_filename = name+"_y_normalizer.gz"
+        toolbox.serialize(self.x_normaliser, x_normalizer_filename)
+        toolbox.serialize(self.y_normaliser, y_normalizer_filename)
 
         root = ET.Element("model")
         ET.SubElement(root, "file").text = name+'.hdf5'
-        ET.SubElement(root, "x_normaliser").text = name+"_x_normalizer.gz"
-        ET.SubElement(root, "y_normaliser").text = name+"_y_normalizer.gz"
+        ET.SubElement(root, "x_normaliser").text = x_normalizer_filename
+        ET.SubElement(root, "y_normaliser").text = y_normalizer_filename
         ET.SubElement(root, "mape").text = "{:.2f}".format(self.analysis["mape"])
         ET.SubElement(root, "rmse").text = "{:.2f}".format(self.analysis["rmse"])
 
@@ -176,14 +181,14 @@ class LSTMHaoTrend:
         temp_actual = actual[:-1]
         new = np.add(temp_actual, y_pred)
 
-        real = plt.plot(actual[1:], label='Actual Price')
-        pred = plt.plot(new, label='Predicted Price')
+        plt.plot(actual[1:], label=label_actual_price)
+        plt.plot(new, label=label_predicted_price)
 
         plt.gcf().set_size_inches(12, 8, forward=True)
         plt.title('Plot of real price and predicted price against number of days')
         plt.xlabel('Number of days')
         plt.ylabel('Adjusted Close Price($)')
-        plt.legend(['Actual Price', 'Predicted Price'])
+        plt.legend([label_actual_price, label_predicted_price])
         plt.savefig(filename)
 
     def predict(self):
