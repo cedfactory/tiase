@@ -11,16 +11,12 @@ def display_from_dataframe(df, name, export_name=""):
         plt.show()
     else:
         plt.savefig(export_name)
+    plt.close()
 
-def display_histogram_from_dataframe(df, name, nbins=10, export_name=""):
-    fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 4))
-    axes.hist(df[name], bins=nbins)
-
-    if export_name == "":
-        plt.show()
-    else:
-        fig.savefig(export_name)
-    plt.clf()
+def display_histogram_from_dataframe(df, name, bins="auto", export_name=""):
+    hist = df.hist(column=name, bins=bins)
+    fig = hist[0][0].get_figure()
+    fig.savefig(export_name)
 
 def display_outliers_from_dataframe(df, d1, export_name=""):
     df['simple_rtn'] = df.close.pct_change()
@@ -35,4 +31,4 @@ def display_outliers_from_dataframe(df, d1, export_name=""):
     ax.legend(loc='lower right')
 
     fig.savefig(export_name)
-    plt.clf()
+    plt.close()

@@ -1,6 +1,7 @@
 from lib.fimport import fimport,visu
 from lib.findicators import findicators
 import pandas as pd
+import numpy as np
 import os
 
 def various():
@@ -51,6 +52,12 @@ def stats(value):
     true_positive, true_negative, false_positive, false_negative = findicators.get_stats_on_trend_today_equals_trend_tomorrow(df)
     print("{:.2f},{:.2f},{:.2f},{:.2f}".format(true_positive, true_negative, false_positive, false_negative))
 
+    # format for images
+    root = './tmp/'
+    prefix = value + '_'
+
+    visu.display_histogram_from_dataframe(df, "simple_rtn", export_name = root + prefix + "simple_rtn_histogram.png")
+
     # output index.html
     f = open("./tmp/index_"+value+".html", "w")
     f.write("<html><body>")
@@ -60,10 +67,14 @@ def stats(value):
     f.write("<p>trend ratio d+7 : {:.2f}%</p>".format(trend_ratio_7d))
     f.write("<p>trend ratio d+21 : {:.2f}%</p>".format(trend_ratio_21d))
 
+    f.write('<p>histogram for simple_rtn :<br><img width=25% src=' + prefix + "simple_rtn_histogram.png" + ' />')
+    f.write('<br>')
+
+    f.write('Indicators : <br>')
     for column in df.columns:
-        imgname = value+'_'+column+'.png'
-        visu.display_from_dataframe(df, column, './tmp/'+imgname)
-        f.write('<img width=50% src='+imgname+' />')
+        imgname = column + '.png'
+        visu.display_from_dataframe(df, column, root + prefix + imgname)
+        f.write('<img width=50% src=' + prefix + imgname + ' />')
 
     f.write("</body></html>")
     f.close()
@@ -85,10 +96,8 @@ def cac40():
             technical_indicators.extend(["atr","adx","roc"])
             df = findicators.add_technical_indicators(df, technical_indicators)
             
-            trend_ratio_1d = findicators.get_stats_for_trend_up(df, 1)
-            trend_ratio_7d = findicators.get_stats_for_trend_up(df, 7)
-            trend_ratio_21d = findicators.get_stats_for_trend_up(df, 21)
-            print("{} ({});{:.2f};{:.2f};{:.2f}".format(value, name, trend_ratio_1d, trend_ratio_7d, trend_ratio_21d))
+            trend_ratio, true_positive, true_negative, false_positive, false_negative = findicators.get_trend_info(df)
+            print("{} ({});{:.2f};{:.2f};{:.2f};{:.2f};{:.2f}".format(value, name, trend_ratio, true_positive, true_negative, false_positive, false_negative))
 
 
 
