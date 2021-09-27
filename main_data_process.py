@@ -124,6 +124,20 @@ def check(action):
         print(df.head())
         df.to_csv("./lib/data/test/datapreprocess_transformation_x2_reference.csv")
 
+    elif action == "correlation_reduction":
+        df = get_real_dataframe()
+        df = df.head(200)
+        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30', 'simple_rtn','target']
+        df = findicators.add_technical_indicators(df, technical_indicators)
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        print(df.head())
+
+        df = fprocessfeature.process_features(df, ['correlation_reduction'])
+
+        #df = findicators.remove_features(df, ["high", "volume"])
+        print(df.head())
+        df.to_csv("./lib/data/test/featureengineering_correlation_reduction_reference.csv")
+
     else:
         print("action {} is unknown".format(action))
 
