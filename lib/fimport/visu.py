@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 def display_from_dataframe(df, name, export_name=""):
     plt.figure(figsize=(15, 5))
@@ -17,6 +18,23 @@ def display_histogram_from_dataframe(df, name, bins="auto", export_name=""):
     hist = df.hist(column=name, bins=bins)
     fig = hist[0][0].get_figure()
     fig.savefig(export_name)
+
+def display_histogram_fitted_gaussian(data, bins="auto", export_name=""):
+    (mu, sigma) = norm.fit(data)
+
+    n, bins, patches = plt.hist(data, bins, density=True, alpha=0.75)
+
+    x = bins
+    y = norm.pdf(bins, mu, sigma)
+    plt.plot(x, y, 'r--', linewidth=2)
+    plt.grid(True)
+    plt.title(r'fitted gaussian: $\mu={:2f}$, $\sigma={:3f}$'.format(mu, sigma))
+
+    if export_name == "":
+        plt.show()
+    else:
+        plt.savefig(export_name)
+    plt.close()
 
 def display_outliers_from_dataframe(df, d1, export_name=""):
     df['simple_rtn'] = df.close.pct_change()

@@ -1,5 +1,6 @@
 from lib.fimport import fimport,visu
 from lib.findicators import findicators
+from lib.fdatapreprocessing import fdataprep
 import pandas as pd
 import numpy as np
 import os
@@ -56,6 +57,11 @@ def stats(value):
     root = './tmp/'
     prefix = value + '_'
 
+    # simple_rtn & histogram
+    df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+    simple_rtn = df["simple_rtn"].to_numpy()
+
+    visu.display_histogram_fitted_gaussian(simple_rtn, export_name = root + prefix + "simple_rtn_histogram_gaussian.png")
     visu.display_histogram_from_dataframe(df, "simple_rtn", export_name = root + prefix + "simple_rtn_histogram.png")
 
     # output index.html
@@ -67,7 +73,7 @@ def stats(value):
     f.write("<p>trend ratio d+7 : {:.2f}%</p>".format(trend_ratio_7d))
     f.write("<p>trend ratio d+21 : {:.2f}%</p>".format(trend_ratio_21d))
 
-    f.write('<p>histogram for simple_rtn :<br><img width=25% src=' + prefix + "simple_rtn_histogram.png" + ' />')
+    f.write('<p>histogram for simple_rtn :<br><img width=25% src=' + prefix + "simple_rtn_histogram_gaussian.png" + ' />')
     f.write('<br>')
 
     f.write('Indicators : <br>')
