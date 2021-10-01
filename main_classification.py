@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 
 from matplotlib import pyplot as plt
-from lib.fimport import fimport,synthetic,visu
-from lib.findicators import findicators
-from lib.fdatapreprocessing import fdataprep
-from lib.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis,toolbox
+from tiar.fimport import fimport,synthetic,visu
+from tiar.findicators import findicators
+from tiar.fdatapreprocessing import fdataprep
+from tiar.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis,toolbox
 import os
 from rich import print,inspect
 
@@ -76,7 +76,7 @@ def evaluate_classifiers(df, value, verbose=False):
 
 def experiment(value):
 
-    filename = "./lib/data/test/google_stocks_data.csv"
+    filename = "./tiar/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     print(df.head())
 
@@ -88,7 +88,7 @@ def experiment(value):
 
 
 def cac40():
-    directory = "./lib/data/CAC40/"
+    directory = "./tiar/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             value = filename[:len(filename)-4]

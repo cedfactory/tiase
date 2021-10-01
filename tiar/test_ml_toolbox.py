@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from lib.fimport import fimport,synthetic
-from lib.findicators import findicators
-from lib.ml import toolbox
+from tiar.fimport import fimport,synthetic
+from tiar.findicators import findicators
+from tiar.ml import toolbox
 from sklearn import preprocessing
 import os
 
@@ -127,7 +127,7 @@ class TestMlToolbox:
         assert(len(list_df_training) == 3)
         assert(len(list_df_testing) == 3)
         for idx,df_computed in enumerate(list_df_training + list_df_testing):
-            ref_file = "./lib/data/test/get_train_test_data_list_from_CV_WF_split_dataframe_{}_reference.csv".format(idx)
+            ref_file = "./tiar/data/test/get_train_test_data_list_from_CV_WF_split_dataframe_{}_reference.csv".format(idx)
             #df_computed.to_csv(ref_file)
             df_expected = fimport.get_dataframe_from_csv(ref_file)
             assert(compare_dataframes(df_computed, df_expected, df_expected.columns))

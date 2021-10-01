@@ -1,9 +1,9 @@
-from lib.fimport import fimport
-from lib.findicators import findicators
-from lib.ml import toolbox,dr
+from tiar.fimport import fimport
+from tiar.findicators import findicators
+from tiar.ml import toolbox,dr
 
 
-df = fimport.get_dataframe_from_csv("./lib/data/CAC40/AI.PA.csv")
+df = fimport.get_dataframe_from_csv("./tiar/data/CAC40/AI.PA.csv")
 techindicators = ["ema_5","macd","rsi_30","cci_30","dx_30","trend_1d"]
 df = findicators.add_technical_indicators(df, techindicators)
 df = findicators.remove_features(df, ["open","close","low","high","volume"])

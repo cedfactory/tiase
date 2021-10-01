@@ -1,15 +1,15 @@
 import pandas as pd
 import numpy as np
-from lib.fimport import fimport
-from lib.findicators import findicators
-from lib.fdatapreprocessing import fdataprep
-from lib.featureengineering import fbalance,fprocessfeature
+from tiar.fimport import fimport
+from tiar.findicators import findicators
+from tiar.fdatapreprocessing import fdataprep
+from tiar.featureengineering import fbalance,fprocessfeature
 import pytest
 
 class TestFeatureEngineering:
 
     def get_real_dataframe(self):
-        filename = "./lib/data/test/google_stocks_data.csv"
+        filename = "./tiar/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
         df = findicators.normalize_column_headings(df)
         return df
@@ -45,7 +45,7 @@ class TestFeatureEngineering:
         for reduction in ["kbest_reduction", "correlation_reduction","pca_reduction","rfecv_reduction"]:
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             
-            ref_file = "./lib/data/test/featureengineering_"+reduction+"_reference.csv"
+            ref_file = "./tiar/data/test/featureengineering_"+reduction+"_reference.csv"
             #df_reduction.to_csv(ref_file)
             expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
@@ -62,7 +62,7 @@ class TestFeatureEngineering:
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
         df_reduction = fprocessfeature.process_features(df.copy(), ["vsa_reduction"])
 
-        ref_file = "./lib/data/test/featureengineering_vsa_reduction_reference.csv"
+        ref_file = "./tiar/data/test/featureengineering_vsa_reduction_reference.csv"
         #df_reduction.to_csv(ref_file)
         expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
@@ -77,7 +77,7 @@ class TestFeatureEngineering:
         df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"])
         df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
 
-        ref_file = "./lib/data/test/featureengineering_data_labeling_reference.csv"
+        ref_file = "./tiar/data/test/featureengineering_data_labeling_reference.csv"
         #df_labeling.to_csv(ref_file)
         expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
 

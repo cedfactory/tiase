@@ -1,5 +1,5 @@
 import numpy as np
-from lib.ml import analysis
+from tiar.ml import analysis
 
 class TestMlAnalysis:
 

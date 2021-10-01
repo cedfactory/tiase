@@ -1,7 +1,7 @@
 import pandas as pd
-from lib.fimport import synthetic
-from lib.findicators import findicators
-from lib.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
+from tiar.fimport import synthetic
+from tiar.findicators import findicators
+from tiar.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
 import pytest
 
 class TestMlClassifier:

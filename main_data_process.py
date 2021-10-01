@@ -1,7 +1,7 @@
-from lib.fimport import fimport,synthetic,visu
-from lib.findicators import findicators
-from lib.featureengineering import fprocessfeature
-from lib.fdatapreprocessing import fdataprep
+from tiar.fimport import fimport,synthetic,visu
+from tiar.findicators import findicators
+from tiar.featureengineering import fprocessfeature
+from tiar.fdatapreprocessing import fdataprep
 import numpy as np
 
 import pandas as pd
@@ -10,7 +10,7 @@ import os
 from rich import print,inspect
 
 def get_real_dataframe():
-    filename = "./lib/data/test/google_stocks_data.csv"
+    filename = "./tiar/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     df = findicators.normalize_column_headings(df)
     return df
@@ -60,7 +60,7 @@ def check(action):
         df = fdataprep.process_technical_indicators(df, ['discretization_supervised'])
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
-        #df.to_csv("./lib/data/test/datapreprocess_discretization_reference.csv")
+        #df.to_csv("./tiar/data/test/datapreprocess_discretization_reference.csv")
 
     elif action == "discretization_unsupervised":
         df = get_real_dataframe()
@@ -74,7 +74,7 @@ def check(action):
         df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
-        #df.to_csv("./lib/data/test/datapreprocess_discretization_unsupervised_reference.csv")
+        #df.to_csv("./tiar/data/test/datapreprocess_discretization_unsupervised_reference.csv")
 
     elif action == "transformation_log":
         df = get_real_dataframe()
@@ -87,7 +87,7 @@ def check(action):
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
-        df.to_csv("./lib/data/test/datapreprocess_transformation_log_reference.csv")
+        df.to_csv("./tiar/data/test/datapreprocess_transformation_log_reference.csv")
 
     elif action == "outliers_mam":
         df = get_real_dataframe()
@@ -98,7 +98,7 @@ def check(action):
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
         print(df.head())
-        df.to_csv("./lib/data/test/datapreprocess_outliers_mam_reference.csv")
+        df.to_csv("./tiar/data/test/datapreprocess_outliers_mam_reference.csv")
 
     elif action == "outliers_ema":
         df = get_real_dataframe()
@@ -109,7 +109,7 @@ def check(action):
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
         print(df.head())
-        df.to_csv("./lib/data/test/datapreprocess_outliers_ema_reference.csv")
+        df.to_csv("./tiar/data/test/datapreprocess_outliers_ema_reference.csv")
 
     elif action == "transformation_x2":
         df = get_real_dataframe()
@@ -122,7 +122,7 @@ def check(action):
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
-        df.to_csv("./lib/data/test/datapreprocess_transformation_x2_reference.csv")
+        df.to_csv("./tiar/data/test/datapreprocess_transformation_x2_reference.csv")
 
     elif action == "correlation_reduction":
         df = get_real_dataframe()
@@ -136,7 +136,7 @@ def check(action):
 
         #df = findicators.remove_features(df, ["high", "volume"])
         print(df.head())
-        df.to_csv("./lib/data/test/featureengineering_correlation_reduction_reference.csv")
+        df.to_csv("./tiar/data/test/featureengineering_correlation_reduction_reference.csv")
 
     else:
         print("action {} is unknown".format(action))
@@ -145,7 +145,7 @@ def check(action):
 # parse directory cac40
 #
 def cac40():
-    directory = "./lib/data/CAC40/"
+    directory = "./tiar/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             df = fimport.get_dataframe_from_csv(directory+"/"+filename)
