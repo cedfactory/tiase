@@ -26,7 +26,6 @@ class TestMlClassifier:
         assert(results["average_accuracy"] == pytest.approx(0.972499, 0.00001))
         assert(equal)
 
-'''
     def test_classifier_alwayssameclass(self):
         df = self.get_dataframe()
 
@@ -146,4 +145,3 @@ class TestMlClassifier:
         assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
         assert(model_analysis["recall"] == pytest.approx(1., 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(1., 0.00001))
-'''
