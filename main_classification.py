@@ -53,8 +53,7 @@ def evaluate_classifiers(df, value, verbose=False):
         name = g_classifier["name"]
         model = g_classifier["classifier"]
 
-        #model.create_model()
-        model.evaluate_cv()
+        model.fit()
         model_analysis = model.get_analysis()
 
         debug = False

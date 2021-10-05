@@ -12,11 +12,11 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
             self.seq_len = params.get("seq_len", self.seq_len)
             self.class_to_return = params.get("class_to_return", 1)
 
-    def build_model(self):
+    def build(self):
         # nothing to build
         pass
 
-    def create_model(self):
+    def fit(self):
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
 
     def get_analysis(self):
@@ -46,11 +46,11 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
 
-    def build_model(self):
+    def build(self):
         # nothing to build
         pass
 
-    def create_model(self):
+    def fit(self):
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
 
     def get_analysis(self):

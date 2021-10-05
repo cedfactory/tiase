@@ -36,7 +36,7 @@ class ClassifierLSTM(classifier.Classifier):
             self.epochs = params.get("epochs", self.epochs)
             self.batch_size = params.get("batch_size", self.batch_size)
 
-    def create_model(self):
+    def fit(self):
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
         self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
         self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
@@ -45,7 +45,7 @@ class ClassifierLSTM(classifier.Classifier):
         tf.random.set_seed(20)
         np.random.seed(10)
 
-        self.build_model()
+        self.build()
 
         #print(self.model.summary())
         self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=self.batch_size, verbose=0)
@@ -93,18 +93,18 @@ class ClassifierLSTM(classifier.Classifier):
             tf.random.set_seed(20)
             np.random.seed(10)
 
-            self.build_model()
+            self.build()
             self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
 
             self.get_analysis()
             results["accuracies"].append(self.analysis["accuracy"])
 
             if debug:
-                iter = index_lst_split
+                iteration = index_lst_split
 
                 # for dump predictions
                 df_tmp = pd.DataFrame(columns=['iteration','y_test','y_test_prob','y_test_pred'])
-                df_tmp['iteration'] = [iter] * len(self.y_test_prob)
+                df_tmp['iteration'] = [iteration] * len(self.y_test_prob)
                 df_tmp['y_test_prob'] = [x[0] for x in self.y_test_prob]
                 df_tmp['y_test'] = [x[0] for x in self.y_test]
                 df_tmp['y_test_pred'] = [x[0] for x in self.y_test_pred]
@@ -113,7 +113,7 @@ class ClassifierLSTM(classifier.Classifier):
                 dump_predictions.reset_index(drop=True, inplace=True)
 
                 # for dump analysis
-                current_analysis = [iter,
+                current_analysis = [iteration,
                                 len(self.y_train),
                                 round(self.analysis['test_size'],2),
                                 self.y_test_pred.sum(),
@@ -175,7 +175,7 @@ class ClassifierLSTM1(ClassifierLSTM):
         if params:
             self.lstm_size = params.get("lstm_size", self.lstm_size)
     
-    def build_model(self):
+    def build(self):
         print("[Build ClassifierLSTM1]")
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
         shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
@@ -202,7 +202,7 @@ class ClassifierLSTM2(ClassifierLSTM):
         if params:
             self.lstm_size = params.get("lstm_size", self.lstm_size)
 
-    def build_model(self):
+    def build(self):
         print("[Build ClassifierLSTM2]")
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
         shape_dim2 = self.seq_len * (self.df.shape[1] - 1)
@@ -233,7 +233,7 @@ class ClassifierLSTM3(ClassifierLSTM):
         if params:
             self.lstm_size = params.get("lstm_size", self.lstm_size)
     
-    def build_model(self):
+    def build(self):
         print("[Build ClassifierLSTM3]")
 
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
@@ -261,7 +261,7 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
     
-    def build_model(self):
+    def build(self):
         print("[Build ClassifierLSTMHao2020]")
         
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
@@ -301,7 +301,7 @@ class ClassifierBiLSTM(ClassifierLSTM):
     def __init__(self, dataframe, target, params = None):
         super().__init__(dataframe, target, params)
     
-    def build_model(self):
+    def build(self):
         print("[Build ClassifierBiLSTM]")
 
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)
@@ -425,7 +425,7 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
         outputs = Concatenate(axis=-1)([branch1x1, branch7x7, branch7x7dbl, branch_pool])
         return outputs
 
-    def build_model(self):
+    def build(self):
         print("[Build ClassifierCNNBiLSTM]")
 
         # length of the input = seq_len * (#columns in the dataframe - one reserved for the target)

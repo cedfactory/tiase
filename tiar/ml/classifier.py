@@ -25,11 +25,11 @@ class Classifier(metaclass = ABCMeta):
 
 
     @abstractmethod
-    def build_model(self):
+    def build(self):
         pass
 
     @abstractmethod
-    def create_model(self):
+    def fit(self):
         pass
 
     @abstractmethod

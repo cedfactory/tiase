@@ -30,7 +30,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_naive.ClassifierAlwaysSameClass(df, "target")
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -42,7 +42,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_naive.ClassifierAlwaysAsPrevious(df, "target")
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -54,7 +54,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
         
         model = classifier_lstm.ClassifierLSTM1(df, "target", params={'epochs': 20})
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -66,7 +66,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
         
         model = classifier_lstm.ClassifierLSTM2(df, "target", params={'epochs': 20})
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -78,7 +78,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
         
         model = classifier_lstm.ClassifierLSTM3(df, "target", params={'epochs': 20})
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -90,7 +90,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
         
         model = classifier_lstm.ClassifierLSTMHao2020(df, "target", params={'epochs': 20})
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -102,7 +102,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_lstm.ClassifierBiLSTM(df, "target")
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -114,7 +114,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_lstm.ClassifierCNNBiLSTM(df, "target")
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -126,7 +126,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_svc.ClassifierSVC(df, "target", params={'seq_len': 50})
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
@@ -138,7 +138,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_xgboost.ClassifierXGBoost(df, "target")
-        model.create_model()
+        model.fit()
 
         model_analysis = model.get_analysis()
 
