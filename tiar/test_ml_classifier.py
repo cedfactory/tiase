@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from tiar.fimport import synthetic
 from tiar.findicators import findicators
 from tiar.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
@@ -14,6 +15,18 @@ class TestMlClassifier:
         df.dropna(inplace = True)
         return df
 
+    def test_classifier_evaluate_cross_validation(self):
+        df = self.get_dataframe()
+
+        model = classifier_lstm.ClassifierLSTM1(df.copy(), "target", params={'epochs': 5})
+        results = model.evaluate_cross_validation()
+        print(results)
+
+        equal = np.array_equal(results["accuracies"], [0.975, 0.975, 0.975, 0.975, 0.9625])
+        assert(results["average_accuracy"] == pytest.approx(0.972499, 0.00001))
+        assert(equal)
+
+'''
     def test_classifier_alwayssameclass(self):
         df = self.get_dataframe()
 
@@ -133,3 +146,4 @@ class TestMlClassifier:
         assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
         assert(model_analysis["recall"] == pytest.approx(1., 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(1., 0.00001))
+'''

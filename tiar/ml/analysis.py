@@ -32,7 +32,6 @@ def get_rmse(y_true, y_pred):
 
 
 def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
-    n_split = 4
     result = {}
 
     result["X_test"] = x_test
@@ -50,8 +49,9 @@ def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
     result["recall"] = metrics.recall_score(y_test, y_test_pred)
     result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average="binary")
 
+    n_split = 4
     y_split_len = int(len(y_test)/n_split)
-    for i in range(0, n_split, 1):
+    for i in range(n_split):
         y_test_split = y_test[i*y_split_len:(i+1)*(y_split_len)]
         y_test_pred_split = y_test_pred[i*y_split_len:(i+1)*(y_split_len)]
 

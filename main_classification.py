@@ -12,6 +12,20 @@ from rich import print,inspect
 import warnings
 warnings.simplefilter("ignore")
 
+def evaluate_cross_validation(value):
+    filename = "./tiar/data/test/google_stocks_data.csv"
+    df = fimport.get_dataframe_from_csv(filename)
+    print(df.head())
+
+    df = findicators.normalize_column_headings(df)
+    df = toolbox.make_target(df, "pct_change", 7)
+    df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
+    target = "target"
+
+    model = classifier_lstm.ClassifierLSTM2(df.copy(), target, params={'epochs': 5})
+    results = model.evaluate_cross_validation()
+    #print("Averaged accuracy : ", results["average_accuracy"])
+    print(results)
 
 def evaluate_classifiers(df, value, verbose=False):
     df = findicators.normalize_column_headings(df)
@@ -39,7 +53,8 @@ def evaluate_classifiers(df, value, verbose=False):
         name = g_classifier["name"]
         model = g_classifier["classifier"]
 
-        model.create_model()
+        #model.create_model()
+        model.evaluate_cv()
         model_analysis = model.get_analysis()
 
         debug = False
@@ -60,6 +75,7 @@ def evaluate_classifiers(df, value, verbose=False):
 
         if verbose:
             print(name)
+            print("Accuracy : ", model_analysis["accuracy"])
             print("Precision : ", model_analysis["precision"])
             print("Recall : ", model_analysis["recall"])
             print("f1_score:", model_analysis["f1_score"])
@@ -101,7 +117,7 @@ def cac40():
 
 _usage_str = """
 Options:
-    [--experiment --cac40]
+    [--experiment --cac40 --cv]
 """
 
 def _usage():
@@ -115,6 +131,11 @@ if __name__ == "__main__":
             if len(sys.argv) > 2:
                 value = sys.argv[2]
             experiment(value)
+        elif sys.argv[1] == "--cv":
+            value = ""
+            if len(sys.argv) > 2:
+                value = sys.argv[2]
+            evaluate_cross_validation(value)
         elif sys.argv[1] == "--cac40":
             cac40()
         else:

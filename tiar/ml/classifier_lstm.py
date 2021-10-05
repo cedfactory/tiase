@@ -16,7 +16,7 @@ from keras import Model
 from tensorflow import keras
 from tensorflow.keras import layers
 
-dump_data_to_df = ["model", "tic", "train_size", "test_size", "sum_pred", "threshold",
+dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
                    "pred_pos_rate","accuracy", "precision", "recall", "f1_score",
                    "pred_pos_rate_0","accuracy_0", "precision_0", "recall_0", "f1_score_0",
                    "pred_pos_rate_1","accuracy_1", "precision_1", "recall_1", "f1_score_1",
@@ -59,16 +59,6 @@ class ClassifierLSTM(classifier.Classifier):
 
         self.threshold, self.y_test_pred = toolbox.get_classification_threshold("naive", self.y_test, self.y_test_prob)
 
-        df_tmp = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
-
-        df_tmp['y_test_prob'] = [x[0] for x in self.y_test_prob]
-        df_tmp['y_test'] = [x[0] for x in self.y_test]
-        df_tmp['y_test_pred'] = [x[0] for x in self.y_test_pred]
-
-        self.df_store_results = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
-        self.df_store_results = pd.concat([self.df_store_results, df_tmp], axis=0)
-        self.df_store_results.reset_index(drop=True, inplace=True)
-
         self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         self.analysis["history"] = getattr(self.model, "history", None)
         return self.analysis
@@ -79,19 +69,23 @@ class ClassifierLSTM(classifier.Classifier):
     def save(self, filename):
         self.model.save(filename)
 
-    def evaluate_cv(self):
-        self.set_info("id", "tic")
-        self.lst_cv_splits = classifier.set_train_test_cv_list(self.df)
-        # create df to store results
-        self.dump_results = pd.DataFrame(columns=dump_data_to_df)
-        
-        print(len(self.lst_cv_splits[0]))
-        for index_lst_split in range(0, len(self.lst_cv_splits[0]), 1):
-            self.split_index = len(self.lst_cv_splits[0][index_lst_split])
-            frames = [self.lst_cv_splits[0][index_lst_split], self.lst_cv_splits[1][index_lst_split]]
-            self.df_cv = pd.concat(frames)
+    def evaluate_cross_validation(self, debug=False):
+        results = {}
+        results["accuracies"] = []
+        results["average_accuracy"] = 0
 
-            self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df_cv, self.seq_len, self.split_index, self.target)
+        lst_cv_splits = classifier.set_train_test_cv_list(self.df)
+
+        # data for debug
+        dump_analysis = pd.DataFrame(columns=dump_data_to_df)
+        dump_predictions = pd.DataFrame(columns=['iteration','y_test','y_test_prob','y_test_pred'])
+       
+        for index_lst_split in range(len(lst_cv_splits[0])):
+            split_index = len(lst_cv_splits[0][index_lst_split])
+            frames = [lst_cv_splits[0][index_lst_split], lst_cv_splits[1][index_lst_split]]
+            df_cv = pd.concat(frames)
+
+            self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(df_cv, self.seq_len, split_index, self.target)
             self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
             self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
 
@@ -100,70 +94,69 @@ class ClassifierLSTM(classifier.Classifier):
             np.random.seed(10)
 
             self.build_model()
-
-            # print(self.model.summary())
             self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
 
-            # self.get_analysis()
             self.get_analysis()
-            self.save_results()
+            results["accuracies"].append(self.analysis["accuracy"])
 
-            # Final evaluation of the model
-            #scores = self.model.evaluate(self.X_test, self.y_test, verbose=1)
-            #print("Accuracy cv: %.2f%%" % (scores[1] * 100))
+            if debug:
+                iter = index_lst_split
 
-        self.df_store_results.insert(0, "model", self.id)
-        self.df_store_results.insert(0, "tic", self.tic)
-        filename = './test_results/' + self.tic + '_' + self.id + '_results.csv'
-        self.df_store_results.to_csv(filename)
-        #toolbox.proto_classification_threshold(self.df_store_results)
+                # for dump predictions
+                df_tmp = pd.DataFrame(columns=['iteration','y_test','y_test_prob','y_test_pred'])
+                df_tmp['iteration'] = [iter] * len(self.y_test_prob)
+                df_tmp['y_test_prob'] = [x[0] for x in self.y_test_prob]
+                df_tmp['y_test'] = [x[0] for x in self.y_test]
+                df_tmp['y_test_pred'] = [x[0] for x in self.y_test_pred]
 
-    def set_info(self, model, tic):
-        self.id = model
-        self.tic = tic
-        self.df_store_results = pd.DataFrame(columns=['y_test','y_test_prob','y_test_pred'])
+                dump_predictions = pd.concat([dump_predictions, df_tmp], axis=0)
+                dump_predictions.reset_index(drop=True, inplace=True)
 
-    def save_results(self):
-        list_results = [self.id,
-                        self.tic,
-                        len(self.y_train),
-                        round(self.analysis['test_size'],2),
-                        self.y_test_pred.sum(),
-                        self.threshold,
+                # for dump analysis
+                current_analysis = [iter,
+                                len(self.y_train),
+                                round(self.analysis['test_size'],2),
+                                self.y_test_pred.sum(),
+                                self.threshold,
 
-                        round(self.analysis['pred_pos_rate'],2),
-                        round(self.analysis['accuracy'],2),
-                        round(self.analysis['precision'],2),
-                        round(self.analysis['recall'],2),
-                        round(self.analysis['f1_score'],2),
+                                round(self.analysis['pred_pos_rate'],2),
+                                round(self.analysis['accuracy'],2),
+                                round(self.analysis['precision'],2),
+                                round(self.analysis['recall'],2),
+                                round(self.analysis['f1_score'],2),
 
-                        round(self.analysis['pred_pos_rate_0'], 2),
-                        round(self.analysis['accuracy_0'], 2),
-                        round(self.analysis['precision_0'], 2),
-                        round(self.analysis['recall_0'], 2),
-                        round(self.analysis['f1_score_0'], 2),
+                                round(self.analysis['pred_pos_rate_0'], 2),
+                                round(self.analysis['accuracy_0'], 2),
+                                round(self.analysis['precision_0'], 2),
+                                round(self.analysis['recall_0'], 2),
+                                round(self.analysis['f1_score_0'], 2),
 
-                        round(self.analysis['pred_pos_rate_1'], 2),
-                        round(self.analysis['accuracy_1'], 2),
-                        round(self.analysis['precision_1'], 2),
-                        round(self.analysis['recall_1'], 2),
-                        round(self.analysis['f1_score_1'], 2),
+                                round(self.analysis['pred_pos_rate_1'], 2),
+                                round(self.analysis['accuracy_1'], 2),
+                                round(self.analysis['precision_1'], 2),
+                                round(self.analysis['recall_1'], 2),
+                                round(self.analysis['f1_score_1'], 2),
 
-                        round(self.analysis['pred_pos_rate_2'], 2),
-                        round(self.analysis['accuracy_2'], 2),
-                        round(self.analysis['precision_2'], 2),
-                        round(self.analysis['recall_2'], 2),
-                        round(self.analysis['f1_score_2'], 2),
+                                round(self.analysis['pred_pos_rate_2'], 2),
+                                round(self.analysis['accuracy_2'], 2),
+                                round(self.analysis['precision_2'], 2),
+                                round(self.analysis['recall_2'], 2),
+                                round(self.analysis['f1_score_2'], 2),
 
-                        round(self.analysis['pred_pos_rate_3'], 2),
-                        round(self.analysis['accuracy_3'], 2),
-                        round(self.analysis['precision_3'], 2),
-                        round(self.analysis['recall_3'], 2),
-                        round(self.analysis['f1_score_3'], 2)
-                        ]
+                                round(self.analysis['pred_pos_rate_3'], 2),
+                                round(self.analysis['accuracy_3'], 2),
+                                round(self.analysis['precision_3'], 2),
+                                round(self.analysis['recall_3'], 2),
+                                round(self.analysis['f1_score_3'], 2)
+                                ]
+                dump_analysis = toolbox.add_row_to_df(dump_analysis, current_analysis)
+  
+        if debug:
+            dump_predictions.to_csv('./tmp/cross_validation_results.csv')
+            dump_analysis.to_csv('./tmp/cross_validation_analysis.csv')
 
-        self.dump_results = toolbox.add_row_to_df(self.dump_results, list_results)
-
+        results["average_accuracy"] = sum(results["accuracies"]) / len(results["accuracies"])
+        return results
 
 '''
 LSTM1

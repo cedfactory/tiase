@@ -3,7 +3,7 @@ from . import analysis,toolbox
 from abc import ABCMeta, abstractmethod
 
 def set_train_test_cv_list(dataframe):
-    list_df_train, list_df_test = toolbox.get_train_test_data_list_from_CV_WF_split_dataframe(dataframe, nb_split=20)
+    list_df_train, list_df_test = toolbox.get_train_test_data_list_from_CV_WF_split_dataframe(dataframe, nb_split=5)
     return [list_df_train, list_df_test]
 
 def set_train_test_data(dataframe, seq_len, split_index, target):
