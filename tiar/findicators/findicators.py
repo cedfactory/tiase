@@ -223,16 +223,13 @@ def get_trend_info(df):
     return trend_ratio, true_positive, true_negative, false_positive, false_negative
 
 def get_stats_for_trend_up(df, n_forward_days):
-    tmp = pd.concat([df['close']], axis=1, keys=['close'])
+    tmp = df.copy()
 
     indicator = "trend_"+str(n_forward_days)+"d"
     if indicator not in tmp.columns:
         tmp = add_technical_indicators(tmp, [indicator])
 
-    tmp['shift_trend'] = tmp[indicator].shift(-n_forward_days)
-    tmp.dropna(inplace=True)
-
-    # how many times the trend is up for d+1
+    # how many times the trend is up for d+n_forward_days
     trend_counted = tmp[indicator].value_counts(normalize=True)
     trend_ratio = 100 * trend_counted[1]
 

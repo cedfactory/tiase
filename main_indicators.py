@@ -44,6 +44,7 @@ def stats(value):
 
     technical_indicators = findicators.get_all_default_technical_indicators()
     df = findicators.add_technical_indicators(df, technical_indicators)
+    df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
     trend_ratio_1d = findicators.get_stats_for_trend_up(df, 1)
     trend_ratio_7d = findicators.get_stats_for_trend_up(df, 7)
@@ -58,7 +59,6 @@ def stats(value):
     prefix = value + '_'
 
     # simple_rtn & histogram
-    df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
     simple_rtn = df["simple_rtn"].to_numpy()
 
     visu.display_histogram_fitted_gaussian(simple_rtn, export_name = root + prefix + "simple_rtn_histogram_gaussian.png")
@@ -69,19 +69,28 @@ def stats(value):
     f.write("<html><body>")
     f.write("<center><h1>"+value+" ("+name+")</h1></Center>")
 
+    f.write('<h3>trends</h3>')
     f.write("<p>trend ratio d+1 : {:.2f}%</p>".format(trend_ratio_1d))
     f.write("<p>trend ratio d+7 : {:.2f}%</p>".format(trend_ratio_7d))
     f.write("<p>trend ratio d+21 : {:.2f}%</p>".format(trend_ratio_21d))
 
-    f.write('<p>histogram for simple_rtn :<br><img width=25% src=' + prefix + "simple_rtn_histogram_gaussian.png" + ' />')
+    f.write('<h3>simple_rtn</h3>')
+    print(simple_rtn)
+    f.write('<p>mean : '+str(round(simple_rtn.mean(), 6))+'</p>')
+    f.write('<p>toto : '+str(len(simple_rtn[simple_rtn > 0])/len(simple_rtn))+'</p>')
+
+    f.write('<p>mean of positive values : '+str(round(simple_rtn[simple_rtn > 0].mean(), 6))+'</p>')
+    f.write('<p>mean of negative values : '+str(round(simple_rtn[simple_rtn < 0].mean(), 6))+'</p>')
+    f.write('<p>histogram :<br><img width=25% src=' + prefix + "simple_rtn_histogram_gaussian.png" + ' />')
     f.write('<br>')
 
+    '''
     f.write('Indicators : <br>')
     for column in df.columns:
         imgname = column + '.png'
         visu.display_from_dataframe(df, column, root + prefix + imgname)
         f.write('<img width=50% src=' + prefix + imgname + ' />')
-
+    '''
     f.write("</body></html>")
     f.close()
 
