@@ -49,10 +49,6 @@ def process_technical_indicators(df, preprocessing):
             strategy = 'kmeans'
             nb_bins = 5
             df = fdiscretize.data_discretization_unsupervized(df, columns, nb_bins, strategy)
-        elif preprocess == 'scaling':
-            df = fprep.data_scaling(df)
-        elif preprocess == 'drop_ohlcv':
-            df = fprep.drop_ohlcv(df)
 
         else:
             print("Warning : preprocessing {} is unknown".format(preprocess))

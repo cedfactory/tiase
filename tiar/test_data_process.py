@@ -29,6 +29,14 @@ class TestDataProcess:
         df = fdataprep.process_technical_indicators(df, ['missing_values'])
         assert(df.shape[0] == 2)
 
+    def test_duplicates(self):
+        data = {'A':[20, 21, 13, 21, 18], 'B':[18, 19, 23, 19, 17]}
+        df = pd.DataFrame(data)
+
+        assert(df.shape[0] == 5)
+        df = fdataprep.process_technical_indicators(df, ['duplicates'])
+        assert(df.shape[0] == 4)
+
     def test_discretization(self):
         df = self.get_real_dataframe()
         df = df.head(200)
