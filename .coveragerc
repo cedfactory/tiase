@@ -1,5 +1,5 @@
 [run]
-omit = ./tiar/alfred.py
+#omit = ./tiar/alfred.py
 
 [report]
 # Regexes for lines to exclude from consideration
