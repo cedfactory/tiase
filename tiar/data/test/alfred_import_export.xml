@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<dings>
+    <ding>
+        <import filename="./tiar/data/CAC40/AI.PA.csv"/>
+        <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
+        <export filename="./tmp/out.csv"/>
+    </ding>
+</dings>

@@ -1,8 +1,8 @@
 import xml.etree.cElementTree as ET
-from lib.fimport import fimport,visu
-from lib.fdatapreprocessing import fdataprep
-from lib.findicators import findicators
-from lib.ml import classifier_svc
+from tiar.fimport import fimport,visu
+from tiar.fdatapreprocessing import fdataprep
+from tiar.findicators import findicators
+from tiar.ml import classifier_svc
 
 from rich import print,inspect
 
@@ -57,10 +57,14 @@ def execute(filename):
         import_node = ding.find('import')
         if import_node is not None:
             value = import_node.get("value", None)
+            import_filename = import_node.get("filename", None)
             if value != None:
+                print("value : {}".format(value))
                 df = fimport.get_dataframe_from_yahoo(value)
-                print(value)
-                print(df.head())
+            elif import_filename != None:
+                print("filename : {}".format(import_filename))
+                df = fimport.get_dataframe_from_csv(import_filename)
+            print(df.head())
 
         # indicators
         features_node = ding.find('features')
@@ -127,12 +131,18 @@ def execute(filename):
                     print("[FEATURE ENGINEERING] reduction : {}".format(method))
 
         # learning model
+        export_node = ding.find('export')
+        if export_node is not None:
+            export_filename = export_node.get("filename", None)
+            df.to_csv(export_filename)
+
+        # learning model
         classifier_node = ding.find('classifier')
         if classifier_node is not None:
             classifier_name = classifier_node.get("name", None)
             if classifier_name == 'svc':
                 model = classifier_svc.ClassifierSVC(df.copy(), target=target)
-                model.create_model()
+                model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))
                 print("Recall : {:.2f}".format(model_analysis["recall"]))
