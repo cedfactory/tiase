@@ -1,7 +1,7 @@
 from . import fprep, fdiscretize
 
 
-def process_technical_indicators(df, preprocessing):
+def process_technical_indicators(df, preprocessing, features = []):
     """
     data preprocessing
     :param data: (df) pandas dataframe
@@ -34,21 +34,15 @@ def process_technical_indicators(df, preprocessing):
         elif preprocess == 'feature_encoding':
             df = fprep.feature_encoding(df)
         elif preprocess == 'transformation_log':
-            columns = ['simple_rtn']
-            df = fprep.data_log_transformation(df, columns)
+            df = fprep.data_log_transformation(df, features)
         elif preprocess == 'transformation_x2':
-            columns = ['simple_rtn']
-            df = fprep.data_x2_transformation(df, columns)
+            df = fprep.data_x2_transformation(df, features)
         elif preprocess == 'discretization_supervised':
-            columns = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'wma', 'ema', 'sma', 'macd',
-                       'stoch_%d', 'williams_%r', 'rsi_30']
-            df = fdiscretize.data_discretization(df, columns)
+            df = fdiscretize.data_discretization(df, features)
         elif preprocess == 'discretization_unsupervised':
-            columns = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'wma', 'ema', 'sma', 'cci_30', 'macd',
-                       'stoch_%d', 'williams_%r', 'rsi_30']
             strategy = 'kmeans'
             nb_bins = 5
-            df = fdiscretize.data_discretization_unsupervized(df, columns, nb_bins, strategy)
+            df = fdiscretize.data_discretization_unsupervized(df, features, nb_bins, strategy)
 
         else:
             print("Warning : preprocessing {} is unknown".format(preprocess))

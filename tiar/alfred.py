@@ -79,10 +79,9 @@ def execute(filename):
                 target = target[0] # keep the only one target
                 print("Using the following technical indicators : {}".format(all_features))
                 df = findicators.add_technical_indicators(df, all_features)
-                df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 # todo implement findicators.keep([])
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
-                print(df.head())
+                df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
         # preprocessing
         preprocessing_node = ding.find('preprocessing')
@@ -96,9 +95,8 @@ def execute(filename):
                     print("[PREPROCESSING] outliers : {}".format(method))
                     df_original = df.copy()
                     df = fdataprep.process_technical_indicators(df, [method])
-                    visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_'+method+'.png')
+                    #visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_'+method+'.png')
                     df = fdataprep.process_technical_indicators(df, ['missing_values'])
-                    print(df.head())
 
             # transformations
             transformations_node = preprocessing_node.find('transformations')
@@ -109,16 +107,22 @@ def execute(filename):
                     indicators = transformation.get("indicators", None)
                     if method is not None and indicators is not None:
                         print("[PREPROCESSING] transformation {} for {}".format(method, indicators))
+                        indicators = indicators.split(',')
+                        df = fdataprep.process_technical_indicators(df, ["transformation_"+method], indicators)
+                        df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
             # discretizations
             discretizations_node = preprocessing_node.find('discretizations')
             if discretizations_node is not None:
                 discretizations = discretizations_node.findall('discretization')
                 for discretization in discretizations:
-                    indicator = discretization.get("indicator", None)
-                    method = transformation.get("method", None)
-                    if indicator is not None and method is not None:
-                        print("[PREPROCESSING] discretization {} for {}".format(indicator, method))
+                    indicators = discretization.get("indicators", None)
+                    method = discretization.get("method", None)
+                    if indicators is not None and method is not None:
+                        print("[PREPROCESSING] discretization {} for {}".format(method, indicators))
+                        indicators = indicators.split(',')
+                        df = fdataprep.process_technical_indicators(df, ["discretization_"+method], indicators)
+                        df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
         # feature engineering
         featureengeineering_node = ding.find('featureengeineering')

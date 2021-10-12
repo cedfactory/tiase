@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<dings>
+    <ding>
+        <import filename="./tiar/data/test/google_stocks_data.csv"/>
+        <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
+        <preprocessing>
+            <transformations>
+                <transformation method="log" indicators="rsi_30" />
+                <transformation method="x2" indicators="williams_%r" />
+            </transformations>
+        </preprocessing>
+        <export filename="./tmp/out.csv"/>
+    </ding>
+</dings>

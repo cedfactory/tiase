@@ -43,7 +43,7 @@ class TestDataProcess:
         technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
         df = findicators.add_technical_indicators(df, technical_indicators)
 
-        df = fdataprep.process_technical_indicators(df, ['discretization_supervised'])
+        df = fdataprep.process_technical_indicators(df, ['discretization_supervised'], technical_indicators)
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
         #df.to_csv("./tiar/data/test/datapreprocess_discretization_reference.csv")
@@ -57,7 +57,7 @@ class TestDataProcess:
         df = findicators.add_technical_indicators(df, technical_indicators)
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
-        df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
+        df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'], technical_indicators)
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
@@ -151,7 +151,7 @@ class TestDataProcess:
         df = findicators.add_technical_indicators(df, technical_indicators)
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
-        df = fdataprep.process_technical_indicators(df, ['transformation_log'])
+        df = fdataprep.process_technical_indicators(df, ['transformation_log'], technical_indicators)
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
@@ -169,7 +169,7 @@ class TestDataProcess:
         df = findicators.add_technical_indicators(df, technical_indicators)
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
-        df = fdataprep.process_technical_indicators(df, ['transformation_x2'])
+        df = fdataprep.process_technical_indicators(df, ['transformation_x2'], technical_indicators)
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
