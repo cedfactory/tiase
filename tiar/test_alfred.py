@@ -2,6 +2,7 @@ from tiar.fimport import fimport
 from tiar import alfred
 import numpy as np
 import pytest
+import os
 
 g_generate_references = False
 
@@ -40,3 +41,14 @@ class TestAlfred:
 
     def test_outliers_discretization(self):
         self.common_process("./tiar/data/test/alfred_discretization.xml", "./tiar/data/test/alfred_discretization_reference.csv")
+
+    def test_outliers_classifier(self):
+        out_file = "./tmp/lstm1.hdf5"
+        if os.path.isfile(out_file):
+            os.remove(out_file)
+
+        alfred.execute("./tiar/data/test/alfred_classifier.xml")
+        
+        assert(os.path.isfile(out_file))
+        if os.path.isfile(out_file):
+            os.remove(out_file) 

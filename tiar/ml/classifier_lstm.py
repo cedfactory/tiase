@@ -64,10 +64,10 @@ class ClassifierLSTM(classifier.Classifier):
         return self.analysis
 
     def load(self, filename):
-        self.model = tf.keras.models.load_model(filename)
+        self.model = tf.keras.models.load_model(filename+".hdf5")
 
     def save(self, filename):
-        self.model.save(filename)
+        self.model.save(filename+".hdf5")
 
     def evaluate_cross_validation(self, debug=False):
         results = {}

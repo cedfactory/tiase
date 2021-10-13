@@ -2,7 +2,7 @@ import xml.etree.cElementTree as ET
 from tiar.fimport import fimport,visu
 from tiar.fdatapreprocessing import fdataprep
 from tiar.findicators import findicators
-from tiar.ml import classifier_svc
+from tiar.ml import classifier_svc,classifier_lstm
 
 from rich import print,inspect
 
@@ -133,22 +133,31 @@ def execute(filename):
                 if method is not None:
                     print("[FEATURE ENGINEERING] reduction : {}".format(method))
 
-        # learning model
+        # export
         export_node = ding.find('export')
         if export_node is not None:
             export_filename = export_node.get("filename", None)
             df.to_csv(export_filename)
 
         # learning model
-        classifier_node = ding.find('classifier')
-        if classifier_node is not None:
-            classifier_name = classifier_node.get("name", None)
-            if classifier_name == 'svc':
-                model = classifier_svc.ClassifierSVC(df.copy(), target=target)
+        classifiers_node = ding.find('classifiers')
+        if classifiers_node:
+            classifiers = classifiers_node.findall('classifier')
+            for classifier in classifiers:
+                classifier_name = classifier.get("name", None)
+                export_filename = classifier.get("export", None)
+                print(classifier_name)
+                if classifier_name == 'svc':
+                    model = classifier_svc.ClassifierSVC(df.copy(), target=target)
+                elif classifier_name == "lstm1":
+                    model = classifier_lstm.ClassifierLSTM1(df.copy(), target, params={'epochs': 20})
                 model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))
                 print("Recall : {:.2f}".format(model_analysis["recall"]))
                 print("f1_score : {:.2f}".format(model_analysis["f1_score"]))
+                if export_filename:
+                    print("export => {}".format(export_filename))
+                    model.save(export_filename)
 
     return 0
