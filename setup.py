@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
-import tiar
+import tiase
 
 from setuptools import setup,find_packages
 
 
 setup(
-    name='tiar',
-    description="tiar",
-    version=tiar.__version__,
-    author=tiar.__author__,
-    author_email=tiar.__email__,
+    name='tiase',
+    description="tiase",
+    version=tiase.__version__,
+    author=tiase.__author__,
+    author_email=tiase.__email__,
     url="https://github.com/cedfactory/f",
     packages=find_packages(),
     include_package_data=True,

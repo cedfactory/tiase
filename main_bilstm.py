@@ -1,6 +1,6 @@
 # https://towardsdatascience.com/the-beginning-of-a-deep-learning-trading-bot-part1-95-accuracy-is-not-enough-c338abc98fc2
 
-from tiar.fimport import visu
+from tiase.fimport import visu
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -499,7 +499,7 @@ class BiLSTM:
 
 
 
-prices = './tiar/data/IBM_Prices.csv'
+prices = './tiase/data/IBM_Prices.csv'
 value = "IBM"
 df = read_data(prices)
 

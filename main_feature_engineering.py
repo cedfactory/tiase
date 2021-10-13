@@ -1,7 +1,7 @@
-from tiar.fimport import fimport,synthetic
-from tiar.findicators import findicators
-from tiar.fdatapreprocessing import fdataprep
-from tiar.featureengineering import fprocessfeature,fbalance
+from tiase.fimport import fimport,synthetic
+from tiase.findicators import findicators
+from tiase.fdatapreprocessing import fdataprep
+from tiase.featureengineering import fprocessfeature,fbalance
 import numpy as np
 
 import pandas as pd
@@ -10,7 +10,7 @@ import os
 from rich import print,inspect
 
 def get_real_dataframe():
-    filename = "./tiar/data/test/google_stocks_data.csv"
+    filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     df = findicators.normalize_column_headings(df)
     return df
@@ -36,7 +36,7 @@ def check(action):
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         print(df.head())
         print(df['target'].value_counts())
-        #df.to_csv("./tiar/data/test/featureengineering_smote_reference.csv")
+        #df.to_csv("./tiase/data/test/featureengineering_smote_reference.csv")
 
     elif action == "reductions":
         df = get_real_dataframe()
@@ -50,7 +50,7 @@ def check(action):
         for reduction in ["kbest_reduction", "correlation_reduction","pca_reduction","rfecv_reduction"]:
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             print(df_reduction.head())
-            df_reduction.to_csv("./tiar/data/test/featureengineering_"+reduction+"_reference.csv")
+            df_reduction.to_csv("./tiase/data/test/featureengineering_"+reduction+"_reference.csv")
 
         # vsa_reduction
         df = get_real_dataframe()

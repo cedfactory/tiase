@@ -1,4 +1,4 @@
-from tiar.fimport import fimport,synthetic,visu
+from tiase.fimport import fimport,synthetic,visu
 
 ###
 ### AS A SCRIPT
@@ -19,7 +19,7 @@ def _test1():
     print()
 
 def _test2():
-    hist = fimport.get_dataframe_from_csv('./tiar/data/CAC40/AI.PA.csv')
+    hist = fimport.get_dataframe_from_csv('./tiase/data/CAC40/AI.PA.csv')
     visu.display_from_dataframe(hist, "Close", "AI.PA.close.png")
 
 def _test3():

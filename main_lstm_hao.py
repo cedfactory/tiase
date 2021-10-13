@@ -1,14 +1,14 @@
 import pandas as pd
-from tiar.fimport import fimport
-from tiar.findicators import findicators
-from tiar.ml import lstm_hao,analysis
+from tiase.fimport import fimport
+from tiase.findicators import findicators
+from tiase.ml import lstm_hao,analysis
 
 #
 # basic lstm
 # Reference : https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
 #
 def hao_basic():
-    filename = "./tiar/data/test/google_stocks_data.csv"
+    filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
 
     model = lstm_hao.LSTMHaoBasic(df)
@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 
 
 def hao_trend():
-    filename = "./tiar/data/test/google_stocks_data.csv"
+    filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
 
     model = lstm_hao.LSTMHaoTrend(df)

@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from tiar.fimport import synthetic
-from tiar.findicators import findicators
-from tiar.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
+from tiase.fimport import synthetic
+from tiase.findicators import findicators
+from tiase.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
 import pytest
 
 class TestMlClassifier:

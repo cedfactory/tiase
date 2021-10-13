@@ -1,13 +1,13 @@
 import pandas as pd
-from tiar.fimport import fimport
-from tiar.findicators import findicators
-from tiar.ml import lstm_hao
+from tiase.fimport import fimport
+from tiase.findicators import findicators
+from tiase.ml import lstm_hao
 import pytest
 
 class TestMlLstmHao:
 
     def test_lstml_hao_basic(self):
-        filename = "./tiar/data/test/google_stocks_data.csv"
+        filename = "./tiase/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
 
         model = lstm_hao.LSTMHaoBasic(df)
@@ -29,7 +29,7 @@ class TestMlLstmHao:
         assert(prediction2 == pytest.approx(1423.31, 0.0001))
 
     def test_lstml_hao_trend(self):
-        filename = "./tiar/data/test/google_stocks_data.csv"
+        filename = "./tiase/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
 
         model = lstm_hao.LSTMHaoTrend(df)

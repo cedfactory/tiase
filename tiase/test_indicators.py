@@ -1,6 +1,6 @@
-from tiar.fimport import fimport
-from tiar.findicators import findicators
-from tiar.fdatapreprocessing import fdataprep
+from tiase.fimport import fimport
+from tiase.findicators import findicators
+from tiase.fdatapreprocessing import fdataprep
 import pandas as pd
 # todo : try to use from pandas._testing import assert_frame_equal
 import numpy as np
@@ -10,7 +10,7 @@ import datetime
 class TestIndicators:
     
     def get_real_dataframe(self):
-        filename = "./tiar/data/test/google_stocks_data.csv"
+        filename = "./tiase/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
         df = findicators.normalize_column_headings(df)
         return df
@@ -25,7 +25,7 @@ class TestIndicators:
         assert(ti == expected_ti)
 
     def test_number_colums(self):
-        df = fimport.get_dataframe_from_csv("./tiar/data/CAC40/AI.PA.csv")
+        df = fimport.get_dataframe_from_csv("./tiase/data/CAC40/AI.PA.csv")
         assert(len(list(df.columns)) == 6)
 
         # first set of technical indicators
@@ -88,8 +88,8 @@ class TestIndicators:
 
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
-        #df.to_csv("./tiar/data/test/findicators_vsa_reference.csv")
-        expected_df = fimport.get_dataframe_from_csv("./tiar/data/test/findicators_vsa_reference.csv")
+        #df.to_csv("./tiase/data/test/findicators_vsa_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/findicators_vsa_reference.csv")
 
         for column in ["vsa_volume_1D","vsa_price_spread_1D","vsa_close_loc_1D","vsa_close_change_1D","vsa_volume_2D","vsa_price_spread_2D","vsa_close_loc_2D","vsa_close_change_2D","vsa_volume_3D","vsa_price_spread_3D","vsa_close_loc_3D","vsa_close_change_3D","vsa_volume_5D","vsa_price_spread_5D","vsa_close_loc_5D","vsa_close_change_5D","vsa_volume_20D","vsa_price_spread_20D","vsa_close_loc_20D","vsa_close_change_20D","vsa_volume_40D","vsa_price_spread_40D","vsa_close_loc_40D","vsa_close_change_40D","vsa_volume_60D","vsa_price_spread_60D","vsa_close_loc_60D","vsa_close_change_60D","outcomes_vsa"]:
             array = df[column].to_numpy()
@@ -102,6 +102,6 @@ class TestIndicators:
         df = pd.DataFrame([1]*10, columns=["Foobar"], index=idx)
         df = findicators.add_temporal_indicators(df, "Date")
 
-        expected_df = fimport.get_dataframe_from_csv("./tiar/data/test/findicators_temporal_indicators_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/findicators_temporal_indicators_reference.csv")
         #assert_frame_equal(df, expected_df, check_dtype=False) // don't work :(
         assert(df.equals(expected_df))

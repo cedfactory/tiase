@@ -1,4 +1,4 @@
-from tiar.fimport import fimport,synthetic
+from tiase.fimport import fimport,synthetic
 import numpy as np
 import pytest
 

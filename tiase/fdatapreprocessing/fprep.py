@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
-from tiar.fimport import visu
+from ..fimport import visu
 from rich import print,inspect
 
 def missing_values(df):

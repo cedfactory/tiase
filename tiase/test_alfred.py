@@ -1,5 +1,5 @@
-from tiar.fimport import fimport
-from tiar import alfred
+from tiase.fimport import fimport
+from tiase import alfred
 import numpy as np
 import pytest
 import os
@@ -31,23 +31,23 @@ class TestAlfred:
         assert(compare_dataframes(df_generated, df_expected, df_expected.columns))
 
     def test_indicators(self):
-        self.common_process("./tiar/data/test/alfred_indicators.xml", "./tiar/data/test/alfred_indicators_reference.csv")
+        self.common_process("./tiase/data/test/alfred_indicators.xml", "./tiase/data/test/alfred_indicators_reference.csv")
 
     def test_outliers_normalize_stdcutoff(self):
-        self.common_process("./tiar/data/test/alfred_outliers.xml", "./tiar/data/test/alfred_outliers_reference.csv")
+        self.common_process("./tiase/data/test/alfred_outliers.xml", "./tiase/data/test/alfred_outliers_reference.csv")
 
     def test_outliers_transformation(self):
-        self.common_process("./tiar/data/test/alfred_transformation.xml", "./tiar/data/test/alfred_transformation_reference.csv")
+        self.common_process("./tiase/data/test/alfred_transformation.xml", "./tiase/data/test/alfred_transformation_reference.csv")
 
     def test_outliers_discretization(self):
-        self.common_process("./tiar/data/test/alfred_discretization.xml", "./tiar/data/test/alfred_discretization_reference.csv")
+        self.common_process("./tiase/data/test/alfred_discretization.xml", "./tiase/data/test/alfred_discretization_reference.csv")
 
     def test_outliers_classifier(self):
         out_file = "./tmp/lstm1.hdf5"
         if os.path.isfile(out_file):
             os.remove(out_file)
 
-        alfred.execute("./tiar/data/test/alfred_classifier.xml")
+        alfred.execute("./tiase/data/test/alfred_classifier.xml")
         
         assert(os.path.isfile(out_file))
         if os.path.isfile(out_file):

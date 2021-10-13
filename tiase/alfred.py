@@ -1,8 +1,8 @@
 import xml.etree.cElementTree as ET
-from tiar.fimport import fimport,visu
-from tiar.fdatapreprocessing import fdataprep
-from tiar.findicators import findicators
-from tiar.ml import classifier_svc,classifier_lstm
+from tiase.fimport import fimport,visu
+from tiase.fdatapreprocessing import fdataprep
+from tiase.findicators import findicators
+from tiase.ml import classifier_svc,classifier_lstm
 
 from rich import print,inspect
 

@@ -8,6 +8,6 @@ install:
   - pip install pytest-cov
 # command to run tests
 script:
-  - pytest --cov=./tiar
+  - pytest --cov=./tiase
 after_success:
   - bash <(curl -s https://codecov.io/bash)

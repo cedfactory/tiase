@@ -1,6 +1,6 @@
-from tiar.fimport import fimport,visu
-from tiar.findicators import findicators
-from tiar.fdatapreprocessing import fdataprep
+from tiase.fimport import fimport,visu
+from tiase.findicators import findicators
+from tiase.fdatapreprocessing import fdataprep
 import pandas as pd
 import numpy as np
 import os
@@ -16,7 +16,7 @@ def various():
     print(trend1)
     print(trend4)
 
-    df = fimport.get_dataframe_from_csv("./tiar/data/CAC40/AI.PA.csv")
+    df = fimport.get_dataframe_from_csv("./tiase/data/CAC40/AI.PA.csv")
     visu.display_from_dataframe(df,"Close","close.png")
     print(df.head())
 
@@ -98,7 +98,7 @@ def stats(value):
 # parse directory cac40
 #
 def cac40():
-    directory = "./tiar/data/CAC40/"
+    directory = "./tiase/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             value = filename[:len(filename)-4]
