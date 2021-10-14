@@ -6,6 +6,8 @@ from tiase.fdatapreprocessing import fdataprep
 from tiase.featureengineering import fbalance,fprocessfeature
 import pytest
 
+g_generate_references = False
+
 class TestFeatureEngineering:
 
     def get_real_dataframe(self):
@@ -46,7 +48,8 @@ class TestFeatureEngineering:
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             
             ref_file = "./tiase/data/test/featureengineering_"+reduction+"_reference.csv"
-            #df_reduction.to_csv(ref_file)
+            if g_generate_references:
+                df_reduction.to_csv(ref_file)
             expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
             for column in df_reduction.columns:
@@ -63,7 +66,8 @@ class TestFeatureEngineering:
         df_reduction = fprocessfeature.process_features(df.copy(), ["vsa_reduction"])
 
         ref_file = "./tiase/data/test/featureengineering_vsa_reduction_reference.csv"
-        #df_reduction.to_csv(ref_file)
+        if g_generate_references:
+            df_reduction.to_csv(ref_file)
         expected_df_reduction = fimport.get_dataframe_from_csv(ref_file)
 
         for column in df_reduction.columns:
@@ -78,7 +82,8 @@ class TestFeatureEngineering:
         df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
 
         ref_file = "./tiase/data/test/featureengineering_data_labeling_reference.csv"
-        #df_labeling.to_csv(ref_file)
+        if g_generate_references:
+            df_labeling.to_csv(ref_file)
         expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
 
         for column in df_labeling.columns:

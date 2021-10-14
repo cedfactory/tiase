@@ -1,7 +1,7 @@
 from . import fselection, fbalance, fstationary, flabeling
 
 
-def process_features(df, featureengineering):
+def process_features(df, featureengineering, params=None):
     # process data indicators
     for process in featureengineering:
         if process == 'correlation_reduction':
@@ -18,9 +18,14 @@ def process_features(df, featureengineering):
             balance_methode = 'smote'
             df = fbalance.balance_features(df, balance_methode)
         elif process == 'kbest_reduction':
-            model_type = 'regression' # classification
-            k_best = 0.7
-            df = fselection.kbest_reduction(df, model_type, k_best)
+            score_func_name = 'f_classif'
+            k = 0.7
+            verbose = False
+            if params:
+                score_func = params.get("score_func_name", score_func)
+                k = params.get("k",k)
+                verbose = params.get("verbose", verbose)
+            df = fselection.kbest_reduction(df, score_func_name=score_func_name, k=k, verbose=verbose)
         elif process == 'vsa_reduction':
             df = fselection.vsa_corr_selection(df)
         elif process == 'stationary_transform':

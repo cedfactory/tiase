@@ -8,10 +8,11 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
 from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2, f_regression
+from sklearn.feature_selection import chi2,f_classif,f_regression
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
+from rich import print,inspect
 
 
 def get_sma_ema_wma(df, columns):
@@ -33,36 +34,41 @@ def get_sma_ema_wma(df, columns):
     return columns
 
 
-def kbest_reduction(df, model_type, k_best=0.5):
-    if model_type == 'regression':
-        selection_type = f_regression
+def kbest_reduction(df, score_func_name, k=0.5, verbose=False):
+    if score_func_name == 'f_regression':
+        score_func = f_regression
+    elif score_func_name == 'f_classif':
+        score_func = f_classif
+    elif score_func_name == 'chi2':
+        score_func = chi2
     else:
-        selection_type = chi2
+        return None
 
-    if k_best < 1:
-        k_best = int((len(df.columns) - 2) * k_best)
-
-    list_features = df.columns.to_list()
-    list_features.remove('simple_rtn')
-    list_features.remove('target')
+    if k < 1:
+        k = int((len(df.columns) - 2) * k)
 
     df_copy_simple_rtn = df['simple_rtn'].copy()
-    df_copy_target = df['target'].copy()
+    x = df.drop(['simple_rtn','target'], axis=1)
+    y = df['target'].copy()
 
-    df_for_feature_eng = df[list_features]
+    select = SelectKBest(score_func=score_func, k=k)
+    fit = select.fit(x, y)
 
-    select = SelectKBest(score_func=selection_type, k=k_best)
-    fit_features = select.fit_transform(df_for_feature_eng, df_copy_target)
+    selected_features = fit.transform(x)
+    features_names = np.array(x.columns)
     support = select.get_support()
+    selected_columns = features_names[support]
+    
+    if verbose:
+        print("k_best = {}".format(k))
+        print("columns : {}".format(features_names))
+        print("support : {}".format(support))
+        print("score : {}".format(fit.scores_))
+        print("selected_columns : {}".format(selected_columns))
 
-    features = np.array(df_for_feature_eng.columns)
+    df_x_fitted = pd.DataFrame(index=df.index, data=selected_features, columns=selected_columns)
 
-    columns = features[support]
-
-    selected_features = df_for_feature_eng[columns]
-
-    frames = [df_copy_simple_rtn, df_copy_target, selected_features]
-    df_result = pd.concat(frames, axis=1).reindex(df.index)
+    df_result = pd.concat([df_copy_simple_rtn, y, df_x_fitted], axis=1)
 
     return df_result
 
@@ -211,7 +217,7 @@ def get_outliers(df, n_sigmas):
 
 def vsa_corr_selection(df, debug=False):
     if debug == True:
-        folder = './vsa_traces/'
+        folder = './tmp/'
         if (os.path.isdir("vsa_traces") == False):
             print("new vsa traces directory")
             os.mkdir(folder)

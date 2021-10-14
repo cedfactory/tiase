@@ -47,17 +47,20 @@ def check(action):
         df = df.astype({"target": int})
         print(df.head())
 
-        for reduction in ["kbest_reduction", "correlation_reduction","pca_reduction","rfecv_reduction"]:
+        for reduction in ["kbest_reduction"]: #, "correlation_reduction","pca_reduction","rfecv_reduction"]:
+            print("Testing {}".format(reduction))
             df_reduction = fprocessfeature.process_features(df.copy(), [reduction])
             print(df_reduction.head())
-            df_reduction.to_csv("./tiase/data/test/featureengineering_"+reduction+"_reference.csv")
+            #df_reduction.to_csv("./tiase/data/test/featureengineering_"+reduction+"_reference.csv")
 
         # vsa_reduction
+        '''
         df = get_real_dataframe()
-        df = findicators.add_technical_indicators(df, "vsa")
+        df = findicators.add_technical_indicators(df, ["vsa"])
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
         df_reduction = fprocessfeature.process_features(df.copy(), ["vsa_reduction"])
         print(df_reduction.head())
+        '''
             
     elif action == "labeling":
         df = get_real_dataframe()
