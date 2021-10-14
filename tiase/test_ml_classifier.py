@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from tiase.fimport import synthetic
 from tiase.findicators import findicators
-from tiase.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost
+from tiase.ml import classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost,classifier_decision_tree
 import pytest
 
 class TestMlClassifier:
@@ -138,6 +138,18 @@ class TestMlClassifier:
         df = self.get_dataframe()
 
         model = classifier_xgboost.ClassifierXGBoost(df, "target")
+        model.fit()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(1., 0.00001))
+
+    def test_classifier_decision_tree(self):
+        df = self.get_dataframe()
+
+        model = classifier_decision_tree.ClassifierDecisionTree(df, "target")
         model.fit()
 
         model_analysis = model.get_analysis()

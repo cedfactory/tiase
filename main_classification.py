@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 
 from matplotlib import pyplot as plt
-from tiar.fimport import fimport,synthetic,visu
-from tiar.findicators import findicators
-from tiar.fdatapreprocessing import fdataprep
-from tiar.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,analysis,toolbox
+from tiase.fimport import fimport,synthetic,visu
+from tiase.findicators import findicators
+from tiase.fdatapreprocessing import fdataprep
+from tiase.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,classifier_decision_tree,meta_classifier,analysis,toolbox
 import os
 from rich import print,inspect
 
@@ -13,7 +13,7 @@ import warnings
 warnings.simplefilter("ignore")
 
 def evaluate_cross_validation(value):
-    filename = "./tiar/data/test/google_stocks_data.csv"
+    filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     print(df.head())
 
@@ -37,6 +37,7 @@ def evaluate_classifiers(df, value, verbose=False):
 
     target = "target"
     g_classifiers = [
+        { "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target)},
         { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, params={'epochs': 20})},
         { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, params={'epochs': 20})},
         { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, params={'epochs': 20})},
@@ -88,10 +89,14 @@ def evaluate_classifiers(df, value, verbose=False):
 
     analysis.export_roc_curves(test_vs_pred, "roc_curves_"+value+".png", value)
 
+    estimators = meta_classifier.PrepareModelsForMetaClassifierVoting(g_classifiers)
+    print(estimators)
+    meta_voting = meta_classifier.MetaClassifierVoting(estimators)
+
 
 def experiment(value):
 
-    filename = "./tiar/data/test/google_stocks_data.csv"
+    filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     print(df.head())
 
@@ -103,7 +108,7 @@ def experiment(value):
 
 
 def cac40():
-    directory = "./tiar/data/CAC40/"
+    directory = "./tiase/data/CAC40/"
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             value = filename[:len(filename)-4]
