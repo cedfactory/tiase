@@ -13,12 +13,12 @@ class ClassifierXGBoost(classifier.Classifier):
         super().__init__(dataframe, target, params)
 
     def build(self):
-        self.model = XGBClassifier(use_label_encoder=False)
+        self.model = XGBClassifier(use_label_encoder=False, objective='binary:logistic', eval_metric='error')
 
     def fit(self):
         self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
         self.build()
-        self.model.fit(self.X_train,self.y_train, eval_metric="logloss")
+        self.model.fit(self.X_train,self.y_train)
 
     def get_analysis(self):
         self.y_test_pred = self.model.predict(self.X_test)
