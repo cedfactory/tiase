@@ -1,5 +1,6 @@
 from ..findicators import findicators
 from . import toolbox,analysis
+from sklearn import preprocessing
 
 import tensorflow as tf
 from keras.models import Model
@@ -11,6 +12,45 @@ import matplotlib.pyplot as plt
 
 label_actual_price = "Actual Price"
 label_predicted_price = "Predicted Price"
+
+#
+# from https://github.com/yuhaolee97/stock-project/blob/main/basicmodel.py
+#
+def get_train_test_data_from_dataframe_hao(df, seq_len, column_target, train_split):
+    #Preparation of train test set.
+
+    train_indices = int(df.shape[0] * train_split)
+
+    train_data = df[:train_indices]
+
+    test_data = df[train_indices:]
+    test_data = test_data.reset_index()
+    test_data = test_data.drop(columns = ['Date'])
+
+    x_normaliser = preprocessing.MinMaxScaler()
+
+    train_normalised_data = x_normaliser.fit_transform(train_data)
+    test_normalised_data = x_normaliser.transform(test_data)
+
+    x_train = np.array([train_normalised_data[:,0:][i : i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
+
+    y_train = np.array([train_normalised_data[:,0][i + seq_len].copy() for i in range(len(train_normalised_data) - seq_len)])
+    y_train = np.expand_dims(y_train, -1)
+
+    y_normaliser = preprocessing.MinMaxScaler()
+    next_day_close_values = np.array([train_data[column_target][i + seq_len].copy() for i in range(len(train_data) - seq_len)])
+    next_day_close_values = np.expand_dims(next_day_close_values, -1)
+
+    y_normaliser.fit(next_day_close_values)
+    
+    x_test = np.array([test_normalised_data[:,0:][i  : i + seq_len].copy() for i in range(len(test_normalised_data) - seq_len)])
+
+    y_test = np.array([test_data[column_target][i + seq_len].copy() for i in range(len(test_data) - seq_len)])
+    
+    y_test = np.expand_dims(y_test, -1)
+
+    return x_train, y_train, x_test, y_test, x_normaliser, y_normaliser
+
 
 #
 # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
@@ -46,7 +86,7 @@ class LSTMHaoBasic:
     def create_model(self, epochs = 170):
 
         # split the data
-        self.x_train, self.y_train, self.x_test, self.y_test, self.x_normaliser, self.y_normaliser = toolbox.get_train_test_data_from_dataframe0(self.df, self.seq_len, 'adj_close', .7)
+        self.x_train, self.y_train, self.x_test, self.y_test, self.x_normaliser, self.y_normaliser = get_train_test_data_from_dataframe_hao(self.df, self.seq_len, 'adj_close', .7)
 
         # build the model
         tf.random.set_seed(20)

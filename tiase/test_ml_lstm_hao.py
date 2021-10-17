@@ -2,9 +2,24 @@ import pandas as pd
 from tiase.fimport import fimport
 from tiase.findicators import findicators
 from tiase.ml import lstm_hao
+import numpy as np
 import pytest
 
 class TestMlLstmHao:
+
+    def test_get_train_test_data_from_dataframe_hao(self):
+        data = [[10,1000], [2,500], [3,600], [2,800], [2,500], [0,700], [1,800], [3,500], [5,900], [7,1000]]
+        df = pd.DataFrame(data, columns = ['indicator', 'adj_close'])
+        df.index.name = 'Date'
+
+        x_train, y_train, x_test, y_test, x_normaliser, y_normaliser = lstm_hao.get_train_test_data_from_dataframe_hao(df, 2, 'adj_close', 0.6)
+
+        x_train_expected = np.array([[[1., 1. ], [0.2 ,0. ]], [[0.2, 0. ], [0.3, 0.2]], [[0.3, 0.2], [0.2, 0.6]], [[0.2, 0.6], [0.2, 0.]]])
+        np.testing.assert_allclose(x_train, x_train_expected, 0.00001)
+
+        y_train_expected = np.array([[0.3], [0.2], [0.2], [0. ]])
+        np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
+
 
     def test_lstml_hao_basic(self):
         filename = "./tiase/data/test/google_stocks_data.csv"
