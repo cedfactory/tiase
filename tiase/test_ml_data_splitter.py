@@ -105,7 +105,7 @@ class TestMlDataSplitter:
         df = pd.DataFrame(data, columns = ['A', 'B', 'C', 'target'])
 
         # instantiate the data splitter
-        ds = data_splitter.DataSplitterForCrossValidation(df, target='target', nb_splits=3, test_size=2)
+        ds = data_splitter.DataSplitterForCrossValidation(df, nb_splits=3, test_size=2)
         list_df_training, list_df_testing = ds.split()
 
         #expectations
