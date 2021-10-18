@@ -3,7 +3,6 @@ import numpy as np
 from sklearn import preprocessing
 from sklearn.model_selection import TimeSeriesSplit
 
-#ex toolbox.get_train_test_data_from_dataframe2
 class DataSplitterWithLag:
     """
     build train & test data from a dataframe
@@ -74,8 +73,6 @@ class DataSplitterWithLag:
         df_y_test.to_csv("y_test.csv")
 
 
-
-# ex toolbox.get_train_test_data_from_dataframe
 class DataSplitter:
     '''
     build train & test data from a dataframe

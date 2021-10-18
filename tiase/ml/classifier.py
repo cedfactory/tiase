@@ -1,4 +1,4 @@
-from . import analysis,toolbox
+from . import analysis,toolbox,data_splitter
 
 from abc import ABCMeta, abstractmethod
 
@@ -8,10 +8,11 @@ def set_train_test_cv_list(dataframe):
 
 def set_train_test_data(dataframe, seq_len, split_index, target):
     # split the data
-    x_train, y_train, x_test, y_test, x_normaliser = toolbox.get_train_test_data_from_dataframe(dataframe, seq_len, target, split_index, debug=True)
-    y_train = y_train.astype(int)
-    y_test = y_test.astype(int)
-    return x_train, y_train, x_test, y_test, x_normaliser
+    ds = data_splitter.DataSplitter(dataframe, target, seq_len)
+    ds.split(split_index)
+    y_train = ds.y_train.astype(int)
+    y_test = ds.y_test.astype(int)
+    return ds.X_train, y_train, ds.X_test, y_test, ds.normalizer
 
 class Classifier(metaclass = ABCMeta):
     
