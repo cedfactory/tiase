@@ -3,7 +3,8 @@ from . import analysis,toolbox,data_splitter
 from abc import ABCMeta, abstractmethod
 
 def set_train_test_cv_list(dataframe):
-    list_df_train, list_df_test = toolbox.get_train_test_data_list_from_CV_WF_split_dataframe(dataframe, nb_split=5)
+    ds = data_splitter.DataSplitterForCrossValidation(dataframe, nb_splits=5)
+    list_df_train, list_df_test = ds.split()
     return [list_df_train, list_df_test]
 
 def set_train_test_data(dataframe, seq_len, split_index, target):

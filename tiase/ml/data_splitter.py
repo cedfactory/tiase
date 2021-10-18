@@ -147,12 +147,10 @@ class DataSplitter:
         df_y_test.to_csv("y_test.csv")
 
 
-#ex toolbox.get_train_test_data_list_from_CV_WF_split_dataframe
 class DataSplitterForCrossValidation:
 
-    def __init__(self, df, nb_splits, target, max_train_size=500, test_size=100):
+    def __init__(self, df, nb_splits, max_train_size=500, test_size=100):
         self.df = df
-        self.target = target
         self.nb_splits = nb_splits
         self.test_size = test_size
         self.max_train_size = max_train_size

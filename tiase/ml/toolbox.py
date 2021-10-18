@@ -24,45 +24,6 @@ def serialize(scaler, filename):
 def deserialize(filename):
     return joblib.load(filename)
 
-def get_train_test_data_list_from_CV_WF_split_dataframe(df, nb_split=5, debug=False):
-    """
-
-    """
-    #tscv = TimeSeriesSplit(gap=0, max_train_size=int(len(df)/2), n_splits=nb_split, test_size=100)
-    tscv = TimeSeriesSplit(gap=0, max_train_size=500, n_splits=nb_split, test_size=100)
-
-    list_df_training = []
-    list_df_testing = []
-    for split_index in tscv.split(df):
-        if debug:
-            print("df size: ", len(df))
-            print("TRAIN:", split_index[0][0]," -> ", split_index[0][len(split_index[0])-1], " Size: ", split_index[0][len(split_index[0])-1] - split_index[0][0])
-            print("TEST: ", split_index[1][0], " -> ", split_index[1][len(split_index[1]) - 1], " Size: ", split_index[1][len(split_index[1])-1] - split_index[1][0])
-            print(" ")
-
-        train = [-1] * split_index[0][0]
-        train.extend(split_index[0].tolist().copy())
-        train.extend([-1] * (len(df) - len(train)))
-
-        test = [-1] * split_index[1][0]
-        test.extend(split_index[1].tolist().copy())
-        test.extend([-1] * (len(df) - len(test)))
-
-        df['train'] = train
-        df['test']  = test
-        df_train = df[df['train'] != -1]
-        df_test = df[df['test'] != -1]
-        df.drop(columns=['train'], inplace=True)
-        df.drop(columns=['test'], inplace=True)
-        df_train.drop(columns=['train'], inplace=True)
-        df_train.drop(columns=['test'], inplace=True)
-        df_test.drop(columns=['test'], inplace=True)
-        df_test.drop(columns=['train'], inplace=True)
-        list_df_training.append(df_train)
-        list_df_testing.append(df_test)
-
-    return list_df_training, list_df_testing
-
 def add_row_to_df(df,ls):
     """
     Given a dataframe and a list, append the list as a new row to the dataframe.
