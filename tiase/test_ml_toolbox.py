@@ -19,19 +19,6 @@ def compare_dataframes(df1, df2, columns):
 
 class TestMlToolbox:
 
-    def test_get_train_test_data_from_dataframe1(self):
-        data = [[10,1], [2,1], [3,1], [2,1], [2,0], [0,0], [1,1], [3,0], [5,0], [7,1]]
-        df = pd.DataFrame(data, columns = ['value', 'target'])
-        df.index.name = 'Date'
-        x_train, y_train, x_test, y_test, x_normaliser = toolbox.get_train_test_data_from_dataframe1(df, 2, 'target', 0.6)
-
-        x_train_expected = np.array([[1., 0.2], [0.2, 0.3], [0.3, 0.2], [0.2, 0.2]])
-        np.testing.assert_allclose(x_train, x_train_expected, 0.00001)
-
-        y_train_expected = np.array([[1], [1], [0], [0]])
-        np.testing.assert_allclose(y_train, y_train_expected, 0.00001)
-
-
     def test_get_train_test_data_from_dataframe2(self):
         data =[
             [0., 11., 3., 1],
