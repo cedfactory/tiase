@@ -17,9 +17,10 @@ def set_train_test_data(dataframe, seq_len, split_index, target):
 
 class Classifier(metaclass = ABCMeta):
     
-    def __init__(self, dataframe, target, params = None):
+    def __init__(self, dataframe, target, data_splitter, params = None):
         self.df = dataframe
         self.target = target
+        self.data_splitter = data_splitter
 
         self.seq_len = 21
         if params:

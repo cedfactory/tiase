@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from tiase.fimport import fimport,synthetic,visu
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
-from tiase.ml import classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,classifier_decision_tree,meta_classifier,analysis,toolbox
+from tiase.ml import data_splitter,classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,classifier_decision_tree,meta_classifier,analysis,toolbox
 import os
 from rich import print,inspect
 
@@ -35,18 +35,21 @@ def evaluate_classifiers(df, value, verbose=False):
     if verbose:
         print(df.head())
 
+    ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
+    ds.split(0.7)
+        
     target = "target"
     g_classifiers = [
-        { "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target)},
-        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, params={'epochs': 20})},
-        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, params={'epochs': 20})},
-        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, params={'epochs': 20})},
-        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), target, params={'epochs': 40})},
-        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), target, params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, params={'seq_len': 50})},
-        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), target)},
-        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), target)},
-        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), target, params={'class_to_return': 1})}
+        { "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target, ds)},
+        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params={'epochs': 20})},
+        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, ds, params={'epochs': 20})},
+        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, ds, params={'epochs': 20})},
+        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), target, ds, params={'epochs': 40})},
+        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), target, ds, params={'epochs': 20})},
+        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds, params={'seq_len': 50})},
+        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), target, ds)},
+        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), target, ds)},
+        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), target, ds, params={'class_to_return': 1})}
     ]
 
     test_vs_pred = []

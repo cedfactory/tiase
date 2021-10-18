@@ -4,8 +4,8 @@ import numpy as np
 from rich import print,inspect
 
 class ClassifierAlwaysSameClass(classifier.Classifier):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
         self.class_to_return = 1
         self.seq_len = 50
         if params:
@@ -17,8 +17,12 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         pass
 
     def fit(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
-
+        self.X_train = self.data_splitter.X_train
+        self.y_train = self.data_splitter.y_train
+        self.X_test = self.data_splitter.X_test
+        self.y_test = self.data_splitter.y_test
+        self.x_normaliser = self.data_splitter.normalizer
+        
     def get_analysis(self):
         self.y_test_pred = np.empty(len(self.y_test))
         self.y_test_pred.fill(1)
@@ -40,8 +44,8 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
 
 
 class ClassifierAlwaysAsPrevious(classifier.Classifier):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
         self.seq_len = 50
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
@@ -51,8 +55,12 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         pass
 
     def fit(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
-
+        self.X_train = self.data_splitter.X_train
+        self.y_train = self.data_splitter.y_train
+        self.X_test = self.data_splitter.X_test
+        self.y_test = self.data_splitter.y_test
+        self.x_normaliser = self.data_splitter.normalizer
+        
     def get_analysis(self):
         self.y_test_pred = np.roll(self.y_test, 1)
         self.y_test_prob = np.empty(len(self.y_test))

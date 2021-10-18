@@ -27,8 +27,8 @@ dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
 #
 class ClassifierLSTM(classifier.Classifier):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
 
         self.epochs = 170
         self.batch_size = 10
@@ -37,7 +37,12 @@ class ClassifierLSTM(classifier.Classifier):
             self.batch_size = params.get("batch_size", self.batch_size)
 
     def fit(self):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(self.df, self.seq_len, 0.7, self.target)
+        self.X_train = self.data_splitter.X_train
+        self.y_train = self.data_splitter.y_train
+        self.X_test = self.data_splitter.X_test
+        self.y_test = self.data_splitter.y_test
+        self.x_normaliser = self.data_splitter.normalizer
+
         self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
         self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
 
@@ -168,8 +173,8 @@ Input:
 - batch_size = 10
 '''        
 class ClassifierLSTM1(ClassifierLSTM):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target, params)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
 
         self.lstm_size = 100
         if params:
@@ -195,8 +200,8 @@ Input:
 - batch_size = 10
 '''  
 class ClassifierLSTM2(ClassifierLSTM):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target, params)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
     
         self.lstm_size = 100
         if params:
@@ -226,8 +231,8 @@ Input:
 - batch_size = 10
 '''  
 class ClassifierLSTM3(ClassifierLSTM):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target, params)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
     
         self.lstm_size = 100
         if params:
@@ -258,8 +263,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierLSTMHao2020(ClassifierLSTM):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target, params)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
     
     def build(self):
         print("[Build ClassifierLSTMHao2020]")
@@ -298,8 +303,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierBiLSTM(ClassifierLSTM):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target, params)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
     
     def build(self):
         print("[Build ClassifierBiLSTM]")
@@ -332,8 +337,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierCNNBiLSTM(ClassifierLSTM):
-    def __init__(self, dataframe, target, params = None):
-        super().__init__(dataframe, target, params)
+    def __init__(self, dataframe, target, data_splitter, params = None):
+        super().__init__(dataframe, target, data_splitter, params)
     
     def inception_a(self, layer_in, c7):
         branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
