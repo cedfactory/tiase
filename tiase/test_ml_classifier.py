@@ -18,7 +18,7 @@ class TestMlClassifier:
     def test_classifier_evaluate_cross_validation(self):
         df = self.get_dataframe()
 
-        ds = data_splitter.DataSplitter(df, target="target", seq_len=50)
+        ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
         ds.split(0.7)
         model = classifier_lstm.ClassifierLSTM1(df.copy(), "target", ds, params={'epochs': 5})
         results = model.evaluate_cross_validation()
