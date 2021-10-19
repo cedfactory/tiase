@@ -57,7 +57,6 @@ def getWeights(d, size):
     # thres>0 drops insignificant weights
     w = [1.]
     for k in range(1, size):
-        tmp = -w[-1]
         w_ = -w[-1] / k * (d - k + 1)
         w.append(w_)
     w = np.array(w[::-1]).reshape(-1, 1)  # sort and reshape the w
@@ -208,12 +207,8 @@ def stationary_transform(df):
     out = get_adf_corr(price)
     plotWeights(out, "FFD_d")
 
-    d = select_d_FFD(out)
-
     df_FFD_transformed = trans_a_bunch_of_data_FFD(df_stock, d=0.1, thres=1e-4)
 
-
-    w_FFD = getWeights_FFD(thres=1e-4)
     print('FF shape:', w_FFD.shape)
 
     price_trans = transfer_data_by_frac_diff_FFD(price)

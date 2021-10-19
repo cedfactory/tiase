@@ -37,7 +37,7 @@ class TestMlClassifier:
             print("f1_score :  {:.3f}".format(model_analysis["f1_score"]))
             '''
 
-        estimators = meta_classifier.PrepareModelsForMetaClassifierVoting(g_classifiers)
+        estimators = meta_classifier.prepare_models_for_meta_classifier_voting(g_classifiers)
         meta_voting = meta_classifier.MetaClassifierVoting(estimators, data_splitter=ds, params={'voting': 'soft'})
         meta_voting.build()
         meta_voting.fit()

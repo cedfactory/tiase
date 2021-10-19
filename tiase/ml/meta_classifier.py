@@ -1,7 +1,7 @@
 from sklearn.ensemble import VotingClassifier
 from . import analysis
 
-def PrepareModelsForMetaClassifierVoting(models):
+def prepare_models_for_meta_classifier_voting(models):
     formatted_estimators = []
     for model in models:
         name = model["name"]

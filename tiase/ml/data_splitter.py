@@ -161,11 +161,10 @@ class DataSplitterForCrossValidation:
         list_df_training = []
         list_df_testing = []
         for split_index in tscv.split(self.df):
-            if True:
-                print("df size: ", len(self.df))
-                print("TRAIN:", split_index[0][0]," -> ", split_index[0][len(split_index[0])-1], " Size: ", split_index[0][len(split_index[0])-1] - split_index[0][0])
-                print("TEST: ", split_index[1][0], " -> ", split_index[1][len(split_index[1]) - 1], " Size: ", split_index[1][len(split_index[1])-1] - split_index[1][0])
-                print(" ")
+            print("df size: ", len(self.df))
+            print("TRAIN:", split_index[0][0]," -> ", split_index[0][len(split_index[0])-1], " Size: ", split_index[0][len(split_index[0])-1] - split_index[0][0])
+            print("TEST: ", split_index[1][0], " -> ", split_index[1][len(split_index[1]) - 1], " Size: ", split_index[1][len(split_index[1])-1] - split_index[1][0])
+            print(" ")
 
             train = [-1] * split_index[0][0]
             train.extend(split_index[0].tolist().copy())
