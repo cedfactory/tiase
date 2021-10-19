@@ -7,13 +7,23 @@ DecisionTree
 
 Input:
 - seq_len = 21
+- max_depth = None
+- random_state = None
+
+reference : https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
 '''
 class ClassifierDecisionTree(classifier.Classifier):
     def __init__(self, dataframe, target, data_splitter, params = None):
         super().__init__(dataframe, target, data_splitter, params)
 
+        self.max_depth = 10
+        self.random_state = None
+        if params:
+            self.max_depth = params.get("max_depth", self.max_depth)
+            self.random_state = params.get("random_state", self.random_state)
+
     def build(self):
-        self.model = DecisionTreeClassifier()
+        self.model = DecisionTreeClassifier(max_depth=self.max_depth, random_state=self.random_state)
 
     def fit(self):
         self.X_train = self.data_splitter.X_train
