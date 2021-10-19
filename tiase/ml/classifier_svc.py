@@ -7,15 +7,17 @@ SVC
 
 Input:
 - seq_len = 21
-- kernel = "linear"
-- c = 0.025
+- kernel \in {‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’}, default=’rbf’
+- c \in R, default=1.
+
+ref : https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
 '''       
 class ClassifierSVC(classifier.Classifier):
     def __init__(self, dataframe, target, data_splitter, params = None):
         super().__init__(dataframe, target, data_splitter, params)
 
-        self.kernel = "linear"
-        self.c = 0.025
+        self.kernel = "rbf"
+        self.c = 1.
         if params:
             self.kernel = params.get("kernel", self.kernel)
             self.c = params.get("c", self.c)
