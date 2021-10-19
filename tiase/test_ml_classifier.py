@@ -145,7 +145,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitter(df, target="target", seq_len=50)
         ds.split(0.7)
-        model = classifier_svc.ClassifierSVC(df, "target", ds, params={'seq_len': 50})
+        model = classifier_svc.ClassifierSVC(df, "target", ds, params={'kernel': 'linear', 'c': 0.025})
         model.fit()
 
         model_analysis = model.get_analysis()
