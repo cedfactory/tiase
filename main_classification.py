@@ -40,16 +40,19 @@ def evaluate_classifiers(df, value, verbose=False):
         
     target = "target"
     g_classifiers = [
-        { "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target, ds)},
-        { "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params={'epochs': 20})},
-        { "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, ds, params={'epochs': 20})},
-        { "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, ds, params={'epochs': 20})},
-        { "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), target, ds, params={'epochs': 40})},
-        { "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), target, ds, params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds, params={'seq_len': 50})},
-        { "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), target, ds)},
-        { "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), target, ds)},
-        { "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), target, ds, params={'class_to_return': 1})}
+        #{ "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': None})},
+        { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': 3})},
+        #{ "name": "DTC5", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': 5})},
+        #{ "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params={'epochs': 20})},
+        #{ "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, ds, params={'epochs': 20})},
+        #{ "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, ds, params={'epochs': 20})},
+        #{ "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), target, ds, params={'epochs': 40})},
+        #{ "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), target, ds, params={'epochs': 20})},
+        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds)},
+        { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds, params={'kernel': 'poly'})},
+        #{ "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), target, ds)},
+        #{ "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), target, ds)},
+        #{ "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), target, ds, params={'class_to_return': 1})}
     ]
 
     test_vs_pred = []
@@ -78,10 +81,10 @@ def evaluate_classifiers(df, value, verbose=False):
 
         if verbose:
             print(name)
-            print("Accuracy : ", model_analysis["accuracy"])
-            print("Precision : ", model_analysis["precision"])
-            print("Recall : ", model_analysis["recall"])
-            print("f1_score:", model_analysis["f1_score"])
+            print("Accuracy :  {:.3f}".format(model_analysis["accuracy"]))
+            print("Precision : {:.3f}".format(model_analysis["precision"]))
+            print("Recall :    {:.3f}".format(model_analysis["recall"]))
+            print("f1_score :  {:.3f}".format(model_analysis["f1_score"]))
 
         analysis.export_confusion_matrix(model_analysis["confusion_matrix"], name+"_classification_confusion_matrix.png")
         analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], name+"_classification_roc_curve.png")
@@ -92,9 +95,22 @@ def evaluate_classifiers(df, value, verbose=False):
 
     analysis.export_roc_curves(test_vs_pred, "roc_curves_"+value+".png", value)
 
+
+    #
+    # ensemble
+    #
     estimators = meta_classifier.PrepareModelsForMetaClassifierVoting(g_classifiers)
-    print(estimators)
-    meta_voting = meta_classifier.MetaClassifierVoting(estimators)
+    meta_voting = meta_classifier.MetaClassifierVoting(estimators, data_splitter=ds)
+    meta_voting.build()
+    meta_voting.fit()
+    metamodel_analysis = meta_voting.get_analysis()
+
+    if verbose:
+        print("meta_model")
+        print("Accuracy :  {:.3f}".format(metamodel_analysis["accuracy"]))
+        print("Precision : {:.3f}".format(metamodel_analysis["precision"]))
+        print("Recall :    {:.3f}".format(metamodel_analysis["recall"]))
+        print("f1_score :  {:.3f}".format(metamodel_analysis["f1_score"]))
 
 
 def experiment(value):
