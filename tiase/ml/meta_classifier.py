@@ -9,36 +9,39 @@ def PrepareModelsForMetaClassifierVoting(models):
         formatted_estimators.append((name, estimator))
     return formatted_estimators
 
+'''
+params :
+- voting \in {‘hard’, ‘soft’}, default=’hard’
 
+reference : https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html
+'''
 class MetaClassifierVoting:
-    def __init__(self, classifiers, X_train, y_train, X_test, y_test, params=None):
+    def __init__(self, classifiers, data_splitter, params=None):
         '''
         format for classifiers : [('classifier1_name', classifier1), ('classifier2_name', classifier2)]
         '''
         self.classifiers = classifiers
 
-        self.voting = "soft"
+        self.voting = "hard"
         if params:
             self.voting = params.get("voting", self.voting)
 
-        self.X_train = X_train
-        self.y_train = y_train
-        self.X_test = X_test
-        self.y_test = y_test
+        self.data_splitter = data_splitter
+
 
     def build(self):
         print(self.classifiers)
         self.model = VotingClassifier(estimators=self.classifiers, voting=self.voting)
 
     def fit(self):
-        self.model.fit(self.X_train, self.y_train)
+        self.model.fit(self.data_splitter.X_train, self.data_splitter.y_train)
 
     def predict(self, x):
         self.model.predict(x)
 
     def get_analysis(self):
-        self.y_test_pred = self.model.predict(self.X_test)
-        self.y_test_prob = self.model.predict_proba(self.X_test)
+        self.y_test_pred = self.model.predict(self.data_splitter.X_test)
+        self.y_test_prob = self.model.predict_proba(self.data_splitter.X_test)
         self.y_test_prob = self.y_test_prob[:, 1]
-        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis
