@@ -26,20 +26,14 @@ class ClassifierSVC(classifier.Classifier):
         self.model = SVC(kernel=self.kernel, C=self.c, probability=True)
 
     def fit(self):
-        self.X_train = self.data_splitter.X_train
-        self.y_train = self.data_splitter.y_train
-        self.X_test = self.data_splitter.X_test
-        self.y_test = self.data_splitter.y_test
-        self.x_normaliser = self.data_splitter.normalizer
-        
         self.build()
-        self.model.fit(self.X_train,self.y_train)
-
+        self.model.fit(self.data_splitter.X_train,self.data_splitter.y_train)
+        
     def get_analysis(self):
-        self.y_test_pred = self.model.predict(self.X_test)
-        self.y_test_prob = self.model.predict_proba(self.X_test)
+        self.y_test_pred = self.model.predict(self.data_splitter.X_test)
+        self.y_test_prob = self.model.predict_proba(self.data_splitter.X_test)
         self.y_test_prob = self.y_test_prob[:, 1]
-        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, self.y_test_pred, self.y_test_prob)
         return self.analysis
 
     def save(self, filename):
