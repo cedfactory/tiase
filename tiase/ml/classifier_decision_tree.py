@@ -7,6 +7,8 @@ DecisionTree
 
 Input:
 - seq_len = 21
+- criterion \in {“gini”, “entropy”}, default=”gini”
+- splitter \in {“best”, “random”}, default=”best”
 - max_depth = None
 - random_state = None
 
@@ -16,14 +18,24 @@ class ClassifierDecisionTree(classifier.Classifier):
     def __init__(self, dataframe, target, data_splitter, params = None):
         super().__init__(dataframe, target, data_splitter, params)
 
+        self.criterion = 'gini'
+        self.splitter = 'best'
         self.max_depth = 10
         self.random_state = None
         if params:
+            self.criterion = params.get("criterion", self.criterion)
+            self.splitter = params.get("splitter", self.splitter)
             self.max_depth = params.get("max_depth", self.max_depth)
             self.random_state = params.get("random_state", self.random_state)
 
+    def get_param_grid(self):
+        return {'max_depth': [2, 3, 4, 5, 6], 'criterion': ['gini', 'entropy'], 'splitter': ['best']}
+
+    def get_model(self):
+        return self.model
+
     def build(self):
-        self.model = DecisionTreeClassifier(max_depth=self.max_depth, random_state=self.random_state)
+        self.model = DecisionTreeClassifier(criterion=self.criterion, splitter=self.splitter, max_depth=self.max_depth, random_state=self.random_state)
 
     def fit(self):
         self.build()

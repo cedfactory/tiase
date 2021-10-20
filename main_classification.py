@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from tiase.fimport import fimport,synthetic,visu
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
-from tiase.ml import data_splitter,classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,classifier_decision_tree,meta_classifier,analysis,toolbox
+from tiase.ml import data_splitter,hyper_parameters_tuning,classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,classifier_decision_tree,meta_classifier,analysis,toolbox
 import os
 from rich import print,inspect
 
@@ -26,6 +26,40 @@ def evaluate_cross_validation(value):
     results = model.evaluate_cross_validation()
     #print("Averaged accuracy : ", results["average_accuracy"])
     print(results)
+
+def evaluate_hyper_parameters_tuning():
+    filename = "./tiase/data/test/google_stocks_data.csv"
+    df = fimport.get_dataframe_from_csv(filename)
+    print(df.head())
+
+    df = findicators.normalize_column_headings(df)
+    df = toolbox.make_target(df, "pct_change", 7)
+    df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
+    print(df.head())
+
+    ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
+    ds.split(0.7)
+
+    dtc = classifier_decision_tree.ClassifierDecisionTree(df.copy(), target="target", data_splitter=ds)
+    dtc.fit()
+    dtc_analysis = dtc.get_analysis()
+    print("DTC")
+    print("Accuracy :  {:.3f}".format(dtc_analysis["accuracy"]))
+    print("Precision : {:.3f}".format(dtc_analysis["precision"]))
+    print("Recall :    {:.3f}".format(dtc_analysis["recall"]))
+    print("f1_score :  {:.3f}".format(dtc_analysis["f1_score"]))
+
+    hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(dtc, ds)
+    result = hpt_grid_search.fit()
+    print(result)
+
+    model_analysis = hpt_grid_search.get_analysis()
+    print("Analysis")
+    print("Accuracy :  {:.3f}".format(model_analysis["accuracy"]))
+    print("Precision : {:.3f}".format(model_analysis["precision"]))
+    print("Recall :    {:.3f}".format(model_analysis["recall"]))
+    print("f1_score :  {:.3f}".format(model_analysis["f1_score"]))
+
 
 def evaluate_classifiers(df, value, verbose=False):
     df = findicators.normalize_column_headings(df)
@@ -140,7 +174,7 @@ def cac40():
 
 _usage_str = """
 Options:
-    [--experiment --cac40 --cv]
+    [--experiment --cac40 --cv --hpt]
 """
 
 def _usage():
@@ -149,7 +183,9 @@ def _usage():
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--experiment":
+        if sys.argv[1] == "--hpt":
+            evaluate_hyper_parameters_tuning()
+        elif sys.argv[1] == "--experiment":
             value = ""
             if len(sys.argv) > 2:
                 value = sys.argv[2]
