@@ -1,5 +1,6 @@
 from sklearn.ensemble import VotingClassifier
 from . import analysis
+from . import classifier
 
 def prepare_models_for_meta_classifier_voting(models):
     formatted_estimators = []
@@ -40,8 +41,5 @@ class MetaClassifierVoting:
         self.model.predict(x)
 
     def get_analysis(self):
-        self.y_test_pred = self.model.predict(self.data_splitter.X_test)
-        self.y_test_prob = self.model.predict_proba(self.data_splitter.X_test)
-        self.y_test_prob = self.y_test_prob[:, 1]
-        self.analysis = analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, self.y_test_pred, self.y_test_prob)
-        return self.analysis
+        y_test_pred, y_test_prob = classifier.get_pred_and_prob_with_predict_pred_and_predict_proba(self.model, self.data_splitter)
+        return analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, y_test_pred, y_test_prob)
