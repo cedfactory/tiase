@@ -1,14 +1,14 @@
 from sklearn.tree import DecisionTreeClassifier
-from . import classifier,toolbox,analysis
-from ..findicators import findicators
+from . import classifier,analysis
+
 
 '''
 DecisionTree
 
 Input:
 - seq_len = 21
-- criterion \in {“gini”, “entropy”}, default=”gini”
-- splitter \in {“best”, “random”}, default=”best”
+- criterion \in {'gini', 'entropy'}, default='gini'
+- splitter \in {'best', 'random'}, default='best'
 - max_depth = None
 - random_state = None
 
@@ -29,7 +29,7 @@ class ClassifierDecisionTree(classifier.Classifier):
             self.random_state = params.get("random_state", self.random_state)
 
     def get_param_grid(self):
-        return {'max_depth': [2, 3, 4, 5, 6], 'criterion': ['gini', 'entropy'], 'splitter': ['best']}
+        return {'max_depth': [2, 3, 4, 5, 6], 'criterion': ['gini', 'entropy'], 'splitter': ['best'], 'random_state': [1]}
 
     def get_model(self):
         return self.model
@@ -42,11 +42,8 @@ class ClassifierDecisionTree(classifier.Classifier):
         self.model.fit(self.data_splitter.X_train,self.data_splitter.y_train)
 
     def get_analysis(self):
-        self.y_test_pred = self.model.predict(self.data_splitter.X_test)
-        self.y_test_prob = self.model.predict_proba(self.data_splitter.X_test)
-        self.y_test_prob = self.y_test_prob[:, 1]
-        self.analysis = analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, self.y_test_pred, self.y_test_prob)
-        return self.analysis
+        y_test_pred, y_test_prob = classifier.get_pred_and_prob_with_predict_pred_and_predict_proba(self.model, self.data_splitter)
+        return analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, y_test_pred, y_test_prob)
 
     def save(self, filename):
         print("ClassifierDecisionTree.save() is not implemented")

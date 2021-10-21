@@ -1,20 +1,6 @@
 from . import classifier,analysis
 from sklearn.model_selection import GridSearchCV
-from abc import ABCMeta, abstractmethod
 
-class HyperParametersTuning(metaclass = ABCMeta):
-    """
-
-    """
-    def __init__(self, model, data_splitter, params=None):
-        self.model = model
-        self.data_splitter = data_splitter
-
-    @abstractmethod
-    def fit(self):
-        pass
-
-#class HPTGridSearch(HyperParametersTuning):
 class HPTGridSearch(classifier.Classifier):
     """
     reference : https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
@@ -42,11 +28,8 @@ class HPTGridSearch(classifier.Classifier):
         return self.tuner.best_params_
 
     def get_analysis(self):
-        self.y_test_pred = self.tuner.predict(self.data_splitter.X_test)
-        self.y_test_prob = self.tuner.predict_proba(self.data_splitter.X_test)
-        self.y_test_prob = self.y_test_prob[:, 1]
-        self.analysis = analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, self.y_test_pred, self.y_test_prob)
-        return self.analysis
+        y_test_pred, y_test_prob = classifier.get_pred_and_prob_with_predict_pred_and_predict_proba(self.tuner, self.data_splitter)
+        return analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, y_test_pred, y_test_prob)
 
     def save(self, filename):
         print("HPTGridSearch.save() is not implemented")
