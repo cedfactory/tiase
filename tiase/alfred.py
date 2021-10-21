@@ -146,7 +146,7 @@ def execute(filename):
             for classifier in classifiers:
                 classifier_name = classifier.get("name", None)
                 export_filename = classifier.get("export", None)
-                ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
+                ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
                 ds.split(0.7)
                 print(classifier_name)
                 if classifier_name == 'svc':

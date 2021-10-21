@@ -18,7 +18,7 @@ class TestMlHyperParametersTuning:
         df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
 
         # data splitter
-        ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
+        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
 
         # classifier

@@ -37,7 +37,7 @@ def evaluate_hyper_parameters_tuning():
     df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
     print(df.head())
 
-    ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
+    ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
     ds.split(0.7)
 
     dtc = classifier_decision_tree.ClassifierDecisionTree(df.copy(), target="target", data_splitter=ds)
@@ -69,7 +69,7 @@ def evaluate_classifiers(df, value, verbose=False):
     if verbose:
         print(df.head())
 
-    ds = data_splitter.DataSplitter(df, target="target", seq_len=21)
+    ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
     ds.split(0.7)
         
     target = "target"

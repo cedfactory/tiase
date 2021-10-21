@@ -3,7 +3,31 @@ import numpy as np
 from sklearn import preprocessing
 from sklearn.model_selection import TimeSeriesSplit
 
-class DataSplitterWithLag:
+from abc import ABCMeta, abstractmethod
+
+class DataSplitter(metaclass = ABCMeta):
+    def __init__(self):
+        pass
+
+
+class DataSplitterTrainTest(DataSplitter):
+    def __init__(self):
+        pass
+
+    def export(self):
+        df_x_train = pd.DataFrame(self.X_train)
+        df_y_train = pd.DataFrame(self.y_train)
+        df_x_test = pd.DataFrame(self.X_test)
+        df_y_test = pd.DataFrame(self.y_test)
+
+        df_x_train.to_csv("x_train.csv")
+        df_y_train.to_csv("y_train.csv")
+
+        df_x_test.to_csv("x_test.csv")
+        df_y_test.to_csv("y_test.csv")
+
+
+class DataSplitterTrainTestWithLag(DataSplitterTrainTest):
     """
     build train & test data from a dataframe
     Warnings :
@@ -60,20 +84,8 @@ class DataSplitterWithLag:
         self.X_train, self.y_train = self.__split_train_test(train_normalised_features, train_target)
         self.X_test, self.y_test = self.__split_train_test(test_normalised_features, test_target)
 
-    def export(self):
-        df_x_train = pd.DataFrame(self.X_train)
-        df_y_train = pd.DataFrame(self.y_train)
-        df_x_test = pd.DataFrame(self.X_test)
-        df_y_test = pd.DataFrame(self.y_test)
 
-        df_x_train.to_csv("x_train.csv")
-        df_y_train.to_csv("y_train.csv")
-
-        df_x_test.to_csv("x_test.csv")
-        df_y_test.to_csv("y_test.csv")
-
-
-class DataSplitter:
+class DataSplitterTrainTestSimple(DataSplitterTrainTest):
     '''
     build train & test data from a dataframe
     Warnings :
@@ -134,20 +146,8 @@ class DataSplitter:
         self.X_train, self.y_train = self.__split_train_test(train_normalised_features, train_target)
         self.X_test, self.y_test = self.__split_train_test(test_normalised_features, test_target)
 
-    def export(self):
-        df_x_train = pd.DataFrame(self.X_train)
-        df_y_train = pd.DataFrame(self.y_train)
-        df_x_test = pd.DataFrame(self.X_test)
-        df_y_test = pd.DataFrame(self.y_test)
 
-        df_x_train.to_csv("x_train.csv")
-        df_y_train.to_csv("y_train.csv")
-
-        df_x_test.to_csv("x_test.csv")
-        df_y_test.to_csv("y_test.csv")
-
-
-class DataSplitterForCrossValidation:
+class DataSplitterForCrossValidation(DataSplitter):
 
     def __init__(self, df, nb_splits, max_train_size=500, test_size=100):
         self.df = df

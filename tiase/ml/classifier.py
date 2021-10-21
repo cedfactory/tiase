@@ -16,7 +16,7 @@ def set_train_test_cv_list(dataframe):
 
 def set_train_test_data(dataframe, seq_len, split_index, target):
     # split the data
-    ds = data_splitter.DataSplitter(dataframe, target, seq_len)
+    ds = data_splitter.DataSplitterTrainTestSimple(dataframe, target, seq_len)
     ds.split(split_index)
     y_train = ds.y_train.astype(int)
     y_test = ds.y_test.astype(int)
