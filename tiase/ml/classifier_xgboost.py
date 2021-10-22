@@ -33,6 +33,9 @@ class ClassifierXGBoost(classifier.Classifier):
             self.booster = params.get("booster", self.booster)
             self.tree_method = params.get("tree_method", self.tree_method)
 
+    def get_model(self):
+        return self.model
+
     def get_param_grid(self):
         return {'n_estimators': [50, 75, 100, 125, 150, 175, 200],
         'max_depth': [2, 3, 4, 5, 6],

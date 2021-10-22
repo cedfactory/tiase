@@ -5,7 +5,7 @@ from . import classifier,analysis
 SVC
 
 Input:
-- c \in R, default=1.
+- C \in R, default=1.
 - kernel \in {'linear', 'poly', 'rbf', 'sigmoid', 'precomputed'}, default='rbf'
 - degree \in N+, default=3
 - gamma \in {'scale', 'auto'} or \in R, default='scale'
@@ -27,11 +27,14 @@ class ClassifierSVC(classifier.Classifier):
             self.gamma = params.get("gamma", self.gamma)
 
     def get_param_grid(self):
-        return {'c': [.8, .9, 1., 1.1, 1.2],
-        'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
-        'degree': [2, 3, 4, 5, 5],
-        'gamma': ['scale', 'auto', .1, .2, .3, .4, .5, .6, .7, .8, .9, 1., 1.1, 1.2]
+        return {'C': [.8, .9, 1., 1.1, 1.2],
+        'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+        'degree': [2, 3, 4, 5, 6],
+        'gamma': ['scale', 'auto', .2, .4, .6, .8, 1., 1.2]
         }
+
+    def get_model(self):
+        return self.model
 
     def build(self):
         self.model = SVC(C=self.c, kernel=self.kernel, degree=self.degree, gamma=self.gamma, probability=True)
