@@ -4,7 +4,11 @@
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
         <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
         <classifiers>
-            <classifier name="lstm1" export="./tmp/lstm1"/>
+            <classifier name="lstm1" export="./tmp/lstm1">
+                <parameters>
+                    <parameter name="epochs" value="20"/>
+                </parameters>
+            </classifier>
         </classifiers>
     </ding>
 </dings>

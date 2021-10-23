@@ -18,7 +18,11 @@
         </featureengeineering>
         <export filename="./tmp/df.csv"/>
         <classifiers>
-            <classifier name="lstm1" export="./tmp/lstm1"/>
+            <classifier name="lstm1" export="./tmp/lstm1">
+                <parameters>
+                    <parameter name="epochs" value="15"/>
+                </parameters>
+            </classifier>
         </classifiers>
     </ding>
 </dings>

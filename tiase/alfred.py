@@ -142,17 +142,24 @@ def execute(filename):
         # learning model
         classifiers_node = ding.find('classifiers')
         if classifiers_node:
-            classifiers = classifiers_node.findall('classifier')
-            for classifier in classifiers:
+            for classifier in classifiers_node:
                 classifier_name = classifier.get("name", None)
                 export_filename = classifier.get("export", None)
                 ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
                 ds.split(0.7)
-                print(classifier_name)
+
+                parameters_node = classifier.find('parameters')
+                params = {}
+                if parameters_node:
+                    for parameter in parameters_node:
+                        parameter_name = parameter.get("name", None)
+                        parameter_value = parameter.get("value", None)
+                        params[parameter_name] = parameter_value
+
                 if classifier_name == 'svc':
                     model = classifier_svc.ClassifierSVC(df.copy(), target=target, data_splitter=ds)
                 elif classifier_name == "lstm1":
-                    model = classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params={'epochs': 20})
+                    model = classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params=params)
                 model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))

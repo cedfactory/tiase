@@ -36,6 +36,9 @@ class ClassifierLSTM(classifier.Classifier):
             self.epochs = params.get("epochs", self.epochs)
             self.batch_size = params.get("batch_size", self.batch_size)
 
+        if isinstance(self.epochs, str):
+            self.epochs = int(self.epochs)
+
         self.X_train = self.data_splitter.X_train
         self.y_train = self.data_splitter.y_train
         self.X_test = self.data_splitter.X_test
