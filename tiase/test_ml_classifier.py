@@ -160,7 +160,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifiers_factory.ClassifiersFactory.get_classifier("xgboost", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("xgboost", {"n_estimators":100}, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -182,3 +182,48 @@ class TestMlClassifier:
         assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
         assert(model_analysis["recall"] == pytest.approx(1., 0.00001))
         assert(model_analysis["f1_score"] == pytest.approx(1., 0.00001))
+
+    def test_classifier_mlp(self):
+        df = self.get_dataframe()
+
+        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+        ds.split(0.7)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("mlp", {'hidden_layer_sizes': 80, 'random_state': 1}, ds)
+        model.fit()
+
+        model_analysis = model.get_analysis()
+        print(model_analysis["precision"])
+        print(model_analysis["recall"])
+        print(model_analysis["f1_score"])
+
+        assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.992592, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.996282, 0.00001))
+
+    def test_classifier_gaussian_naive_bayes(self):
+        df = self.get_dataframe()
+
+        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+        ds.split(0.7)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("gaussian naive bayes", None, ds)
+        model.fit()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(0.948529, 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.955555, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.952029, 0.00001))
+
+    def test_classifier_gaussian_process(self):
+        df = self.get_dataframe()
+
+        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+        ds.split(0.7)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("gaussian process", None, ds)
+        model.fit()
+
+        model_analysis = model.get_analysis()
+
+        assert(model_analysis["precision"] == pytest.approx(1., 0.00001))
+        assert(model_analysis["recall"] == pytest.approx(0.992592, 0.00001))
+        assert(model_analysis["f1_score"] == pytest.approx(0.996282, 0.00001))

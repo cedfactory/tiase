@@ -8,11 +8,11 @@ class ClassifiersFactory:
             return classifier_naive.ClassifierAlwaysAsPrevious(data_splitter=data_splitter, params=params)
         elif name == "decision tree":
             return classifier_decision_tree.ClassifierDecisionTree(data_splitter=data_splitter, params=params)
-        elif name == "gaussian_process":
+        elif name == "gaussian process":
             return classifier_gaussian_process.ClassifierGaussianProcess(data_splitter=data_splitter, params=params)
         elif name == "mlp":
             return classifier_mlp.ClassifierMLP(data_splitter=data_splitter, params=params)
-        elif name == "gaussian_naive_bayes":
+        elif name == "gaussian naive bayes":
             return classifier_naive_bayes.ClassifierGaussianNB(data_splitter=data_splitter, params=params)
         elif name == "svc":
             return classifier_svc.ClassifierSVC(data_splitter=data_splitter, params=params)

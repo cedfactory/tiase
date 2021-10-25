@@ -18,10 +18,12 @@ class ClassifierMLP(classifier.Classifier):
         self.hidden_layer_sizes = 100
         self.activation = 'relu'
         self.solver = 'adam'
+        self.random_state = None
         if params:
             self.hidden_layer_sizes = params.get("hidden_layer_sizes", self.hidden_layer_sizes)
             self.activation = params.get("activation", self.activation)
             self.solver = params.get("solver", self.solver)
+            self.random_state = params.get("random_state", self.random_state)
 
     def get_param_grid(self):
         return {'hidden_layer_sizes': [50, 75, 100, 125, 150, 200, 250, 300],
@@ -33,7 +35,7 @@ class ClassifierMLP(classifier.Classifier):
         return self.model
 
     def build(self):
-        self.model = MLPClassifier(hidden_layer_sizes=self.hidden_layer_sizes, activation=self.activation, solver=self.solver)
+        self.model = MLPClassifier(hidden_layer_sizes=self.hidden_layer_sizes, activation=self.activation, solver=self.solver, random_state=self.random_state)
 
     def fit(self):
         self.build()
