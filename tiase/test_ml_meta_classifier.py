@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from tiase.fimport import fimport
 from tiase.findicators import findicators
-from tiase.ml import data_splitter,classifier_svc,classifier_decision_tree,meta_classifier
+from tiase.ml import data_splitter,classifiers_factory,meta_classifier
 from tiase.ml import toolbox
 import pytest
 
@@ -21,9 +21,9 @@ class TestMlClassifier:
         ds.split(0.7)
         
         g_classifiers = [
-            { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': 3, 'random_state': 1})},
-            { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(ds)},
-            { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(ds, params={'kernel': 'poly'})}
+            { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier(name="decision tree", params={'max_depth': 3, 'random_state': 1}, data_splitter=ds)},
+            { "name": "SVC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)},
+            { "name": "SVC_poly", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds)}
         ]
 
         for g_classifier in g_classifiers:

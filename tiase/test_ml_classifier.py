@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from tiase.fimport import synthetic
 from tiase.findicators import findicators
-from tiase.ml import data_splitter,classifier_naive,classifier_lstm,classifier_svc,classifier_xgboost,classifier_decision_tree
+from tiase.ml import data_splitter,classifiers_factory
 import pytest
 
 class TestMlClassifier:
@@ -20,7 +20,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierLSTM1(ds, params={'epochs': 5})
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5}, ds)
         ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
         results = model.evaluate_cross_validation(ds, "target")
         print(results)
@@ -34,7 +34,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=50)
         ds.split(0.7)
-        model = classifier_naive.ClassifierAlwaysSameClass(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("same class", None, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -48,7 +48,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=50)
         ds.split(0.7)
-        model = classifier_naive.ClassifierAlwaysAsPrevious(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("as previous", None, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -62,7 +62,7 @@ class TestMlClassifier:
         
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierLSTM1(ds, params={'epochs': 20})
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 20}, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -76,7 +76,7 @@ class TestMlClassifier:
         
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierLSTM2(ds, params={'epochs': 20})
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm2", {'epochs': 20}, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -90,7 +90,7 @@ class TestMlClassifier:
         
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierLSTM3(ds, params={'epochs': 20})
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm3", {'epochs': 20}, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -104,7 +104,7 @@ class TestMlClassifier:
         
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierLSTMHao2020(ds, params={'epochs': 20})
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstmhao2020", {'epochs': 20}, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -118,7 +118,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierBiLSTM(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("bilstm", None, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -132,7 +132,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_lstm.ClassifierCNNBiLSTM(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("cnnbilstm", None, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -146,7 +146,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=50)
         ds.split(0.7)
-        model = classifier_svc.ClassifierSVC(ds, params={'kernel': 'linear', 'c': 0.025})
+        model = classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'linear', 'c': 0.025}, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -160,7 +160,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_xgboost.ClassifierXGBoost(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("xgboost", None, ds)
         model.fit()
 
         model_analysis = model.get_analysis()
@@ -174,7 +174,7 @@ class TestMlClassifier:
 
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
-        model = classifier_decision_tree.ClassifierDecisionTree(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("decision tree", None, ds)
         model.fit()
 
         model_analysis = model.get_analysis()

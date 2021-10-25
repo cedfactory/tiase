@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from tiase.fimport import fimport
 from tiase.findicators import findicators
-from tiase.ml import toolbox,data_splitter,classifier_lstm,classifier_svc,classifier_xgboost,classifier_decision_tree,hyper_parameters_tuning
+from tiase.ml import toolbox,data_splitter,classifiers_factory,hyper_parameters_tuning
 import pytest
 
 class TestMlHyperParametersTuning:
@@ -22,7 +22,7 @@ class TestMlHyperParametersTuning:
         ds.split(0.7)
 
         # classifier
-        classifier = classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds)
+        classifier = classifiers_factory.ClassifiersFactory.get_classifier("decision tree", None, ds)
         classifier.build()
 
         # hyper parameters tuning

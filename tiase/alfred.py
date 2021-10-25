@@ -2,7 +2,7 @@ import xml.etree.cElementTree as ET
 from tiase.fimport import fimport,visu
 from tiase.fdatapreprocessing import fdataprep
 from tiase.findicators import findicators
-from tiase.ml import data_splitter,classifier_svc,classifier_lstm
+from tiase.ml import data_splitter,classifiers_factory
 
 from rich import print,inspect
 
@@ -156,10 +156,7 @@ def execute(filename):
                         parameter_value = parameter.get("value", None)
                         params[parameter_name] = parameter_value
 
-                if classifier_name == 'svc':
-                    model = classifier_svc.ClassifierSVC(data_splitter=ds)
-                elif classifier_name == "lstm1":
-                    model = classifier_lstm.ClassifierLSTM1(ds, params=params)
+                model = classifiers_factory.ClassifiersFactory.get_classifier(name=classifier_name, params=params, data_splitter=ds)
                 model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))

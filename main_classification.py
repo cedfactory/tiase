@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from tiase.fimport import fimport,synthetic,visu
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
-from tiase.ml import data_splitter,hyper_parameters_tuning,classifier_lstm,classifier_naive,classifier_svc,classifier_xgboost,classifier_decision_tree,meta_classifier,analysis,toolbox
+from tiase.ml import data_splitter,hyper_parameters_tuning,classifiers_factory,meta_classifier,analysis,toolbox
 import os
 from rich import print,inspect
 
@@ -43,7 +43,7 @@ def evaluate_hyper_parameters_tuning():
     ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
     ds.split(0.7)
 
-    dtc = classifier_decision_tree.ClassifierDecisionTree(target="target", data_splitter=ds)
+    dtc = classifiers_factory.ClassifiersFactory.get_classifier("decision tree", None, ds)
     dtc.fit()
     dtc_analysis = dtc.get_analysis()
     print("DTC")
@@ -77,19 +77,19 @@ def evaluate_classifiers(df, value, verbose=False):
         
     target = "target"
     g_classifiers = [
-        #{ "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': None})},
-        { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': 3})},
-        #{ "name": "DTC5", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': 5})},
-        #{ "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(ds, params={'epochs': 20})},
-        #{ "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(ds, params={'epochs': 20})},
-        #{ "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(ds, params={'epochs': 20})},
-        #{ "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(ds, params={'epochs': 40})},
-        #{ "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(ds, params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(ds)},
-        { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(ds, params={'kernel': 'poly'})},
-        #{ "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(ds)},
-        #{ "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(ds)},
-        #{ "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(ds, params={'class_to_return': 1})}
+        #{ "name": "DTC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': None}, ds)},
+        { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': 3}, ds)},
+        #{ "name": "DTC5", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': 5}, ds)},
+        #{ "name": "LSTM1", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 20}, ds)},
+        #{ "name": "LSTM2", "classifier" : cclassifiers_factory.ClassifiersFactory.get_classifier("lstm2", {'epochs': 20}, ds)},
+        #{ "name": "LSTM3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstm3", {'epochs': 20}, ds)},
+        #{ "name": "LSTM Hao 2020", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstmhao2020", {'epochs': 40}, ds)},
+        #{ "name": "BiLSTM", "classifier" : lassifiers_factory.ClassifiersFactory.get_classifier("bilstm", {'epochs': 20}, ds)},
+        { "name": "SVC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)},
+        { "name": "SVC_poly", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds)},
+        #{ "name": "XGBoost", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("xgboost, None, ds)},
+        #{ "name": "AlwaysAsPrevious", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("as previous", None, ds)},
+        #{ "name": "AlwaysSameClass", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("same class", {'class_to_return': 1}, ds)}
     ]
 
     test_vs_pred = []
