@@ -22,7 +22,7 @@ class TestMlHyperParametersTuning:
         ds.split(0.7)
 
         # classifier
-        classifier = classifier_decision_tree.ClassifierDecisionTree(df.copy(), target="target", data_splitter=ds)
+        classifier = classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds)
         classifier.build()
 
         # hyper parameters tuning

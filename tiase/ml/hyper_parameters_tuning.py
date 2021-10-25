@@ -7,7 +7,6 @@ class HPTGridSearch(classifier.Classifier):
     """
 
     def __init__(self, model, data_splitter, params=None):
-        super().__init__(model, data_splitter, params)
 
         self.param_grid = None
         self.scoring = 'roc_auc' # \in {'roc_auc', ''}

@@ -21,9 +21,9 @@ class TestMlClassifier:
         ds.split(0.7)
         
         g_classifiers = [
-            { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': 3, 'random_state': 1})},
-            { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds)},
-            { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds, params={'kernel': 'poly'})}
+            { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': 3, 'random_state': 1})},
+            { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(ds)},
+            { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(ds, params={'kernel': 'poly'})}
         ]
 
         for g_classifier in g_classifiers:
