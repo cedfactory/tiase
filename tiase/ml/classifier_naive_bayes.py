@@ -9,8 +9,8 @@ Input:
 ref : https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html
 '''
 class ClassifierGaussianNB(classifier.Classifier):
-    def __init__(self, dataframe, data_splitter, params = None):
-        super().__init__(dataframe, data_splitter, params)
+    def __init__(self, data_splitter, params = None):
+        super().__init__(data_splitter, params)
 
     def get_param_grid(self):
         return {}

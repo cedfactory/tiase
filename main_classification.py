@@ -24,7 +24,7 @@ def evaluate_cross_validation(value):
 
     ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
     ds.split(0.7)
-    model = classifier_lstm.ClassifierLSTM2(df.copy(), ds, params={'epochs': 5})
+    model = classifier_lstm.ClassifierLSTM2(ds, params={'epochs': 5})
     ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
     results = model.evaluate_cross_validation(ds, target)
     #print("Averaged accuracy : ", results["average_accuracy"])
@@ -43,7 +43,7 @@ def evaluate_hyper_parameters_tuning():
     ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
     ds.split(0.7)
 
-    dtc = classifier_decision_tree.ClassifierDecisionTree(df.copy(), target="target", data_splitter=ds)
+    dtc = classifier_decision_tree.ClassifierDecisionTree(target="target", data_splitter=ds)
     dtc.fit()
     dtc_analysis = dtc.get_analysis()
     print("DTC")
@@ -77,19 +77,19 @@ def evaluate_classifiers(df, value, verbose=False):
         
     target = "target"
     g_classifiers = [
-        #{ "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), data_splitter=ds, params={'max_depth': None})},
-        { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), data_splitter=ds, params={'max_depth': 3})},
-        #{ "name": "DTC5", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), data_splitter=ds, params={'max_depth': 5})},
-        #{ "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), ds, params={'epochs': 20})},
-        #{ "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), ds, params={'epochs': 20})},
-        #{ "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), ds, params={'epochs': 20})},
-        #{ "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), ds, params={'epochs': 40})},
-        #{ "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), ds, params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), ds)},
-        { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(df.copy(), ds, params={'kernel': 'poly'})},
-        #{ "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), ds)},
-        #{ "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), ds)},
-        #{ "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), ds, params={'class_to_return': 1})}
+        #{ "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': None})},
+        { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': 3})},
+        #{ "name": "DTC5", "classifier" : classifier_decision_tree.ClassifierDecisionTree(data_splitter=ds, params={'max_depth': 5})},
+        #{ "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(ds, params={'epochs': 20})},
+        #{ "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(ds, params={'epochs': 20})},
+        #{ "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(ds, params={'epochs': 20})},
+        #{ "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(ds, params={'epochs': 40})},
+        #{ "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(ds, params={'epochs': 20})},
+        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(ds)},
+        { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(ds, params={'kernel': 'poly'})},
+        #{ "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(ds)},
+        #{ "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(ds)},
+        #{ "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(ds, params={'class_to_return': 1})}
     ]
 
     test_vs_pred = []
@@ -158,7 +158,7 @@ def experiment(value):
 
     #y = synthetic.get_sinusoid(length=1000, amplitude=1, frequency=.1, phi=0, height = 0)
     #df = synthetic.create_dataframe(y, 0.8)
-    visu.display_from_dataframe(df,"Close", "close.png")
+    visu.display_from_dataframe(df, "Close", "close.png")
 
     evaluate_classifiers(df, "experiment", verbose=True)
 

@@ -4,8 +4,8 @@ import numpy as np
 from rich import print,inspect
 
 class ClassifierAlwaysSameClass(classifier.Classifier):
-    def __init__(self, dataframe, data_splitter, params = None):
-        super().__init__(dataframe, data_splitter, params)
+    def __init__(self, data_splitter, params = None):
+        super().__init__(data_splitter, params)
         self.class_to_return = 1
         self.seq_len = 50
         if params:
@@ -44,8 +44,8 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
 
 
 class ClassifierAlwaysAsPrevious(classifier.Classifier):
-    def __init__(self, dataframe, data_splitter, params = None):
-        super().__init__(dataframe, data_splitter, params)
+    def __init__(self, data_splitter, params = None):
+        super().__init__(data_splitter, params)
         self.seq_len = 50
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)

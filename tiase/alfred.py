@@ -157,9 +157,9 @@ def execute(filename):
                         params[parameter_name] = parameter_value
 
                 if classifier_name == 'svc':
-                    model = classifier_svc.ClassifierSVC(df.copy(), target=target, data_splitter=ds)
+                    model = classifier_svc.ClassifierSVC(data_splitter=ds)
                 elif classifier_name == "lstm1":
-                    model = classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params=params)
+                    model = classifier_lstm.ClassifierLSTM1(ds, params=params)
                 model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))
