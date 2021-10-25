@@ -16,8 +16,8 @@ Input:
 reference : https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier
 '''
 class ClassifierXGBoost(classifier.Classifier):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
 
         self.n_estimators = 100
         self.max_depth = None

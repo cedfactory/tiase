@@ -27,8 +27,8 @@ dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
 #
 class ClassifierLSTM(classifier.Classifier):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
 
         self.epochs = 170
         self.batch_size = 10
@@ -79,12 +79,12 @@ class ClassifierLSTM(classifier.Classifier):
     def save(self, filename):
         self.model.save(filename+".hdf5")
 
-    def evaluate_cross_validation(self, debug=False):
+    def evaluate_cross_validation(self, ds, target, debug=False):
         results = {}
         results["accuracies"] = []
         results["average_accuracy"] = 0
 
-        lst_cv_splits = classifier.set_train_test_cv_list(self.df)
+        lst_cv_splits = ds.split()
 
         # data for debug
         dump_analysis = pd.DataFrame(columns=dump_data_to_df)
@@ -95,7 +95,7 @@ class ClassifierLSTM(classifier.Classifier):
             frames = [lst_cv_splits[0][index_lst_split], lst_cv_splits[1][index_lst_split]]
             df_cv = pd.concat(frames)
 
-            self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(df_cv, self.seq_len, split_index, self.target)
+            self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(df_cv, self.seq_len, split_index, target)
             self.X_train = np.reshape(self.X_train, (self.X_train.shape[0], 1, self.X_train.shape[1]))
             self.X_test = np.reshape(self.X_test, (self.X_test.shape[0], 1, self.X_test.shape[1]))
 
@@ -178,8 +178,8 @@ Input:
 - batch_size = 10
 '''        
 class ClassifierLSTM1(ClassifierLSTM):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
 
         self.lstm_size = 100
         if params:
@@ -202,8 +202,8 @@ Input:
 - batch_size = 10
 '''  
 class ClassifierLSTM2(ClassifierLSTM):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
     
         self.lstm_size = 100
         if params:
@@ -230,8 +230,8 @@ Input:
 - batch_size = 10
 '''  
 class ClassifierLSTM3(ClassifierLSTM):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
     
         self.lstm_size = 100
         if params:
@@ -259,8 +259,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierLSTMHao2020(ClassifierLSTM):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
     
     def build(self):
         print("[Build ClassifierLSTMHao2020]")
@@ -296,8 +296,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierBiLSTM(ClassifierLSTM):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
     
     def build(self):
         print("[Build ClassifierBiLSTM]")
@@ -327,8 +327,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierCNNBiLSTM(ClassifierLSTM):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
     
     def inception_a(self, layer_in, c7):
         branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)

@@ -9,11 +9,6 @@ def get_pred_and_prob_with_predict_pred_and_predict_proba(model, data_splitter):
     y_test_prob = y_test_prob[:, 1]
     return y_test_pred, y_test_prob
 
-def set_train_test_cv_list(dataframe):
-    ds = data_splitter.DataSplitterForCrossValidation(dataframe, nb_splits=5)
-    list_df_train, list_df_test = ds.split()
-    return [list_df_train, list_df_test]
-
 def set_train_test_data(dataframe, seq_len, split_index, target):
     # split the data
     ds = data_splitter.DataSplitterTrainTestSimple(dataframe, target, seq_len)
@@ -24,9 +19,8 @@ def set_train_test_data(dataframe, seq_len, split_index, target):
 
 class Classifier(metaclass = ABCMeta):
     
-    def __init__(self, dataframe, target, data_splitter, params = None):
+    def __init__(self, dataframe, data_splitter, params = None):
         self.df = dataframe
-        self.target = target
         self.data_splitter = data_splitter
 
         self.seq_len = 21

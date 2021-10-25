@@ -13,8 +13,8 @@ Input:
 ref : https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
 '''
 class ClassifierSVC(classifier.Classifier):
-    def __init__(self, dataframe, target, data_splitter, params = None):
-        super().__init__(dataframe, target, data_splitter, params)
+    def __init__(self, dataframe, data_splitter, params = None):
+        super().__init__(dataframe, data_splitter, params)
 
         self.c = 1.
         self.kernel = "rbf"

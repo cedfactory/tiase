@@ -22,8 +22,11 @@ def evaluate_cross_validation(value):
     df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
     target = "target"
 
-    model = classifier_lstm.ClassifierLSTM2(df.copy(), target, params={'epochs': 5})
-    results = model.evaluate_cross_validation()
+    ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+    ds.split(0.7)
+    model = classifier_lstm.ClassifierLSTM2(df.copy(), ds, params={'epochs': 5})
+    ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
+    results = model.evaluate_cross_validation(ds, target)
     #print("Averaged accuracy : ", results["average_accuracy"])
     print(results)
 
@@ -74,19 +77,19 @@ def evaluate_classifiers(df, value, verbose=False):
         
     target = "target"
     g_classifiers = [
-        #{ "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': None})},
-        { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': 3})},
-        #{ "name": "DTC5", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), target=target, data_splitter=ds, params={'max_depth': 5})},
-        #{ "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), target, ds, params={'epochs': 20})},
-        #{ "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), target, ds, params={'epochs': 20})},
-        #{ "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), target, ds, params={'epochs': 20})},
-        #{ "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), target, ds, params={'epochs': 40})},
-        #{ "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), target, ds, params={'epochs': 20})},
-        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds)},
-        { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(df.copy(), target, ds, params={'kernel': 'poly'})},
-        #{ "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), target, ds)},
-        #{ "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), target, ds)},
-        #{ "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), target, ds, params={'class_to_return': 1})}
+        #{ "name": "DTC", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), data_splitter=ds, params={'max_depth': None})},
+        { "name": "DTC3", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), data_splitter=ds, params={'max_depth': 3})},
+        #{ "name": "DTC5", "classifier" : classifier_decision_tree.ClassifierDecisionTree(df.copy(), data_splitter=ds, params={'max_depth': 5})},
+        #{ "name": "LSTM1", "classifier" : classifier_lstm.ClassifierLSTM1(df.copy(), ds, params={'epochs': 20})},
+        #{ "name": "LSTM2", "classifier" : classifier_lstm.ClassifierLSTM2(df.copy(), ds, params={'epochs': 20})},
+        #{ "name": "LSTM3", "classifier" : classifier_lstm.ClassifierLSTM3(df.copy(), ds, params={'epochs': 20})},
+        #{ "name": "LSTM Hao 2020", "classifier" : classifier_lstm.ClassifierLSTMHao2020(df.copy(), ds, params={'epochs': 40})},
+        #{ "name": "BiLSTM", "classifier" : classifier_lstm.ClassifierBiLSTM(df.copy(), ds, params={'epochs': 20})},
+        { "name": "SVC", "classifier" : classifier_svc.ClassifierSVC(df.copy(), ds)},
+        { "name": "SVC_poly", "classifier" : classifier_svc.ClassifierSVC(df.copy(), ds, params={'kernel': 'poly'})},
+        #{ "name": "XGBoost", "classifier" : classifier_xgboost.ClassifierXGBoost(df.copy(), ds)},
+        #{ "name": "AlwaysAsPrevious", "classifier" : classifier_naive.ClassifierAlwaysAsPrevious(df.copy(), ds)},
+        #{ "name": "AlwaysSameClass", "classifier" : classifier_naive.ClassifierAlwaysSameClass(df.copy(), ds, params={'class_to_return': 1})}
     ]
 
     test_vs_pred = []
