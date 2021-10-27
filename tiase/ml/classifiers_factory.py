@@ -1,6 +1,7 @@
 from tiase.ml import classifier_lstm,classifier_gaussian_process,classifier_mlp,classifier_naive,classifier_naive_bayes,classifier_svc,classifier_xgboost,classifier_decision_tree
 
 class ClassifiersFactory:
+    @staticmethod
     def get_classifier(name, params, data_splitter):
         if name == "same class":
             return classifier_naive.ClassifierAlwaysSameClass(data_splitter=data_splitter, params=params)
