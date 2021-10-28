@@ -4,8 +4,7 @@ from sklearn import preprocessing
 
 import tensorflow as tf
 from keras.models import Model
-from keras.layers import Dense, Dropout, LSTM, Input, Activation, concatenate
-from keras import optimizers
+from keras.layers import Dense, Dropout, LSTM, Input, Activation
 import numpy as np
 import xml.etree.cElementTree as ET
 import matplotlib.pyplot as plt
@@ -99,7 +98,7 @@ class LSTMHaoBasic:
         output = Activation('linear', name='output')(inputs)
 
         self.model = Model(inputs=lstm_input, outputs=output)
-        adam = optimizers.Adam(lr = 0.0008)
+        adam = tf.keras.optimizers.Adam(lr = 0.0008)
         self.model.compile(optimizer=adam, loss='mse')
 
         # training
@@ -200,7 +199,7 @@ class LSTMHaoTrend:
         output = Activation('linear', name='output')(inputs)
 
         self.model = Model(inputs=lstm_input, outputs=output)
-        adam = optimizers.Adam(lr = 0.002)
+        adam = tf.keras.optimizers.Adam(lr = 0.002)
 
         self.model.compile(optimizer=adam, loss='mse')
         self.history = self.model.fit(x=self.x_train, y=self.y_train, batch_size=15, epochs=epochs, shuffle=True, validation_split = 0.1)
