@@ -187,14 +187,10 @@ class ClassifierLSTM1(ClassifierLSTM):
 
     def build(self):
         print("[Build ClassifierLSTM1]")
-        def create_keras_classifier():
-            model = Sequential()
-            model.add(LSTM(self.lstm_size, input_shape=(1, self.input_size)))
-            model.add(Dense(1, activation='sigmoid'))
-            model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-            return model
-
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = Sequential()
+        self.model.add(LSTM(self.lstm_size, input_shape=(1, self.input_size)))
+        self.model.add(Dense(1, activation='sigmoid'))
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def get_param_grid(self):
         return {
