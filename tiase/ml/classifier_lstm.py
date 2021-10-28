@@ -77,7 +77,7 @@ class ClassifierLSTM(classifier.Classifier):
         self.model = tf.keras.models.load_model(filename+".hdf5")
 
     def save(self, filename):
-        self.model.save(filename+".hdf5")
+        self.model.model_.save(filename+".hdf5")
 
     def evaluate_cross_validation(self, ds, target, debug=False):
         results = {}
@@ -194,7 +194,7 @@ class ClassifierLSTM1(ClassifierLSTM):
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
             return model
 
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier)
 
     def get_param_grid(self):
         return {
@@ -231,7 +231,7 @@ class ClassifierLSTM2(ClassifierLSTM):
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
             return model
 
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier)
 
 
 '''
@@ -262,7 +262,7 @@ class ClassifierLSTM3(ClassifierLSTM):
             model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
             return model
 
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier)
 
 '''
 LSTMHao2020
@@ -306,7 +306,7 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
 
             return model
 
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier)
 
 '''
 BiLSTM
@@ -341,7 +341,7 @@ class ClassifierBiLSTM(ClassifierLSTM):
 
             return model
 
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier)
 
 '''
 CNN + Bi-LSTM model
@@ -474,4 +474,4 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
 
             return model
 
-        self.model = KerasClassifier(build_fn=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier)
