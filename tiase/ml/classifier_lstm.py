@@ -70,7 +70,7 @@ class ClassifierLSTM(classifier.Classifier):
         self.threshold, self.y_test_pred = toolbox.get_classification_threshold("naive", self.y_test, self.y_test_prob)
 
         self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
-        self.analysis["history"] = getattr(self.model, "history", None)
+        self.analysis["history"] = self.model.history_
         return self.analysis
 
     def load(self, filename):

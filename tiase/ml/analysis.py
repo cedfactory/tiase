@@ -120,13 +120,11 @@ def export_roc_curves(testvspreds, filename, value):
     plt.close(idfigroc)
 
 def export_history(name, history):
-    #print(history.history["history"].keys())
-
-    if ('accuracy' in history.history.keys()):
+    if 'accuracy' in history.keys():
         # summarize history for accuracy
         fig = plt.figure(1)
-        plt.plot(history.history['accuracy'])
-        plt.plot(history.history['val_accuracy'])
+        plt.plot(history['accuracy'])
+        plt.plot(history['val_accuracy'])
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
@@ -135,11 +133,11 @@ def export_history(name, history):
         fig.savefig(name+"_accuracy.png")
         plt.close(1)
 
-    if ('loss' in history.history.keys()):
+    if 'loss' in history.keys():
         # summarize history for loss
         fig = plt.figure(1)
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
+        plt.plot(history['loss'])
+        plt.plot(history['val_loss'])
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
