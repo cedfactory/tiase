@@ -7,7 +7,7 @@ import pytest
 
 class TestMlHyperParametersTuning:
 
-    def test_HPTGridSearch(self):
+    def _HPTGridSearch(self, classifiername, param_grid=None):
         # data        
         filename = "./tiase/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
@@ -22,17 +22,21 @@ class TestMlHyperParametersTuning:
         ds.split(0.7)
 
         # classifier
-        classifier = classifiers_factory.ClassifiersFactory.get_classifier("decision tree", None, ds)
+        classifier = classifiers_factory.ClassifiersFactory.get_classifier(classifiername, None, ds)
         classifier.build()
+        if param_grid != None:
+            classifier.param_grid = param_grid
+
+        # hack to transform data feeding the lstm classifier
+        # todo : uniformization of the input
+        if "classifiername == lstm1":
+            ds.X_train = np.reshape(ds.X_train, (ds.X_train.shape[0], 1, ds.X_train.shape[1]))
+            ds.X_test = np.reshape(ds.X_test, (ds.X_test.shape[0], 1, ds.X_test.shape[1]))
 
         # hyper parameters tuning
-        hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(classifier, ds)
+        hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(ds, {"classifier":classifier})
         best_params = hpt_grid_search.fit()
         print(best_params)
-
-        assert(best_params["criterion"] == 'entropy')
-        assert(best_params["max_depth"] == 2)
-        assert(best_params["splitter"] == 'best')
 
         model_analysis = hpt_grid_search.get_analysis()
         print("Analysis")
@@ -41,7 +45,30 @@ class TestMlHyperParametersTuning:
         print("Recall :    {:.4f}".format(model_analysis["recall"]))
         print("f1_score :  {:.4f}".format(model_analysis["f1_score"]))
 
+        return best_params, model_analysis
+
+
+    def test_HPTGridSearch_decision_tree(self):
+        best_params, model_analysis = self._HPTGridSearch("decision tree")
+
+        assert(best_params["criterion"] == 'entropy')
+        assert(best_params["max_depth"] == 2)
+        assert(best_params["splitter"] == 'best')
+
         assert(model_analysis["accuracy"] == pytest.approx(0.389, 0.01))
         assert(model_analysis["precision"] == pytest.approx(1., 0.01))
         assert(model_analysis["recall"] == pytest.approx(.0175, 0.01))
         assert(model_analysis["f1_score"] == pytest.approx(.0345, 0.01))
+
+    def test_HPTGridSearch_decision_tree(self):
+        best_params, model_analysis = self._HPTGridSearch("lstm1", {'epochs': [5, 10], 'batch_size': [10, 15]})
+        '''
+        # todo  : investigate why the results are not reproductible
+        assert(best_params["epochs"] == 10)
+        assert(best_params["batch_size"] == 10)
+
+        assert(model_analysis["accuracy"] == pytest.approx(0.6213, 0.01))
+        assert(model_analysis["precision"] == pytest.approx(0.6213, 0.01))
+        assert(model_analysis["recall"] == pytest.approx(1.0000, 0.01))
+        assert(model_analysis["f1_score"] == pytest.approx(0.7664, 0.01))
+        '''

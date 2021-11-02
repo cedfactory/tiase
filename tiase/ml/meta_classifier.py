@@ -23,7 +23,7 @@ class MetaClassifierVoting:
         '''
         self.classifiers = classifiers
 
-        self.voting = "hard"
+        self.voting = "soft"
         if params:
             self.voting = params.get("voting", self.voting)
 

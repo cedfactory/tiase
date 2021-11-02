@@ -43,7 +43,7 @@ class TestAlfred:
         self.common_process("./tiase/data/test/alfred_discretization.xml", "./tiase/data/test/alfred_discretization_reference.csv")
 
     def test_outliers_classifier(self):
-        out_file = "./tmp/lstm1.hdf5"
+        out_file = "./tmp/lstm1_1.hdf5"
         if os.path.isfile(out_file):
             os.remove(out_file)
 

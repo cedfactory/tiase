@@ -26,6 +26,7 @@ dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
 #
 # Simple LSTM for Sequence Classification
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
+# https://github.com/MohammadFneish7/Keras_LSTM_Diagram
 #
 class ClassifierLSTM(classifier.Classifier):
     def __init__(self, data_splitter, params = None):
@@ -40,12 +41,12 @@ class ClassifierLSTM(classifier.Classifier):
         if isinstance(self.epochs, str):
             self.epochs = int(self.epochs)
 
-        self.X_train = self.data_splitter.X_train
+        self.X_train = self._transform_X(self.data_splitter.X_train)
         self.y_train = self.data_splitter.y_train
-        self.X_test = self.data_splitter.X_test
+        self.X_test = self._transform_X(self.data_splitter.X_test)
         self.y_test = self.data_splitter.y_test
         self.x_normaliser = self.data_splitter.normalizer
-        self.input_size = self.X_train.shape[1]
+        self.input_size = self.X_train.shape[2]
 
     def _transform_X(self, X):
         return np.reshape(X, (X.shape[0], 1, X.shape[1]))
@@ -58,21 +59,20 @@ class ClassifierLSTM(classifier.Classifier):
         self.build()
 
         #print(self.model.summary())
-        X_train = self._transform_X(self.X_train)
-        X_test = self._transform_X(self.X_test)
-
-        self.history = self.model.fit(X_train, self.y_train, validation_data=(X_test, self.y_test), epochs=self.epochs, batch_size=self.batch_size, verbose=0)
+        self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=self.batch_size, verbose=0)
 
     def get_model(self):
         return self.model
 
+    def get_param_grid(self):
+        return self.param_grid
+
     def get_analysis(self):
-        X_test = self._transform_X(self.X_test)
-        self.y_test_prob = self.model.predict(X_test)
+        self.y_test_prob = self.model.predict(self.X_test)
 
         self.threshold, self.y_test_pred = toolbox.get_classification_threshold("naive", self.y_test, self.y_test_prob)
 
-        self.analysis = analysis.classification_analysis(X_test, self.y_test, self.y_test_pred, self.y_test_prob)
+        self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         self.analysis["history"] = self.model.history_
         return self.analysis
 
@@ -99,15 +99,16 @@ class ClassifierLSTM(classifier.Classifier):
             df_cv = pd.concat(frames)
 
             self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(df_cv, self.seq_len, split_index, target)
-            X_train = self._transform_X(self.X_train)
-            X_test = self._transform_X(self.X_test)
 
             # create the model
             tf.random.set_seed(20)
             np.random.seed(10)
 
+            self.X_train = self._transform_X(self.X_train)
+            self.X_test = self._transform_X(self.X_test)
+
             self.build()
-            self.history = self.model.fit(X_train, self.y_train, validation_data=(X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
+            self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
 
             self.get_analysis()
             results["accuracies"].append(self.analysis["accuracy"])
@@ -185,8 +186,13 @@ class ClassifierLSTM1(ClassifierLSTM):
         super().__init__(data_splitter, params)
 
         self.lstm_size = 100
+        self.param_grid = {
+            'epochs': [10, 20, 30, 40],
+            'batch_size': [5, 10, 15, 20, 25]
+        }
         if params:
             self.lstm_size = params.get("lstm_size", self.lstm_size)
+            self.param_grid = params.get("param_grid", self.param_grid)
 
     def build(self):
         print("[Build ClassifierLSTM1]")
@@ -198,12 +204,6 @@ class ClassifierLSTM1(ClassifierLSTM):
             return model
 
         self.model = KerasClassifier(model=create_keras_classifier)
-
-    def get_param_grid(self):
-        return {
-            'epochs': [10, 20, 30, 40, 50, 60, 80, 100],
-            'batch_size': [5, 10, 15, 20, 25]
-        }
 
 '''
 LSTM2

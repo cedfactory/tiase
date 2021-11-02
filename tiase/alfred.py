@@ -141,9 +141,11 @@ def execute(filename):
 
         # learning model
         classifiers_node = ding.find('classifiers')
+        library_models = {}
         if classifiers_node:
             for classifier in classifiers_node:
-                classifier_name = classifier.get("name", None)
+                classifier_id = classifier.get("id", None)
+                classifier_type = classifier.get("type", None)
                 export_filename = classifier.get("export", None)
                 ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
                 ds.split(0.7)
@@ -154,9 +156,19 @@ def execute(filename):
                     for parameter in parameters_node:
                         parameter_name = parameter.get("name", None)
                         parameter_value = parameter.get("value", None)
-                        params[parameter_name] = parameter_value
+                        if parameter_name != None and parameter_value != None:
+                            if parameter_name == "classifier":
+                                print(parameter_name)
+                                print(parameter_value)
+                                print(library_models[parameter_value])
+                                parameter_value = library_models[parameter_value]
+                                print(parameter_value)
+                                
+                            params[parameter_name] = parameter_value
 
-                model = classifiers_factory.ClassifiersFactory.get_classifier(name=classifier_name, params=params, data_splitter=ds)
+                model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params, data_splitter=ds)
+                library_models[classifier_id] = model
+
                 model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))

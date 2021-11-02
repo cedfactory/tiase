@@ -6,28 +6,34 @@ class HPTGridSearch(classifier.Classifier):
     reference : https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
     """
 
-    def __init__(self, model, data_splitter, params=None):
+    def __init__(self, data_splitter, params=None):
 
+        self.classifier = None
         self.param_grid = None
         self.scoring = 'roc_auc' # \in {'roc_auc', ''}
         if params:
             self.param_grid = params.get("param_grid", self.param_grid)
             self.scoring = params.get("scoring", self.scoring)
+            self.classifier = params.get("classifier", self.classifier)
 
         self.data_splitter = data_splitter
-        self.model = model
-        self.param_grid = self.model.get_param_grid()
+        self.param_grid = self.classifier.get_param_grid()
 
     def build(self):
-        self.tuner = GridSearchCV(estimator=self.model.get_model(), param_grid=self.param_grid, scoring=self.scoring)
+        self.model = GridSearchCV(estimator=self.classifier.get_model(), param_grid=self.param_grid, scoring=self.scoring)
 
     def fit(self):
         self.build()
-        self.tuner.fit(self.data_splitter.X_train, self.data_splitter.y_train)
-        return self.tuner.best_params_
+        print("begin fit")
+        print(self.data_splitter.X_train.shape)
+        print(self.data_splitter.X_test.shape)
+        self.model.fit(self.data_splitter.X_train, self.data_splitter.y_train)
+        print("end fit")
+        print(self.model.best_params_)
+        return self.model.best_params_
 
     def get_analysis(self):
-        y_test_pred, y_test_prob = classifier.get_pred_and_prob_with_predict_pred_and_predict_proba(self.tuner, self.data_splitter)
+        y_test_pred, y_test_prob = classifier.get_pred_and_prob_with_predict_pred_and_predict_proba(self.model, self.data_splitter)
         return analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, y_test_pred, y_test_prob)
 
     def save(self, filename):

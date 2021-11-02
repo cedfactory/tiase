@@ -21,7 +21,7 @@ class TestMlClassifier:
         ds.split(0.7)
         
         g_classifiers = [
-            { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier(name="decision tree", params={'max_depth': 3, 'random_state': 1}, data_splitter=ds)},
+            { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier(type="decision tree", params={'max_depth': 3, 'random_state': 1}, data_splitter=ds)},
             { "name": "SVC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)},
             { "name": "SVC_poly", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds)}
         ]

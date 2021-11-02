@@ -18,11 +18,18 @@
         </featureengeineering>
         <export filename="./tmp/df.csv"/>
         <classifiers>
-            <classifier name="lstm1" export="./tmp/lstm1">
+            <classifier id="lstm1_1" type="lstm1" export="./tmp/lstm1_1">
                 <parameters>
                     <parameter name="epochs" value="15"/>
                 </parameters>
             </classifier>
+            <!--<classifier id="decision_tree_1" type="decision tree">
+            </classifier>
+            <classifier type="grid search">
+                <parameters>
+                    <parameter name="classifier" value="decision_tree_1"/>
+                </parameters>
+            </classifier>-->            
         </classifiers>
     </ding>
 </dings>
