@@ -81,6 +81,21 @@ class TestIndicators:
         assert(false_positive == pytest.approx(11.111, 0.001))
         assert(false_negative == pytest.approx(22.222, 0.001))
 
+    def test_get_stats_for_trend_up(self):
+        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27, 28]}
+        df = pd.DataFrame(data)
+        trend_ratio = findicators.get_stats_for_trend_up(df, 1)
+        assert(trend_ratio == 70.)
+
+    def test_get_stats_on_trend_today_equals_trend_tomorrow(self):
+        data = {'close':[20, 21, 23, 19, 18, 24, 25, 26, 27, 28]}
+        df = pd.DataFrame(data)
+        true_positive, true_negative, false_positive, false_negative = findicators.get_stats_on_trend_today_equals_trend_tomorrow(df)
+        assert(true_positive == pytest.approx(55.5555, 0.001))
+        assert(true_negative == pytest.approx(11.111, 0.001))
+        assert(false_positive == pytest.approx(11.111, 0.001))
+        assert(false_negative == pytest.approx(22.222, 0.001))
+
     def test_vsa(self):
         df = self.get_real_dataframe()
         df = df.head(200)
