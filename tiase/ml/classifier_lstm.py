@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
+from keras.layers import Reshape, Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 from keras import backend
@@ -41,12 +41,12 @@ class ClassifierLSTM(classifier.Classifier):
         if isinstance(self.epochs, str):
             self.epochs = int(self.epochs)
 
-        self.X_train = self._transform_X(self.data_splitter.X_train)
+        self.X_train = self.data_splitter.X_train
         self.y_train = self.data_splitter.y_train
-        self.X_test = self._transform_X(self.data_splitter.X_test)
+        self.X_test = self.data_splitter.X_test
         self.y_test = self.data_splitter.y_test
         self.x_normaliser = self.data_splitter.normalizer
-        self.input_size = self.X_train.shape[2]
+        self.input_size = self.X_train.shape[1]
 
     def _transform_X(self, X):
         return np.reshape(X, (X.shape[0], 1, X.shape[1]))
@@ -198,6 +198,7 @@ class ClassifierLSTM1(ClassifierLSTM):
         print("[Build ClassifierLSTM1]")
         def create_keras_classifier():
             model = Sequential()
+            model.add(Reshape((1, self.input_size), input_shape=(self.input_size,)))
             model.add(LSTM(self.lstm_size, input_shape=(1, self.input_size)))
             model.add(Dense(1, activation='sigmoid'))
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -226,6 +227,7 @@ class ClassifierLSTM2(ClassifierLSTM):
         print("[Build ClassifierLSTM2]")
         def create_keras_classifier():
             model = Sequential()
+            model.add(Reshape((1, self.input_size), input_shape=(self.input_size,)))
             model.add(LSTM(self.lstm_size, input_shape=(1, self.input_size)))
             model.add(Dropout(0.5))
             model.add(Dense(self.lstm_size, activation='sigmoid'))
@@ -258,8 +260,9 @@ class ClassifierLSTM3(ClassifierLSTM):
     def build(self):
         print("[Build ClassifierLSTM3]")
         def create_keras_classifier():
-            inputs = keras.Input(shape=(1, self.input_size))
-            x = layers.LSTM(self.lstm_size, activation="sigmoid")(inputs)
+            inputs = keras.Input(shape=(self.input_size,))
+            reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(inputs)
+            x = layers.LSTM(self.lstm_size, activation="sigmoid")(reshaped)
             outputs = layers.Dense(1)(x)
             model = keras.Model(inputs=inputs, outputs=outputs)
             model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
@@ -286,8 +289,9 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
     def build(self):
         print("[Build ClassifierLSTMHao2020]")
         def create_keras_classifier():
-            inputs = keras.Input(shape=(1, self.input_size), name="Input")
-            convmax2 = Conv1D(10, 3, activation="relu", padding='same')(inputs)
+            inputs = keras.Input(shape=(self.input_size,), name="Input")
+            reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(inputs)
+            convmax2 = Conv1D(10, 3, activation="relu", padding='same')(reshaped)
             convmax2 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax2)
             
             convmax3 = Conv1D(20, 3, activation="relu", padding='same')(convmax2)
@@ -296,7 +300,7 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
 
             F2 = layers.LSTM(10, activation="sigmoid")(convmax2)
             
-            F1 = layers.LSTM(10, activation="sigmoid")(inputs)
+            F1 = layers.LSTM(10, activation="sigmoid")(reshaped)
 
             concat = layers.concatenate([F1, F2, F3])
 
@@ -327,9 +331,10 @@ class ClassifierBiLSTM(ClassifierLSTM):
     def build(self):
         print("[Build ClassifierBiLSTM]")
         def create_keras_classifier():
-            in_seq = keras.Input(shape=(1, self.input_size))
-        
-            x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(in_seq)
+            in_seq = keras.Input(shape=(self.input_size,))
+            reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(in_seq)
+            
+            x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(reshaped)
             x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
             x = layers.Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x) 
         
@@ -452,10 +457,11 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
     def build(self):
         print("[Build ClassifierCNNBiLSTM]")
         def create_keras_classifier():
-            in_seq = keras.Input(shape=(1, self.input_size))
+            in_seq = keras.Input(shape=(self.input_size,))
+            reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(in_seq)
             c7 = int(self.seq_len/4)
 
-            x = self.inception_a(in_seq, c7)
+            x = self.inception_a(reshaped, c7)
             x = self.inception_a(x, c7)
             x = self.inception_b(x, c7)
             x = self.inception_b(x, c7)

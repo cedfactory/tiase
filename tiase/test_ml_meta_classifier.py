@@ -20,14 +20,14 @@ class TestMlClassifier:
         ds = data_splitter.DataSplitterTrainTestSimple(df, target=target, seq_len=21)
         ds.split(0.7)
         
-        g_classifiers = [
-            { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier(type="decision tree", params={'max_depth': 3, 'random_state': 1}, data_splitter=ds)},
-            { "name": "SVC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)},
-            { "name": "SVC_poly", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds)}
+        classifiers = [
+            ("DTC3", classifiers_factory.ClassifiersFactory.get_classifier(type="decision tree", params={'max_depth': 3, 'random_state': 1}, data_splitter=ds)),
+            ("SVC", classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)),
+            ("SVC_poly", classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds))
         ]
 
-        for g_classifier in g_classifiers:
-            model = g_classifier["classifier"]
+        for classifier in classifiers:
+            model = classifier[1]
             model.fit()
             '''
             model_analysis = model.get_analysis()
@@ -37,9 +37,7 @@ class TestMlClassifier:
             print("f1_score :  {:.3f}".format(model_analysis["f1_score"]))
             '''
 
-        estimators = meta_classifier.prepare_models_for_meta_classifier_voting(g_classifiers)
-        meta_voting = meta_classifier.MetaClassifierVoting(estimators, data_splitter=ds, params={'voting': 'soft'})
-        meta_voting.build()
+        meta_voting = meta_classifier.MetaClassifierVoting(data_splitter=ds, params={'classifiers':classifiers, 'voting': 'soft'})
         meta_voting.fit()
         metamodel_analysis = meta_voting.get_analysis()
         '''

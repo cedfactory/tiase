@@ -37,22 +37,24 @@ def evaluate_hyper_parameters_tuning():
 
     df = findicators.normalize_column_headings(df)
     df = toolbox.make_target(df, "pct_change", 7)
-    df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
+    #df = findicators.remove_features(df, ["open","adj_close","low","high","volume"])
+    df = findicators.remove_features(df, ["adj_close","low","high","volume"])
     print(df.head())
 
-    ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+    ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=3)
     ds.split(0.7)
 
-    dtc = classifiers_factory.ClassifiersFactory.get_classifier("decision tree", None, ds)
-    dtc.fit()
-    dtc_analysis = dtc.get_analysis()
+    classifier = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 10}, ds)
+    classifier.build()
+    '''classifier.fit()
+    classifier_analysis = classifier.get_analysis()
     print("DTC")
-    print("Accuracy :  {:.3f}".format(dtc_analysis["accuracy"]))
-    print("Precision : {:.3f}".format(dtc_analysis["precision"]))
-    print("Recall :    {:.3f}".format(dtc_analysis["recall"]))
-    print("f1_score :  {:.3f}".format(dtc_analysis["f1_score"]))
+    print("Accuracy :  {:.3f}".format(classifier_analysis["accuracy"]))
+    print("Precision : {:.3f}".format(classifier_analysis["precision"]))
+    print("Recall :    {:.3f}".format(classifier_analysis["recall"]))
+    print("f1_score :  {:.3f}".format(classifier_analysis["f1_score"]))'''
 
-    hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(dtc, ds)
+    hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(ds, {"classifier":classifier})
     result = hpt_grid_search.fit()
     print(result)
 
@@ -134,24 +136,6 @@ def evaluate_classifiers(df, value, verbose=False):
         test_vs_pred.append(analysis.testvspred(name, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
     analysis.export_roc_curves(test_vs_pred, "roc_curves_"+value+".png", value)
-
-
-    #
-    # ensemble
-    #
-    estimators = meta_classifier.prepare_models_for_meta_classifier_voting(g_classifiers)
-    meta_voting = meta_classifier.MetaClassifierVoting(estimators, data_splitter=ds)
-    meta_voting.build()
-    meta_voting.fit()
-    metamodel_analysis = meta_voting.get_analysis()
-
-    if verbose:
-        print("meta_model")
-        print("Accuracy :  {:.3f}".format(metamodel_analysis["accuracy"]))
-        print("Precision : {:.3f}".format(metamodel_analysis["precision"]))
-        print("Recall :    {:.3f}".format(metamodel_analysis["recall"]))
-        print("f1_score :  {:.3f}".format(metamodel_analysis["f1_score"]))
-
 
 def experiment(value):
 

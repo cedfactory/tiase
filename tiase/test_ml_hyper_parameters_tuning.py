@@ -27,12 +27,6 @@ class TestMlHyperParametersTuning:
         if param_grid != None:
             classifier.param_grid = param_grid
 
-        # hack to transform data feeding the lstm classifier
-        # todo : uniformization of the input
-        if "classifiername == lstm1":
-            ds.X_train = np.reshape(ds.X_train, (ds.X_train.shape[0], 1, ds.X_train.shape[1]))
-            ds.X_test = np.reshape(ds.X_test, (ds.X_test.shape[0], 1, ds.X_test.shape[1]))
-
         # hyper parameters tuning
         hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(ds, {"classifier":classifier})
         best_params = hpt_grid_search.fit()
@@ -60,11 +54,12 @@ class TestMlHyperParametersTuning:
         assert(model_analysis["recall"] == pytest.approx(.0175, 0.01))
         assert(model_analysis["f1_score"] == pytest.approx(.0345, 0.01))
 
-    def test_HPTGridSearch_decision_tree(self):
+    def test_HPTGridSearch_lstm1(self):
         best_params, model_analysis = self._HPTGridSearch("lstm1", {'epochs': [5, 10], 'batch_size': [10, 15]})
-        '''
+
         # todo  : investigate why the results are not reproductible
-        assert(best_params["epochs"] == 10)
+        '''
+        assert(best_params["epochs"] == 15)
         assert(best_params["batch_size"] == 10)
 
         assert(model_analysis["accuracy"] == pytest.approx(0.6213, 0.01))
@@ -72,3 +67,4 @@ class TestMlHyperParametersTuning:
         assert(model_analysis["recall"] == pytest.approx(1.0000, 0.01))
         assert(model_analysis["f1_score"] == pytest.approx(0.7664, 0.01))
         '''
+

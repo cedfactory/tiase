@@ -1,4 +1,4 @@
-from tiase.ml import classifier_lstm,classifier_gaussian_process,classifier_mlp,classifier_naive,classifier_naive_bayes,classifier_svc,classifier_xgboost,classifier_decision_tree,hyper_parameters_tuning
+from tiase.ml import classifier_lstm,classifier_gaussian_process,classifier_mlp,classifier_naive,classifier_naive_bayes,classifier_svc,classifier_xgboost,classifier_decision_tree,hyper_parameters_tuning,meta_classifier
 
 class ClassifiersFactory:
     @staticmethod
@@ -33,5 +33,7 @@ class ClassifiersFactory:
             return classifier_lstm.ClassifierCNNBiLSTM(data_splitter=data_splitter, params=params)
         elif type == 'grid search':
             return hyper_parameters_tuning.HPTGridSearch(data_splitter=data_splitter, params=params)
+        elif type == 'voting':
+            return meta_classifier.MetaClassifierVoting(data_splitter=data_splitter, params=params)
 
 

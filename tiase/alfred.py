@@ -145,6 +145,7 @@ def execute(filename):
         if classifiers_node:
             for classifier in classifiers_node:
                 classifier_id = classifier.get("id", None)
+                print("[CLASSIFIER] Treating {}".format(classifier_id))
                 classifier_type = classifier.get("type", None)
                 export_filename = classifier.get("export", None)
                 ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
@@ -157,19 +158,31 @@ def execute(filename):
                         parameter_name = parameter.get("name", None)
                         parameter_value = parameter.get("value", None)
                         if parameter_name != None and parameter_value != None:
+
+                            def get_classifier_from_name(classifier_name):
+                                classifier_value = library_models[classifier_name]
+                                if classifier_value != None:
+                                    print("{} found ({})".format(classifier_name, classifier_value))
+                                else:
+                                    print("!!! {} not found !!!".format(parameter_value))
+                                return classifier_value
+
+                            # replace classifier name with classifier model
                             if parameter_name == "classifier":
-                                print(parameter_name)
+                                parameter_value = get_classifier_from_name(parameter_value)
+
+                            elif parameter_name == "classifiers":
+                                classifier_names = parameter_value.split(',')
+                                parameter_value = [(classifier_name, get_classifier_from_name(classifier_name)) for classifier_name in classifier_names]
                                 print(parameter_value)
-                                print(library_models[parameter_value])
-                                parameter_value = library_models[parameter_value]
-                                print(parameter_value)
-                                
-                            params[parameter_name] = parameter_value
+
+                            if parameter_value:
+                                params[parameter_name] = parameter_value
 
                 model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params, data_splitter=ds)
+                model.fit()
                 library_models[classifier_id] = model
 
-                model.fit()
                 model_analysis = model.get_analysis()
                 print("Precision : {:.2f}".format(model_analysis["precision"]))
                 print("Recall : {:.2f}".format(model_analysis["recall"]))

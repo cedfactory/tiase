@@ -24,11 +24,7 @@ class HPTGridSearch(classifier.Classifier):
 
     def fit(self):
         self.build()
-        print("begin fit")
-        print(self.data_splitter.X_train.shape)
-        print(self.data_splitter.X_test.shape)
         self.model.fit(self.data_splitter.X_train, self.data_splitter.y_train)
-        print("end fit")
         print(self.model.best_params_)
         return self.model.best_params_
 
