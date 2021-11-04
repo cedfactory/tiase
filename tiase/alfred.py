@@ -2,40 +2,13 @@ import xml.etree.cElementTree as ET
 from tiase.fimport import fimport,visu
 from tiase.fdatapreprocessing import fdataprep
 from tiase.findicators import findicators
-from tiase.ml import data_splitter,classifiers_factory
-
+from tiase.ml import data_splitter,classifiers_factory,analysis
+from datetime import datetime
+import os
 from rich import print,inspect
 
-'''
-process :
-*** import data ***
-- dataframe ohlcv
-- simple_rtn & target computation
-- [drop ohlvc?]
-*** data processing ***
-- outliers (\in {stdcutoff, winsorize, mam, ema}
-- indicators computation (especially if close are updated by the outliers computation)
-- transform \in {log, x2}
-- discretization \in {supervised, unsupervised}
-*** feature engineering ***
-- reduction \in {correlation, pca, rfecv, vsa}
-- balancing \in {smote}
-*** machine learning ***
-- classifier | regressor (\in {svc, xgboost, keras, ...})
-
-
-
-input :
-- value (AI.PA, ...)
-- outliers method
-- technical indicators list
-- drop ohlcv ?
-- transform {"method1" : [indicators], "method2" : [indicators]}
-- discretize {"indicator" : method + params (eg strategy for KBinsDiscretizer) + #bins (2 by default)}
-- reduction : method + threshold (0.95 by default)
-- balancing
-- learning model
-'''
+def out(msg):
+    print(msg)
 
 def execute(filename):
     tree = ET.parse(filename)
@@ -51,50 +24,69 @@ def execute(filename):
 |___|_|_|_|_  |
           |___|'''
     for ding in root.findall('ding'):
-        print(ding_msg)
+        export_root = ding.get("export", "./")
+        if export_root and not os.path.isdir(export_root):
+            os.mkdir(export_root)
+
+        def get_full_path(filename):
+            return export_root + '/' + filename
+
+        start = datetime.now()
+        out(ding_msg)
 
         # import
         import_node = ding.find('import')
         if import_node is not None:
             value = import_node.get("value", None)
             import_filename = import_node.get("filename", None)
-            if value != None:
-                print("value : {}".format(value))
+            export_filename = import_node.get("export", None)
+            if value:
+                out("value : {}".format(value))
                 df = fimport.get_dataframe_from_yahoo(value)
-            elif import_filename != None:
-                print("filename : {}".format(import_filename))
+            elif import_filename:
+                out("filename : {}".format(import_filename))
                 df = fimport.get_dataframe_from_csv(import_filename)
-            print(df.head())
+                value = "" # value is used as name to export files, so we can't leave it with None value
+            out(df.head())
+
+            if export_filename:
+                df.to_csv(get_full_path(export_filename))
 
         # indicators
         features_node = ding.find('features')
         if features_node is not None:
             features = features_node.get("indicators", None)
             target = features_node.get("target", None)
-            if features != None and target != None:
-                features = features.split(',')
-                target = target.split(',')
-                all_features = features
-                all_features.extend(target)
-                target = target[0] # keep the only one target
-                print("Using the following technical indicators : {}".format(all_features))
+            export_filename = features_node.get("export", None)
+            if target:
+                all_features = []
+                if features:
+                    all_features = features.split(',')
+                all_features.append(target)
+                #target = target[0] # keep the only one target
+                out("Using the following technical indicators : {}".format(all_features))
                 df = findicators.add_technical_indicators(df, all_features)
-                # todo implement findicators.keep([])
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
                 df = fdataprep.process_technical_indicators(df, ['missing_values'])
+                if export_filename:
+                    df.to_csv(get_full_path(export_filename))
+                    for indicator in df.columns:
+                        visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
+            out(df.head())
 
         # preprocessing
         preprocessing_node = ding.find('preprocessing')
         if preprocessing_node is not None:
+            export_filename = preprocessing_node.get("export", None)
+            
             # outliers
             outliers_node = preprocessing_node.find('outliers')
             if outliers_node is not None:
-                print(outliers_node.get("method", None))
+                out(outliers_node.get("method", None))
                 method = outliers_node.get("method", None)
                 if method is not None:
-                    print("[PREPROCESSING] outliers : {}".format(method))
+                    out("[PREPROCESSING] outliers : {}".format(method))
                     df = fdataprep.process_technical_indicators(df, [method])
-                    #visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_'+method+'.png')
                     df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
             # transformations
@@ -105,7 +97,7 @@ def execute(filename):
                     method = transformation.get("method", None)
                     indicators = transformation.get("indicators", None)
                     if method is not None and indicators is not None:
-                        print("[PREPROCESSING] transformation {} for {}".format(method, indicators))
+                        out("[PREPROCESSING] transformation {} for {}".format(method, indicators))
                         indicators = indicators.split(',')
                         df = fdataprep.process_technical_indicators(df, ["transformation_"+method], indicators)
                         df = fdataprep.process_technical_indicators(df, ['missing_values'])
@@ -118,38 +110,45 @@ def execute(filename):
                     indicators = discretization.get("indicators", None)
                     method = discretization.get("method", None)
                     if indicators is not None and method is not None:
-                        print("[PREPROCESSING] discretization {} for {}".format(method, indicators))
+                        out("[PREPROCESSING] discretization {} for {}".format(method, indicators))
                         indicators = indicators.split(',')
                         df = fdataprep.process_technical_indicators(df, ["discretization_"+method], indicators)
                         df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
+            if export_filename:
+                df.to_csv(get_full_path(export_filename))
+                for indicator in df.columns:
+                    visu.display_from_dataframe(df, indicator, get_full_path(value + '_preprocessing_'+indicator+'.png'))
+
         # feature engineering
-        featureengeineering_node = ding.find('featureengeineering')
-        if featureengeineering_node is not None:
+        featureengineering_node = ding.find('featureengineering')
+        if featureengineering_node is not None:
+            export_filename = featureengineering_node.get("export", None)
+
             # reduction
-            reduction_node = featureengeineering_node.find('reduction')
+            reduction_node = featureengineering_node.find('reduction')
             if reduction_node is not None:
                 method = reduction_node.get("method", None)
                 if method is not None:
-                    print("[FEATURE ENGINEERING] reduction : {}".format(method))
+                    out("[FEATURE ENGINEERING] reduction : {}".format(method))
 
-        # export
-        export_node = ding.find('export')
-        if export_node is not None:
-            export_filename = export_node.get("filename", None)
-            df.to_csv(export_filename)
+            if export_filename:
+                df.to_csv(get_full_path(export_filename))
+                for indicator in df.columns:
+                        visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
 
         # learning model
         classifiers_node = ding.find('classifiers')
-        library_models = {}
         if classifiers_node:
+            ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+            ds.split(0.7)
+            library_models = {}
+            test_vs_pred = []
             for classifier in classifiers_node:
                 classifier_id = classifier.get("id", None)
-                print("[CLASSIFIER] Treating {}".format(classifier_id))
+                out("[CLASSIFIER] Treating {}".format(classifier_id))
                 classifier_type = classifier.get("type", None)
                 export_filename = classifier.get("export", None)
-                ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
-                ds.split(0.7)
 
                 parameters_node = classifier.find('parameters')
                 params = {}
@@ -162,9 +161,9 @@ def execute(filename):
                             def get_classifier_from_name(classifier_name):
                                 classifier_value = library_models[classifier_name]
                                 if classifier_value != None:
-                                    print("{} found ({})".format(classifier_name, classifier_value))
+                                    out("{} found ({})".format(classifier_name, classifier_value))
                                 else:
-                                    print("!!! {} not found !!!".format(parameter_value))
+                                    out("!!! {} not found !!!".format(parameter_value))
                                 return classifier_value
 
                             # replace classifier name with classifier model
@@ -174,7 +173,7 @@ def execute(filename):
                             elif parameter_name == "classifiers":
                                 classifier_names = parameter_value.split(',')
                                 parameter_value = [(classifier_name, get_classifier_from_name(classifier_name)) for classifier_name in classifier_names]
-                                print(parameter_value)
+                                out(parameter_value)
 
                             if parameter_value:
                                 params[parameter_name] = parameter_value
@@ -184,11 +183,18 @@ def execute(filename):
                 library_models[classifier_id] = model
 
                 model_analysis = model.get_analysis()
-                print("Precision : {:.2f}".format(model_analysis["precision"]))
-                print("Recall : {:.2f}".format(model_analysis["recall"]))
-                print("f1_score : {:.2f}".format(model_analysis["f1_score"]))
+                out("Accuracy : {:.2f}".format(model_analysis["accuracy"]))
+                out("Precision : {:.2f}".format(model_analysis["precision"]))
+                out("Recall : {:.2f}".format(model_analysis["recall"]))
+                out("f1_score : {:.2f}".format(model_analysis["f1_score"]))
                 if export_filename:
-                    print("export => {}".format(export_filename))
-                    model.save(export_filename)
+                    model.save(get_full_path(export_filename))
+
+                test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
+
+            analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves.png", "")
+
+        end = datetime.now()
+        out("elapsed time : {}".format(end-start))
 
     return 0

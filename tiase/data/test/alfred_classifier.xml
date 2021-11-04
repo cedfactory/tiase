@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <dings>
-    <ding>
+    <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
         <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
         <classifiers>
-            <classifier id="lstm1_1" type="lstm1" export="./tmp/lstm1_1">
+            <classifier id="lstm1_1" type="lstm1" export="lstm1_1">
                 <parameters>
                     <parameter name="epochs" value="20"/>
                 </parameters>

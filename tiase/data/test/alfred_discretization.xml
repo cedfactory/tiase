@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
 <dings>
-    <ding>
+    <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
         <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
-        <preprocessing>
+        <preprocessing export="out.csv">
             <discretizations>
                 <discretization method="supervised" indicators="rsi_30" />
                 <discretization method="unsupervised" indicators="williams_%r" />
             </discretizations>
         </preprocessing>
-        <export filename="./tmp/out.csv"/>
     </ding>
 </dings>

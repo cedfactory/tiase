@@ -1,6 +1,7 @@
 from ..findicators import findicators
 from . import toolbox,analysis,classifier
 from scikeras.wrappers import KerasClassifier
+import xml.etree.cElementTree as ET
 
 from rich import print,inspect
 
@@ -27,6 +28,7 @@ dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
 # Simple LSTM for Sequence Classification
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
 # https://github.com/MohammadFneish7/Keras_LSTM_Diagram
+# https://www.adriangb.com/scikeras/stable/migration.html
 #
 class ClassifierLSTM(classifier.Classifier):
     def __init__(self, data_splitter, params = None):
@@ -80,7 +82,30 @@ class ClassifierLSTM(classifier.Classifier):
         self.model = tf.keras.models.load_model(filename+".hdf5")
 
     def save(self, filename):
-        self.model.model_.save(filename+".hdf5")
+        model_analysis = self.get_analysis()
+
+        model_filename = filename+".hdf5"
+        self.model.model_.save(model_filename)
+        
+        x_normalizer_filename = filename+"_x_normalizer.gz"
+        toolbox.serialize(self.data_splitter.normalizer, x_normalizer_filename)
+
+        analysis.export_history(filename, self.analysis["history"])
+        analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], filename+"_classification_roc_curve.png")
+        analysis.export_confusion_matrix(model_analysis["confusion_matrix"], filename+"_classification_confusion_matrix.png")
+
+        root = ET.Element("model")
+        ET.SubElement(root, "file").text = model_filename
+        ET.SubElement(root, "x_normaliser").text = x_normalizer_filename
+        ET.SubElement(root, "accuracy").text = "{:.2f}".format(model_analysis["accuracy"])
+        ET.SubElement(root, "precision").text = "{:.2f}".format(model_analysis["precision"])
+        ET.SubElement(root, "recall").text = "{:.2f}".format(model_analysis["recall"])
+        ET.SubElement(root, "f1_score").text = "{:.2f}".format(model_analysis["f1_score"])
+        tree = ET.ElementTree(root)
+
+        xmlfilename = filename+'.xml'
+        tree.write(xmlfilename)
+
 
     def evaluate_cross_validation(self, ds, target, debug=False):
         results = {}

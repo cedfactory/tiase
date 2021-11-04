@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <dings>
-    <ding>
-        <import value="AI.PA"/>
-        <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
-        <preprocessing>
+    <ding export="alfred">
+        <import filename="./tiase/data/test/google_stocks_data.csv" export="input.csv"/>
+        <!--<features indicators="simple_rtn,rsi_30,williams_%r" target="target" export="indicators.csv"/>-->
+        <features target="target" indicators="" export="indicators.csv"/>
+        <!--<preprocessing export="preprocessing.csv">
             <outliers method="outliers_normalize_stdcutoff" />
             <transformations>
                 <transformation method="log" indicators="rsi_30" />
@@ -13,28 +14,56 @@
                 <discretization indicator="rsi_30" method="unsupervised" nbins="2" />
             </discretizations>
         </preprocessing>
-        <featureengeineering>
+        <featureengineering export="featureengineering.csv">
             <reduction method="correlation" threshold="0.95" />
-        </featureengeineering>
-        <export filename="./tmp/df.csv"/>
+        </featureengineering>-->
         <classifiers>
-            <classifier id="decision_tree_1" type="decision tree" export="./tmp/decision_tree_1" />
-            <classifier id="svc_1" type="svc" />
-            <classifier id="lstm1_1" type="lstm1" export="./tmp/lstm1_1">
+            <classifier id="decision_tree_3" type="decision tree" export="decision_tree_3" >
                 <parameters>
-                    <parameter name="epochs" value="15"/>
+                    <parameter name="max_depth" value="3"/>
+                </parameters>
+            </classifier>
+            <classifier id="decision_tree_5" type="decision tree" export="decision_tree_5" >
+                <parameters>
+                    <parameter name="max_depth" value="5"/>
+                </parameters>
+            </classifier>
+            <classifier id="decision_tree_7" type="decision tree" export="decision_tree_7" >
+                <parameters>
+                    <parameter name="max_depth" value="7"/>
+                </parameters>
+            </classifier>
+            <classifier id="svc_1" type="svc" />
+            <classifier id="svc_1" type="svc">
+                <parameters>
+                    <parameter name="kernel" value="poly"/>
+                </parameters>
+            </classifier>
+            <classifier id="lstm1_50" type="lstm1" export="lstm1_50">
+                <parameters>
+                    <parameter name="epochs" value="50"/>
+                </parameters>
+            </classifier>
+            <classifier id="lstm2_50" type="lstm2" export="lstm2_50">
+                <parameters>
+                    <parameter name="epochs" value="50"/>
+                </parameters>
+            </classifier>
+            <classifier id="lstm3_50" type="lstm3" export="lstm3_50">
+                <parameters>
+                    <parameter name="epochs" value="50"/>
                 </parameters>
             </classifier>
             <classifier id="grid_search_1" type="grid search">
                 <parameters>
-                    <parameter name="classifier" value="decision_tree_1"/>
+                    <parameter name="classifier" value="decision_tree_3"/>
                 </parameters>
             </classifier>
             <classifier id="voting_1" type="voting">
                 <parameters>
-                    <parameter name="classifiers" value="decision_tree_1,svc_1,lstm1_1"/>
+                    <parameter name="classifiers" value="decision_tree_3,decision_tree_5,svc_1,lstm1_50,lstm2_50"/>
                 </parameters>
-            </classifier>   
+            </classifier>
         </classifiers>
     </ding>
 </dings>

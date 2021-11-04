@@ -28,6 +28,11 @@ class ClassifierDecisionTree(classifier.Classifier):
             self.max_depth = params.get("max_depth", self.max_depth)
             self.random_state = params.get("random_state", self.random_state)
 
+        if isinstance(self.max_depth, str):
+            self.max_depth = int(self.max_depth)
+        if isinstance(self.random_state, str):
+            self.random_state = int(self.random_state)
+
     def get_param_grid(self):
         return {'max_depth': [2, 3, 4, 5, 6], 'criterion': ['gini', 'entropy'], 'splitter': ['best'], 'random_state': [1]}
 
