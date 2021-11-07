@@ -1,8 +1,18 @@
 from tiase.fimport import fimport,synthetic
+import pandas as pd
 import numpy as np
+import os
 import pytest
 
 class TestFImport:
+
+    def test_download_dataframe_from_yahoo(self):
+        fimport.download_from_yahoo(['AI.PA'], "./tmp/")
+        filename = "./tmp/AI.PA.csv"
+        assert(os.path.isfile(filename))
+        df = fimport.get_dataframe_from_csv(filename)
+        assert(isinstance(df, pd.DataFrame))
+        os.remove(filename)
 
     def test_get_dataframe_from_yahoo(self):
         df = fimport.get_dataframe_from_yahoo('AI.PA')
