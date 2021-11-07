@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
-from tiase.fimport import fimport,synthetic
-from tiase.findicators import findicators
+from tiase.fimport import fimport
 from tiase.ml import data_splitter
+import pandas as pd
+import os
+
+g_generate_references = False
 
 def compare_dataframes(df1, df2):
     if len(df1.columns) != len(df2.columns):
@@ -38,10 +41,11 @@ class TestMlDataSplitter:
         ds = data_splitter.DataSplitterTrainTestWithLag(df, target='target', seq_len=3)
         ds.split(0.7)
 
-        x_train_expected = np.array([[0., 0.16666667, 0.33333333, 1., 0.83333333, 0.66666667, 0., 0.16666667, 0.33333333],
-        [0.16666667, 0.33333333, 0.5, 0.83333333, 0.66666667, 0.5, 0.16666667, 0.33333333, 0.5],
-        [0.33333333, 0.5, 0.66666667, 0.66666667, 0.5, 0.33333333, 0.33333333, 0.5, 0.66666667],
-        [0.5, 0.66666667, 0.83333333, 0.5, 0.33333333, 0.16666667, 0.5, 0.66666667, 0.83333333]])
+        x_train_expected = np.array([
+            [0., 0.16666667, 0.33333333, 1., 0.83333333, 0.66666667, 0., 0.16666667, 0.33333333],
+            [0.16666667, 0.33333333, 0.5, 0.83333333, 0.66666667, 0.5, 0.16666667, 0.33333333, 0.5],
+            [0.33333333, 0.5, 0.66666667, 0.66666667, 0.5, 0.33333333, 0.33333333, 0.5, 0.66666667],
+            [0.5, 0.66666667, 0.83333333, 0.5, 0.33333333, 0.16666667, 0.5, 0.66666667, 0.83333333]])
         np.testing.assert_allclose(ds.X_train, x_train_expected, 0.00001)
 
         y_train_expected = np.array([[1], [1], [0], [1]])
@@ -58,22 +62,53 @@ class TestMlDataSplitter:
         ds = data_splitter.DataSplitterTrainTestSimple(df, target='target', seq_len=3)
         ds.split(0.7)
 
-        X_train_expected = np.array([[0., 0.16666667, 0.33333333, 1., 0.83333333, 0.66666667, 0., 0.16666667, 0.33333333],
-        [0.16666667, 0.33333333, 0.5, 0.83333333, 0.66666667, 0.5, 0.16666667, 0.33333333, 0.5],
-        [0.33333333, 0.5, 0.66666667, 0.66666667, 0.5, 0.33333333, 0.33333333, 0.5, 0.66666667],
-        [0.5, 0.66666667, 0.83333333, 0.5, 0.33333333, 0.16666667, 0.5, 0.66666667, 0.83333333],
-        [0.66666667, 0.83333333, 1., 0.33333333, 0.16666667, 0., 0.66666667, 0.83333333, 1.]])
+        X_train_expected = np.array([
+            [0., 0.16666667, 0.33333333, 1., 0.83333333, 0.66666667, 0., 0.16666667, 0.33333333],
+            [0.16666667, 0.33333333, 0.5, 0.83333333, 0.66666667, 0.5, 0.16666667, 0.33333333, 0.5],
+            [0.33333333, 0.5, 0.66666667, 0.66666667, 0.5, 0.33333333, 0.33333333, 0.5, 0.66666667],
+            [0.5, 0.66666667, 0.83333333, 0.5, 0.33333333, 0.16666667, 0.5, 0.66666667, 0.83333333],
+            [0.66666667, 0.83333333, 1., 0.33333333, 0.16666667, 0., 0.66666667, 0.83333333, 1.]])
         np.testing.assert_allclose(ds.X_train, X_train_expected, 0.00001)
 
         y_train_expected = np.array([[0], [1], [1], [0], [1]])
         np.testing.assert_allclose(ds.y_train, y_train_expected, 0.00001)
 
-        X_test_expected = np.array([[1.16666667, 1.33333333, 1.5, -0.16666667, -0.33333333, -0.5, 1.16666667, 1.33333333, 1.5],
-        [1.33333333, 1.5, 1.66666667, -0.33333333, -0.5, -0.66666667, 1.33333333, 1.5, 1.66666667]])
+        X_test_expected = np.array([
+            [1.16666667, 1.33333333, 1.5, -0.16666667, -0.33333333, -0.5, 1.16666667, 1.33333333, 1.5],
+            [1.33333333, 1.5, 1.66666667, -0.33333333, -0.5, -0.66666667, 1.33333333, 1.5, 1.66666667]])
         np.testing.assert_allclose(ds.X_test, X_test_expected, 0.00001)
 
         y_test_expected = np.array([[0], [1]])
-        np.testing.assert_allclose(ds.y_test, y_test_expected, 0.00001)
+        np.testing.assert_allclose(ds.y_test, y_test_expected, 0.00001)     
+
+    def test_data_splitter_export(self):
+        df = self.get_dataframe()
+        ds = data_splitter.DataSplitterTrainTestSimple(df, target='target', seq_len=3)
+        ds.split(0.7)
+
+        root_tmp = "./tmp/"
+        x_train = root_tmp+"x_train.csv"
+        x_test = root_tmp+"x_test.csv"
+        y_train = root_tmp+"y_train.csv"
+        y_test = root_tmp+"y_test.csv"
+
+        root_ref = "./tiase/data/test/"
+        ref_x_train = root_ref+"ref_x_train.csv"
+        ref_x_test = root_ref+"ref_x_test.csv"
+        ref_y_train = root_ref+"ref_y_train.csv"
+        ref_y_test = root_ref+"ref_y_test.csv"
+        if g_generate_references:
+            ds.export("./tmp/")
+            os.rename(x_train, ref_x_train)
+            os.rename(x_test, ref_x_test)
+            os.rename(y_train, ref_y_train)
+            os.rename(y_test, ref_y_test)
+
+        ds.export(root_tmp)
+        for (file_generated, file_expected) in [(x_train,ref_x_train), (x_test,ref_x_test), (y_train,ref_y_train), (y_test,ref_y_test)]:
+            df_generated = pd.read_csv(file_generated)
+            df_expected = pd.read_csv(file_expected)
+            assert(compare_dataframes(df_generated, df_expected))
 
     def test_data_splitter_for_cross_validation(self):
         # Prepare the data

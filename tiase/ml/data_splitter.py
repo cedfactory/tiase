@@ -14,17 +14,17 @@ class DataSplitterTrainTest(DataSplitter):
     def __init__(self):
         pass
 
-    def export(self):
+    def export(self, root="."):
         df_x_train = pd.DataFrame(self.X_train)
         df_y_train = pd.DataFrame(self.y_train)
         df_x_test = pd.DataFrame(self.X_test)
         df_y_test = pd.DataFrame(self.y_test)
 
-        df_x_train.to_csv("x_train.csv")
-        df_y_train.to_csv("y_train.csv")
+        df_x_train.to_csv(root+"/x_train.csv")
+        df_y_train.to_csv(root+"/y_train.csv")
 
-        df_x_test.to_csv("x_test.csv")
-        df_y_test.to_csv("y_test.csv")
+        df_x_test.to_csv(root+"/x_test.csv")
+        df_y_test.to_csv(root+"/y_test.csv")
 
 
 class DataSplitterTrainTestWithLag(DataSplitterTrainTest):
