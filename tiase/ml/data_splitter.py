@@ -6,13 +6,45 @@ from sklearn.model_selection import TimeSeriesSplit
 from abc import ABCMeta, abstractmethod
 
 class DataSplitter(metaclass = ABCMeta):
+    '''
     def __init__(self):
         pass
+    '''
 
 
 class DataSplitterTrainTest(DataSplitter):
-    def __init__(self):
+
+    @abstractmethod
+    def split_train_test(self, features, targets):
+        ''' will be defined in the inherited classes '''
         pass
+
+    def split(self, train_size):
+        if train_size <= 1:
+            split_index = int(self.df.shape[0] * train_size)
+        else:
+            split_index = train_size
+
+        # separate features and targets
+        features = self.df.copy().drop(self.target, axis=1)
+        target = pd.DataFrame({'target': self.df[self.target]})
+
+        # split training & testing data
+        train_features = features[:split_index]
+        train_target = target[:split_index]
+        train_target = train_target.reset_index(drop=True)
+
+        test_features = features[split_index:]
+        test_target = target[split_index:]
+        test_target = test_target.reset_index(drop=True)
+
+        self.normalizer = preprocessing.MinMaxScaler()
+
+        train_normalised_features = self.normalizer.fit_transform(train_features)
+        test_normalised_features = self.normalizer.transform(test_features)
+
+        self.X_train, self.y_train = self.split_train_test(train_normalised_features, train_target)
+        self.X_test, self.y_test = self.split_train_test(test_normalised_features, test_target)
 
     def export(self, root="."):
         df_x_train = pd.DataFrame(self.X_train)
@@ -46,7 +78,7 @@ class DataSplitterTrainTestWithLag(DataSplitterTrainTest):
         self.y_test = None
         self.normalizer = None
 
-    def __split_train_test(self, features, targets):
+    def split_train_test(self, features, targets):
         n_features = features.shape[1]
         x_train = []
         for i in range(len(features) - self.seq_len):
@@ -60,29 +92,6 @@ class DataSplitterTrainTestWithLag(DataSplitterTrainTest):
         y_train = np.expand_dims(y_train, 1)
         
         return x_train, y_train
-
-    def split(self, train_size):
-        split_index = int(self.df.shape[0] * train_size)
-
-        # Preparation of train test set.
-        features = self.df.copy().drop(self.target, axis=1)
-        target = pd.DataFrame({'target': self.df[self.target]})
-
-        train_features = features[:split_index]
-        train_target = target[:split_index]
-        train_target = train_target.reset_index(drop=True)
-
-        test_features = features[split_index:]
-        test_target = target[split_index:]
-        test_target = test_target.reset_index(drop=True)
-
-        self.normalizer = preprocessing.MinMaxScaler()
-
-        train_normalised_features = self.normalizer.fit_transform(train_features)
-        test_normalised_features = self.normalizer.transform(test_features)
-
-        self.X_train, self.y_train = self.__split_train_test(train_normalised_features, train_target)
-        self.X_test, self.y_test = self.__split_train_test(test_normalised_features, test_target)
 
 
 class DataSplitterTrainTestSimple(DataSplitterTrainTest):
@@ -104,7 +113,7 @@ class DataSplitterTrainTestSimple(DataSplitterTrainTest):
         self.y_test = None
         self.normalizer = None
 
-    def __split_train_test(self, features, targets):
+    def split_train_test(self, features, targets):
         n_features = features.shape[1]
         x_train = []
         for i in range(len(features) - self.seq_len + 1):
@@ -118,33 +127,6 @@ class DataSplitterTrainTestSimple(DataSplitterTrainTest):
         y_train = np.expand_dims(y_train, 1)
         
         return x_train, y_train
-
-    def split(self, train_size):
-        if train_size <= 1:
-            split_index = int(self.df.shape[0] * train_size)
-        else:
-            split_index = train_size
-
-        # separate features and targets
-        features = self.df.copy().drop(self.target, axis=1)
-        target = pd.DataFrame({'target': self.df[self.target]})
-
-        # split training & testing data
-        train_features = features[:split_index]
-        train_target = target[:split_index]
-        train_target = train_target.reset_index(drop=True)
-
-        test_features = features[split_index:]
-        test_target = target[split_index:]
-        test_target = test_target.reset_index(drop=True)
-
-        self.normalizer = preprocessing.MinMaxScaler()
-
-        train_normalised_features = self.normalizer.fit_transform(train_features)
-        test_normalised_features = self.normalizer.transform(test_features)
-
-        self.X_train, self.y_train = self.__split_train_test(train_normalised_features, train_target)
-        self.X_test, self.y_test = self.__split_train_test(test_normalised_features, test_target)
 
 
 class DataSplitterForCrossValidation(DataSplitter):
