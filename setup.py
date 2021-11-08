@@ -19,12 +19,12 @@ setup(
                     'pandas==1.2.2', 'seaborn==0.11.1', 'statsmodels==0.12.2',
                     'stockstats==0.3.2', 'yfinance==0.1.63', 'finta==1.3', 
                     'scikit-learn==0.24.1','xgboost==1.3.3', 'six~=1.15.0',
-                    'tensorboard==2.7.0', 'tensorflow==2.6.0',
+                    'tensorboard==2.7.0', 'tensorflow==2.6.0', 'rich==10.6.0',
                     'Keras==2.6.0', 'Keras-Preprocessing==1.1.2',
                     'scikeras==0.4.1', 'joblib==1.0.1', 'parse==1.19.0'
     ],
     extras_require={
-            "dev": ["pytest", "pytest-cov", "rich"],
+            "dev": ["pytest", "pytest-cov"],
     },
     python_requires='>=3.8',
 )
