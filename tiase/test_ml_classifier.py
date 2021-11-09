@@ -26,6 +26,7 @@ class TestMlClassifier:
         ds = self.get_data_splitter()
 
         model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5})
+        model.fit(ds)
         ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
         results = model.evaluate_cross_validation(ds, "target")
         print(results)
