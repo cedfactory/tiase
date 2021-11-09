@@ -72,7 +72,11 @@ def kbest_reduction(df, score_func_name, k=0.5, verbose=False):
 
     return df_result
 
-
+'''
+Ref :
+https://chrisalbon.com/code/machine_learning/feature_selection/drop_highly_correlated_features/
+https://newbedev.com/python-check-correlation-of-x-train-with-y-train-code-example
+'''
 def correlation_reduction(df):
     list_features = df.columns.to_list()
     list_features.remove('simple_rtn')

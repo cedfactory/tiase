@@ -72,10 +72,10 @@ class TestMlDataSplitter:
         y_train_expected = np.array([[0], [1], [1], [0], [1]])
         np.testing.assert_allclose(ds.y_train, y_train_expected, 0.00001)
 
-        X_test_expected = np.array([
+        x_test_expected = np.array([
             [1.16666667, 1.33333333, 1.5, -0.16666667, -0.33333333, -0.5, 1.16666667, 1.33333333, 1.5],
             [1.33333333, 1.5, 1.66666667, -0.33333333, -0.5, -0.66666667, 1.33333333, 1.5, 1.66666667]])
-        np.testing.assert_allclose(ds.X_test, X_test_expected, 0.00001)
+        np.testing.assert_allclose(ds.X_test, x_test_expected, 0.00001)
 
         y_test_expected = np.array([[0], [1]])
         np.testing.assert_allclose(ds.y_test, y_test_expected, 0.00001)     
