@@ -203,8 +203,5 @@ def summary():
     classifiers = classifiers_factory.ClassifiersFactory.get_classifiers_list()
     for classifier_name in classifiers:
         print(classifier_name)
-        ds = data_splitter.DataSplitterTrainTestSimple(None, None, None)
-        classifier = classifiers_factory.ClassifiersFactory.get_classifier(classifier_name, None, ds)
-        print(classifier)
     
     return 0

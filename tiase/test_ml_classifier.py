@@ -77,7 +77,6 @@ class TestMlClassifier:
         self._test_classifier_common(model, {"precision":0.984732, "recall":0.955555, "f1_score":0.969924}, 0.1)
 
     def test_classifier_svc(self):
-        ds = self.get_data_splitter()
         model = classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'linear', 'c': 0.025})
         self._test_classifier_common(model, {"precision":0.985185, "recall":0.985185, "f1_score":0.985185}, 0.00001)
 
