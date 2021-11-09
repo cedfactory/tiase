@@ -6,10 +6,10 @@ from sklearn.model_selection import TimeSeriesSplit
 from abc import ABCMeta, abstractmethod
 
 class DataSplitter(metaclass = ABCMeta):
-    '''
+
+    @abstractmethod
     def __init__(self):
         pass
-    '''
 
 
 class DataSplitterTrainTest(DataSplitter):

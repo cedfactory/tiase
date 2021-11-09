@@ -1,4 +1,3 @@
-from ..findicators import findicators
 from . import toolbox,analysis,classifier
 from scikeras.wrappers import KerasClassifier
 import xml.etree.cElementTree as ET

@@ -1,6 +1,5 @@
 import pandas as pd
 from tiase.fimport import fimport
-from tiase.findicators import findicators
 from tiase.ml import lstm_hao
 import numpy as np
 import pytest

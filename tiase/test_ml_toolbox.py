@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from tiase.fimport import fimport,synthetic
 from tiase.findicators import findicators
 from tiase.ml import toolbox
 from sklearn import preprocessing

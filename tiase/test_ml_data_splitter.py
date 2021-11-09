@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from tiase.fimport import fimport
 from tiase.ml import data_splitter
 import pandas as pd
 import os
