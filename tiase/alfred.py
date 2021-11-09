@@ -67,7 +67,7 @@ def execute(filename):
                 out("Using the following technical indicators : {}".format(all_features))
                 df = findicators.add_technical_indicators(df, all_features)
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
-                #df = fdataprep.process_technical_indicators(df, ['missing_values'])
+                df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
                     for indicator in df.columns:
