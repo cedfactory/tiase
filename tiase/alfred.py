@@ -63,7 +63,7 @@ def execute(filename):
                 if features:
                     all_features = features.split(',')
                 all_features.append(target)
-                #target = target[0] # keep the only one target
+
                 out("Using the following technical indicators : {}".format(all_features))
                 df = findicators.add_technical_indicators(df, all_features)
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])

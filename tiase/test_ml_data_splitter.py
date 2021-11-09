@@ -61,13 +61,13 @@ class TestMlDataSplitter:
         ds = data_splitter.DataSplitterTrainTestSimple(df, target='target', seq_len=3)
         ds.split(0.7)
 
-        X_train_expected = np.array([
+        x_train_expected = np.array([
             [0., 0.16666667, 0.33333333, 1., 0.83333333, 0.66666667, 0., 0.16666667, 0.33333333],
             [0.16666667, 0.33333333, 0.5, 0.83333333, 0.66666667, 0.5, 0.16666667, 0.33333333, 0.5],
             [0.33333333, 0.5, 0.66666667, 0.66666667, 0.5, 0.33333333, 0.33333333, 0.5, 0.66666667],
             [0.5, 0.66666667, 0.83333333, 0.5, 0.33333333, 0.16666667, 0.5, 0.66666667, 0.83333333],
             [0.66666667, 0.83333333, 1., 0.33333333, 0.16666667, 0., 0.66666667, 0.83333333, 1.]])
-        np.testing.assert_allclose(ds.X_train, X_train_expected, 0.00001)
+        np.testing.assert_allclose(ds.X_train, x_train_expected, 0.00001)
 
         y_train_expected = np.array([[0], [1], [1], [0], [1]])
         np.testing.assert_allclose(ds.y_train, y_train_expected, 0.00001)

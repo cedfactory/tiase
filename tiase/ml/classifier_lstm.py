@@ -49,8 +49,8 @@ class ClassifierLSTM(classifier.Classifier):
         self.x_normaliser = self.data_splitter.normalizer
         self.input_size = self.X_train.shape[1]
 
-    def _transform_X(self, X):
-        return np.reshape(X, (X.shape[0], 1, X.shape[1]))
+    def _transform_X(self, x):
+        return np.reshape(x, (x.shape[0], 1, x.shape[1]))
 
     def fit(self):
         # create the model

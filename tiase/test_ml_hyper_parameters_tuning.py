@@ -7,7 +7,7 @@ import pytest
 
 class TestMlHyperParametersTuning:
 
-    def _HPTGridSearch(self, classifiername, param_grid=None):
+    def _hpt_grid_search(self, classifiername, param_grid=None):
         # data        
         filename = "./tiase/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
@@ -43,7 +43,7 @@ class TestMlHyperParametersTuning:
 
 
     def test_HPTGridSearch_decision_tree(self):
-        best_params, model_analysis = self._HPTGridSearch("decision tree")
+        best_params, model_analysis = self._hpt_grid_search("decision tree")
 
         assert(best_params["criterion"] == 'entropy')
         assert(best_params["max_depth"] == 2)
@@ -55,7 +55,7 @@ class TestMlHyperParametersTuning:
         assert(model_analysis["f1_score"] == pytest.approx(.0345, 0.01))
 
     def test_HPTGridSearch_lstm1(self):
-        best_params, model_analysis = self._HPTGridSearch("lstm1", {'epochs': [5, 10], 'batch_size': [10, 15]})
+        best_params, model_analysis = self._hpt_grid_search("lstm1", {'epochs': [5, 10], 'batch_size': [10, 15]})
 
         # todo  : investigate why the results are not reproductible
         '''
