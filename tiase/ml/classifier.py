@@ -19,9 +19,7 @@ def set_train_test_data(dataframe, seq_len, split_index, target):
 
 class Classifier(metaclass = ABCMeta):
     
-    def __init__(self, data_splitter, params = None):
-        self.data_splitter = data_splitter
-
+    def __init__(self, params = None):
         self.seq_len = 21
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
@@ -35,7 +33,7 @@ class Classifier(metaclass = ABCMeta):
         pass
 
     @abstractmethod
-    def fit(self):
+    def fit(self, data_splitter):
         pass
 
     @abstractmethod

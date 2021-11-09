@@ -21,14 +21,14 @@ class TestMlClassifier:
         ds.split(0.7)
         
         classifiers = [
-            ("DTC3", classifiers_factory.ClassifiersFactory.get_classifier(type="decision tree", params={'max_depth': 3, 'random_state': 1}, data_splitter=ds)),
-            ("SVC", classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)),
-            ("SVC_poly", classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds))
+            ("DTC3", classifiers_factory.ClassifiersFactory.get_classifier(type="decision tree", params={'max_depth': 3, 'random_state': 1})),
+            ("SVC", classifiers_factory.ClassifiersFactory.get_classifier("svc")),
+            ("SVC_poly", classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}))
         ]
 
         for classifier in classifiers:
             model = classifier[1]
-            model.fit()
+            model.fit(ds)
             '''
             model_analysis = model.get_analysis()
             print("------")
@@ -37,8 +37,8 @@ class TestMlClassifier:
             print("f1_score :  {:.3f}".format(model_analysis["f1_score"]))
             '''
 
-        meta_voting = meta_classifier.MetaClassifierVoting(data_splitter=ds, params={'classifiers':classifiers, 'voting': 'soft'})
-        meta_voting.fit()
+        meta_voting = meta_classifier.MetaClassifierVoting(params={'classifiers':classifiers, 'voting': 'soft'})
+        meta_voting.fit(ds)
         metamodel_analysis = meta_voting.get_analysis()
         '''
         print("* Precision : {:.3f}".format(metamodel_analysis["precision"]))

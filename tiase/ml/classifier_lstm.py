@@ -30,8 +30,8 @@ dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
 # https://www.adriangb.com/scikeras/stable/migration.html
 #
 class ClassifierLSTM(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
 
         self.epochs = 170
         self.batch_size = 10
@@ -42,6 +42,12 @@ class ClassifierLSTM(classifier.Classifier):
         if isinstance(self.epochs, str):
             self.epochs = int(self.epochs)
 
+    def _transform_X(self, x):
+        return np.reshape(x, (x.shape[0], 1, x.shape[1]))
+
+    def fit(self, data_splitter):
+        
+        self.data_splitter = data_splitter
         self.X_train = self.data_splitter.X_train
         self.y_train = self.data_splitter.y_train
         self.X_test = self.data_splitter.X_test
@@ -49,10 +55,6 @@ class ClassifierLSTM(classifier.Classifier):
         self.x_normaliser = self.data_splitter.normalizer
         self.input_size = self.X_train.shape[1]
 
-    def _transform_X(self, x):
-        return np.reshape(x, (x.shape[0], 1, x.shape[1]))
-
-    def fit(self):
         # create the model
         tf.random.set_seed(20)
         np.random.seed(10)
@@ -206,8 +208,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierLSTM1(ClassifierLSTM):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
 
         self.lstm_size = 100
         self.param_grid = {
@@ -240,8 +242,8 @@ Input:
 - batch_size = 10
 '''  
 class ClassifierLSTM2(ClassifierLSTM):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
     
         self.lstm_size = 100
         if params:
@@ -274,8 +276,8 @@ Input:
 - batch_size = 10
 '''  
 class ClassifierLSTM3(ClassifierLSTM):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
     
         self.lstm_size = 100
         if params:
@@ -307,8 +309,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierLSTMHao2020(ClassifierLSTM):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
     
     def build(self):
         print("[Build ClassifierLSTMHao2020]")
@@ -349,8 +351,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierBiLSTM(ClassifierLSTM):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
     
     def build(self):
         print("[Build ClassifierBiLSTM]")
@@ -385,8 +387,8 @@ Input:
 - batch_size = 10
 '''
 class ClassifierCNNBiLSTM(ClassifierLSTM):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
     
     def inception_a(self, layer_in, c7):
         branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)

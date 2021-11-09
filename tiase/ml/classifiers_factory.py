@@ -5,39 +5,39 @@ import inspect
 
 class ClassifiersFactory:
     @staticmethod
-    def get_classifier(type, params, data_splitter):
+    def get_classifier(type, params=None):
         if type == "same class":
-            return classifier_naive.ClassifierAlwaysSameClass(data_splitter=data_splitter, params=params)
+            return classifier_naive.ClassifierAlwaysSameClass(params)
         elif type == "as previous":
-            return classifier_naive.ClassifierAlwaysAsPrevious(data_splitter=data_splitter, params=params)
+            return classifier_naive.ClassifierAlwaysAsPrevious(params)
         elif type == "decision tree":
-            return classifier_decision_tree.ClassifierDecisionTree(data_splitter=data_splitter, params=params)
+            return classifier_decision_tree.ClassifierDecisionTree(params)
         elif type == "gaussian process":
-            return classifier_gaussian_process.ClassifierGaussianProcess(data_splitter=data_splitter, params=params)
+            return classifier_gaussian_process.ClassifierGaussianProcess(params)
         elif type == "mlp":
-            return classifier_mlp.ClassifierMLP(data_splitter=data_splitter, params=params)
+            return classifier_mlp.ClassifierMLP(params)
         elif type == "gaussian naive bayes":
-            return classifier_naive_bayes.ClassifierGaussianNB(data_splitter=data_splitter, params=params)
+            return classifier_naive_bayes.ClassifierGaussianNB(params)
         elif type == "svc":
-            return classifier_svc.ClassifierSVC(data_splitter=data_splitter, params=params)
+            return classifier_svc.ClassifierSVC(params)
         elif type == "xgboost":
-            return classifier_xgboost.ClassifierXGBoost(data_splitter=data_splitter, params=params)
+            return classifier_xgboost.ClassifierXGBoost(params)
         elif type == 'lstm1':
-            return classifier_lstm.ClassifierLSTM1(data_splitter=data_splitter, params=params)
+            return classifier_lstm.ClassifierLSTM1(params)
         elif type == 'lstm2':
-            return classifier_lstm.ClassifierLSTM2(data_splitter=data_splitter, params=params)
+            return classifier_lstm.ClassifierLSTM2(params)
         elif type == 'lstm3':
-            return classifier_lstm.ClassifierLSTM3(data_splitter=data_splitter, params=params)
+            return classifier_lstm.ClassifierLSTM3(params)
         elif type == 'lstmhao2020':
-            return classifier_lstm.ClassifierLSTMHao2020(data_splitter=data_splitter, params=params)
+            return classifier_lstm.ClassifierLSTMHao2020(params)
         elif type == 'bilstm':
-            return classifier_lstm.ClassifierBiLSTM(data_splitter=data_splitter, params=params)
+            return classifier_lstm.ClassifierBiLSTM(params)
         elif type == 'cnnbilstm':
-            return classifier_lstm.ClassifierCNNBiLSTM(data_splitter=data_splitter, params=params)
+            return classifier_lstm.ClassifierCNNBiLSTM(params)
         elif type == 'grid search':
-            return hyper_parameters_tuning.HPTGridSearch(data_splitter=data_splitter, params=params)
+            return hyper_parameters_tuning.HPTGridSearch(params)
         elif type == 'voting':
-            return meta_classifier.MetaClassifierVoting(data_splitter=data_splitter, params=params)
+            return meta_classifier.MetaClassifierVoting(params)
 
     @staticmethod
     def __get_classifiers_list_from_class(classifier):

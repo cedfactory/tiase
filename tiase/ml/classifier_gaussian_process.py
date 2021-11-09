@@ -11,8 +11,8 @@ Input:
 ref : https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessClassifier.html
 '''
 class ClassifierGaussianProcess(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
 
         self.kernel = None
         self.optimizer = 'fmin_l_bfgs_b'
@@ -31,7 +31,8 @@ class ClassifierGaussianProcess(classifier.Classifier):
     def build(self):
         self.model = GaussianProcessClassifier(kernel=self.kernel, optimizer=self.optimizer)
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.build()
         self.model.fit(self.data_splitter.X_train,self.data_splitter.y_train)
         

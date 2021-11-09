@@ -9,7 +9,7 @@ params :
 reference : https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html
 '''
 class MetaClassifierVoting(classifier.Classifier):
-    def __init__(self, data_splitter, params=None):
+    def __init__(self, params=None):
         '''
         format for params["classifiers"] : [('classifier1_name', classifier1), ('classifier2_name', classifier2)]
         '''
@@ -23,15 +23,14 @@ class MetaClassifierVoting(classifier.Classifier):
         # since VotingClassifier deals with scikit models, we extract models from Classifier objects.
         self.classifiers = [(classifier[0], classifier[1].model) for classifier in self.classifiers]
 
-        self.data_splitter = data_splitter
-
     def get_param_grid(self):
         return {}
         
     def build(self):
         self.model = VotingClassifier(estimators=self.classifiers, voting=self.voting)
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.build()
         self.model.fit(self.data_splitter.X_train, self.data_splitter.y_train)
 

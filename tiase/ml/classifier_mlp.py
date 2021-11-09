@@ -12,8 +12,8 @@ Input:
 ref : https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html
 '''
 class ClassifierMLP(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
 
         self.hidden_layer_sizes = 100
         self.activation = 'relu'
@@ -37,7 +37,8 @@ class ClassifierMLP(classifier.Classifier):
     def build(self):
         self.model = MLPClassifier(hidden_layer_sizes=self.hidden_layer_sizes, activation=self.activation, solver=self.solver, random_state=self.random_state)
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.build()
         self.model.fit(self.data_splitter.X_train,self.data_splitter.y_train)
         

@@ -178,8 +178,8 @@ def execute(filename):
                             if parameter_value:
                                 params[parameter_name] = parameter_value
 
-                model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params, data_splitter=ds)
-                model.fit()
+                model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
+                model.fit(ds)
                 library_models[classifier_id] = model
 
                 model_analysis = model.get_analysis()

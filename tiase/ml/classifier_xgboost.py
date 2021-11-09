@@ -16,8 +16,8 @@ Input:
 reference : https://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.XGBClassifier
 '''
 class ClassifierXGBoost(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
 
         self.n_estimators = 100
         self.max_depth = None
@@ -48,7 +48,8 @@ class ClassifierXGBoost(classifier.Classifier):
     def build(self):
         self.model = XGBClassifier(use_label_encoder=False, n_estimators=self.n_estimators, max_depth=self.max_depth, learning_rate=self.learning_rate, objective=self.objective, tree_method=self.tree_method, eval_metric='error')
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.build()
         self.model.fit(self.data_splitter.X_train,self.data_splitter.y_train)
 

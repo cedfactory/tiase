@@ -22,14 +22,14 @@ class TestMlHyperParametersTuning:
         ds.split(0.7)
 
         # classifier
-        classifier = classifiers_factory.ClassifiersFactory.get_classifier(classifiername, None, ds)
-        classifier.build()
+        classifier = classifiers_factory.ClassifiersFactory.get_classifier(classifiername)
+        classifier.fit(ds)
         if param_grid != None:
             classifier.param_grid = param_grid
 
         # hyper parameters tuning
-        hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(ds, {"classifier":classifier})
-        best_params = hpt_grid_search.fit()
+        hpt_grid_search = hyper_parameters_tuning.HPTGridSearch({"classifier":classifier})
+        best_params = hpt_grid_search.fit(ds)
         print(best_params)
 
         model_analysis = hpt_grid_search.get_analysis()

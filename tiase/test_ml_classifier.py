@@ -25,7 +25,7 @@ class TestMlClassifier:
         df = self.get_dataframe()
         ds = self.get_data_splitter()
 
-        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5})
         ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
         results = model.evaluate_cross_validation(ds, "target")
         print(results)
@@ -35,7 +35,8 @@ class TestMlClassifier:
         assert(equal)
 
     def _test_classifier_common(self, model, expected_results, epsilon):
-        model.fit()
+        ds = self.get_data_splitter()
+        model.fit(ds)
         model_analysis = model.get_analysis()
 
         assert(model_analysis["precision"] == pytest.approx(expected_results["precision"], epsilon))
@@ -43,71 +44,58 @@ class TestMlClassifier:
         assert(model_analysis["f1_score"] == pytest.approx(expected_results["f1_score"], epsilon))
 
     def test_classifier_alwayssameclass(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("same class", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("same class")
         self._test_classifier_common(model, {"precision":0.482142, "recall":1., "f1_score":0.650602}, 0.00001)
 
     def test_classifier_alwaysasprevious(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("as previous", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("as previous")
         self._test_classifier_common(model, {"precision":0.962962, "recall":0.962962, "f1_score":0.962962}, 0.00001)
 
     def test_classifier_lstm1(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 20}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 20})
         self._test_classifier_common(model, {"precision":0.992647, "recall":1., "f1_score":0.996309}, 0.00001)
 
     def test_classifier_lstm2(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm2", {'epochs': 20}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm2", {'epochs': 20})
         self._test_classifier_common(model, {"precision":1., "recall":0.985185, "f1_score":0.992537}, 0.00001)
 
     def test_classifier_lstm3(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm3", {'epochs': 20}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm3", {'epochs': 20})
         self._test_classifier_common(model, {"precision":1., "recall":0.955555, "f1_score":0.977272}, 0.00001)
 
     def test_classifier_lstm_hao2020(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("lstmhao2020", {'epochs': 20}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstmhao2020", {'epochs': 20})
         self._test_classifier_common(model, {"precision":1., "recall":0.985185, "f1_score":0.992537}, 0.1)
 
     def test_classifier_bilstm(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("bilstm", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("bilstm")
         self._test_classifier_common(model, {"precision":0.9851852, "recall":0.985185, "f1_score":0.985185}, 0.1)
 
     def test_classifier_cnnbilstm(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("cnnbilstm", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("cnnbilstm")
         self._test_classifier_common(model, {"precision":0.984732, "recall":0.955555, "f1_score":0.969924}, 0.1)
 
     def test_classifier_svc(self):
         ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'linear', 'c': 0.025}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'linear', 'c': 0.025})
         self._test_classifier_common(model, {"precision":0.985185, "recall":0.985185, "f1_score":0.985185}, 0.00001)
 
     def test_classifier_xgboost(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("xgboost", {"n_estimators":100}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("xgboost", {"n_estimators":100})
         self._test_classifier_common(model, {"precision":1., "recall":1., "f1_score":1.}, 0.00001)
 
     def test_classifier_decision_tree(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("decision tree", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("decision tree")
         self._test_classifier_common(model, {"precision":1., "recall":1., "f1_score":1.}, 0.00001)
 
     def test_classifier_mlp(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("mlp", {'hidden_layer_sizes': 80, 'random_state': 1}, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("mlp", {'hidden_layer_sizes': 80, 'random_state': 1})
         self._test_classifier_common(model, {"precision":1., "recall":0.992592, "f1_score":0.996282}, 0.00001)
 
     def test_classifier_gaussian_naive_bayes(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("gaussian naive bayes", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("gaussian naive bayes")
         self._test_classifier_common(model, {"precision":0.948529, "recall":0.955555, "f1_score":0.952029}, 0.00001)
 
     def test_classifier_gaussian_process(self):
-        ds = self.get_data_splitter()
-        model = classifiers_factory.ClassifiersFactory.get_classifier("gaussian process", None, ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("gaussian process")
         self._test_classifier_common(model, {"precision":1., "recall":0.992592, "f1_score":0.996282}, 0.00001)

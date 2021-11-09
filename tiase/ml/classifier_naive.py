@@ -4,8 +4,8 @@ import numpy as np
 from rich import print,inspect
 
 class ClassifierAlwaysSameClass(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
         self.class_to_return = 1
         self.seq_len = 50
         if params:
@@ -19,7 +19,8 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
         # nothing to build
         pass
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.X_train = self.data_splitter.X_train
         self.y_train = self.data_splitter.y_train
         self.X_test = self.data_splitter.X_test
@@ -47,8 +48,8 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
 
 
 class ClassifierAlwaysAsPrevious(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
         self.seq_len = 50
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
@@ -60,7 +61,8 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         # nothing to build
         pass
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.X_train = self.data_splitter.X_train
         self.y_train = self.data_splitter.y_train
         self.X_test = self.data_splitter.X_test

@@ -6,7 +6,7 @@ class HPTGridSearch(classifier.Classifier):
     reference : https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
     """
 
-    def __init__(self, data_splitter, params=None):
+    def __init__(self, params=None):
 
         self.classifier = None
         self.param_grid = None
@@ -16,7 +16,6 @@ class HPTGridSearch(classifier.Classifier):
             self.scoring = params.get("scoring", self.scoring)
             self.classifier = params.get("classifier", self.classifier)
 
-        self.data_splitter = data_splitter
         self.param_grid = self.classifier.get_param_grid()
         
     def get_param_grid(self):
@@ -25,7 +24,8 @@ class HPTGridSearch(classifier.Classifier):
     def build(self):
         self.model = GridSearchCV(estimator=self.classifier.get_model(), param_grid=self.param_grid, scoring=self.scoring)
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.build()
         self.model.fit(self.data_splitter.X_train, self.data_splitter.y_train)
         print(self.model.best_params_)

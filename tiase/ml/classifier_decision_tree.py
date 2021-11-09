@@ -15,8 +15,8 @@ Input:
 reference : https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
 '''
 class ClassifierDecisionTree(classifier.Classifier):
-    def __init__(self, data_splitter, params = None):
-        super().__init__(data_splitter, params)
+    def __init__(self, params = None):
+        super().__init__(params)
 
         self.criterion = 'gini'
         self.splitter = 'best'
@@ -42,7 +42,8 @@ class ClassifierDecisionTree(classifier.Classifier):
     def build(self):
         self.model = DecisionTreeClassifier(criterion=self.criterion, splitter=self.splitter, max_depth=self.max_depth, random_state=self.random_state)
 
-    def fit(self):
+    def fit(self, data_splitter):
+        self.data_splitter = data_splitter
         self.build()
         self.model.fit(self.data_splitter.X_train,self.data_splitter.y_train)
 
