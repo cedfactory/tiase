@@ -12,6 +12,9 @@ class ClassifierAlwaysSameClass(classifier.Classifier):
             self.seq_len = params.get("seq_len", self.seq_len)
             self.class_to_return = params.get("class_to_return", 1)
 
+    def get_param_grid(self):
+        return {}
+
     def build(self):
         # nothing to build
         pass
@@ -50,6 +53,9 @@ class ClassifierAlwaysAsPrevious(classifier.Classifier):
         if params:
             self.seq_len = params.get("seq_len", self.seq_len)
 
+    def get_param_grid(self):
+        return {}
+        
     def build(self):
         # nothing to build
         pass

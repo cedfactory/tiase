@@ -67,7 +67,7 @@ def execute(filename):
                 out("Using the following technical indicators : {}".format(all_features))
                 df = findicators.add_technical_indicators(df, all_features)
                 findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
-                df = fdataprep.process_technical_indicators(df, ['missing_values'])
+                #df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
                     for indicator in df.columns:
@@ -197,4 +197,14 @@ def execute(filename):
         end = datetime.now()
         out("elapsed time : {}".format(end-start))
 
+    return 0
+
+def summary():
+    classifiers = classifiers_factory.ClassifiersFactory.get_classifiers_list()
+    for classifier_name in classifiers:
+        print(classifier_name)
+        ds = data_splitter.DataSplitterTrainTestSimple(None, None, None)
+        classifier = classifiers_factory.ClassifiersFactory.get_classifier(classifier_name, None, ds)
+        print(classifier)
+    
     return 0

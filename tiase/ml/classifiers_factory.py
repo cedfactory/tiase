@@ -1,4 +1,7 @@
-from tiase.ml import classifier_lstm,classifier_gaussian_process,classifier_mlp,classifier_naive,classifier_naive_bayes,classifier_svc,classifier_xgboost,classifier_decision_tree,hyper_parameters_tuning,meta_classifier
+from tiase.ml import classifier,classifier_lstm,classifier_gaussian_process,classifier_mlp,classifier_naive,classifier_naive_bayes,classifier_svc,classifier_xgboost,classifier_decision_tree,hyper_parameters_tuning,meta_classifier
+import inspect
+
+
 
 class ClassifiersFactory:
     @staticmethod
@@ -36,4 +39,19 @@ class ClassifiersFactory:
         elif type == 'voting':
             return meta_classifier.MetaClassifierVoting(data_splitter=data_splitter, params=params)
 
+    @staticmethod
+    def __get_classifiers_list_from_class(classifier):
+        if classifier:
+            available_classifiers = []
+            if not inspect.isabstract(classifier):
+                available_classifiers = [classifier.__name__]
+            subclassifiers = classifier.__subclasses__()
+            for subclassifier in subclassifiers:
+                available_classifiers.extend(ClassifiersFactory.__get_classifiers_list_from_class(subclassifier))
+            return available_classifiers
+        else:
+            return []
 
+    @staticmethod
+    def get_classifiers_list():
+        return ClassifiersFactory.__get_classifiers_list_from_class(classifier.Classifier)

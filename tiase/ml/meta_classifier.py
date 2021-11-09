@@ -25,6 +25,9 @@ class MetaClassifierVoting(classifier.Classifier):
 
         self.data_splitter = data_splitter
 
+    def get_param_grid(self):
+        return {}
+        
     def build(self):
         self.model = VotingClassifier(estimators=self.classifiers, voting=self.voting)
 

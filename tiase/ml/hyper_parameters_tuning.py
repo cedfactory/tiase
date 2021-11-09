@@ -18,7 +18,10 @@ class HPTGridSearch(classifier.Classifier):
 
         self.data_splitter = data_splitter
         self.param_grid = self.classifier.get_param_grid()
-
+        
+    def get_param_grid(self):
+        return {}
+        
     def build(self):
         self.model = GridSearchCV(estimator=self.classifier.get_model(), param_grid=self.param_grid, scoring=self.scoring)
 
