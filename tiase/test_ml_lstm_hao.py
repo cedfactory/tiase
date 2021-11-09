@@ -26,19 +26,21 @@ class TestMlLstmHao:
 
         model = lstm_hao.LSTMHaoBasic(df)
         model.create_model(epochs = 10)
-
+        
         analysis = model.get_analysis()
 
         assert(analysis["mape"] == pytest.approx(5.54, 0.01))
         assert(analysis["rmse"] == pytest.approx(81.60, 0.01))
         assert(analysis["mse"] == pytest.approx(6658.72, 0.01))
+        
+        model.export_predictions("./tmp/lstm_hao_basic.png")
 
         prediction = model.predict()
         assert(prediction == pytest.approx(1423.31, 0.0001))
 
-        model.save_model("hao")
+        model.save_model("lstm_hao_basic")
 
-        model2 = lstm_hao.LSTMHaoBasic(df, name="hao")
+        model2 = lstm_hao.LSTMHaoBasic(df, name="lstm_hao_basic")
         prediction2 = model2.predict()
         assert(prediction2 == pytest.approx(1423.31, 0.0001))
 
@@ -53,6 +55,8 @@ class TestMlLstmHao:
 
         assert(analysis["rmse"] == pytest.approx(22.41, 0.01))
         assert(analysis["mse"] == pytest.approx(502.38, 0.01))
+
+        model.export_predictions("./tmp/lstm_hao_trend.png")
 
         prediction = model.predict()
         assert(prediction == pytest.approx(1639.23, 0.0001))
