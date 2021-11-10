@@ -26,6 +26,9 @@ class ClassifierSVC(classifier.Classifier):
             self.degree = params.get("degree", self.degree)
             self.gamma = params.get("gamma", self.gamma)
 
+    def get_name(self):
+        return "svc"
+
     def get_param_grid(self):
         return {'C': [.8, .9, 1., 1.1, 1.2],
         'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],

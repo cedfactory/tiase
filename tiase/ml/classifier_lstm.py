@@ -220,6 +220,9 @@ class ClassifierLSTM1(ClassifierLSTM):
             self.lstm_size = params.get("lstm_size", self.lstm_size)
             self.param_grid = params.get("param_grid", self.param_grid)
 
+    def get_name(self):
+        return "lstm1"
+
     def build(self):
         print("[Build ClassifierLSTM1]")
         def create_keras_classifier():
@@ -246,8 +249,16 @@ class ClassifierLSTM2(ClassifierLSTM):
         super().__init__(params)
     
         self.lstm_size = 100
+        self.param_grid = {
+            'epochs': [10, 20, 30, 40],
+            'batch_size': [5, 10, 15, 20, 25]
+        }
         if params:
             self.lstm_size = params.get("lstm_size", self.lstm_size)
+            self.param_grid = params.get("param_grid", self.param_grid)
+
+    def get_name(self):
+        return "lstm2"
 
     def build(self):
         print("[Build ClassifierLSTM2]")
@@ -280,9 +291,17 @@ class ClassifierLSTM3(ClassifierLSTM):
         super().__init__(params)
     
         self.lstm_size = 100
+        self.param_grid = {
+            'epochs': [10, 20, 30, 40],
+            'batch_size': [5, 10, 15, 20, 25]
+        }
         if params:
             self.lstm_size = params.get("lstm_size", self.lstm_size)
+            self.param_grid = params.get("param_grid", self.param_grid)
     
+    def get_name(self):
+        return "lstm3"
+
     def build(self):
         print("[Build ClassifierLSTM3]")
         def create_keras_classifier():
@@ -312,6 +331,13 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
     def __init__(self, params = None):
         super().__init__(params)
     
+        self.param_grid = None
+        if params:
+            self.param_grid = params.get("param_grid", self.param_grid)
+
+    def get_name(self):
+        return "lstmhao2020"
+
     def build(self):
         print("[Build ClassifierLSTMHao2020]")
         def create_keras_classifier():
@@ -353,7 +379,14 @@ Input:
 class ClassifierBiLSTM(ClassifierLSTM):
     def __init__(self, params = None):
         super().__init__(params)
-    
+        
+        self.param_grid = None
+        if params:
+            self.param_grid = params.get("param_grid", self.param_grid)
+
+    def get_name(self):
+        return "bisltm"
+
     def build(self):
         print("[Build ClassifierBiLSTM]")
         def create_keras_classifier():
@@ -390,6 +423,13 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
     def __init__(self, params = None):
         super().__init__(params)
     
+        self.param_grid = None
+        if params:
+            self.param_grid = params.get("param_grid", self.param_grid)
+
+    def get_name(self):
+        return "cnnbilstm"
+
     def inception_a(self, layer_in, c7):
         branch1x1_1 = Conv1D(c7, kernel_size=1, padding="same", use_bias=False)(layer_in)
         branch1x1 = BatchNormalization()(branch1x1_1)

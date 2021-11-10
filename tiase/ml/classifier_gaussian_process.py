@@ -20,6 +20,9 @@ class ClassifierGaussianProcess(classifier.Classifier):
             self.kernel = params.get("kernel", self.kernel)
             self.optimizer = params.get("optimizer", self.optimizer)
 
+    def get_name(self):
+        return "gaussian process"
+
     def get_param_grid(self):
         return {'kernel': [None],
         'optimizer': ['fmin_l_bfgs_b']

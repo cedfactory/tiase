@@ -19,9 +19,12 @@ class MetaClassifierVoting(classifier.Classifier):
             self.classifiers = params.get("classifiers", self.classifiers)
             self.voting = params.get("voting", self.voting)
 
-        # hack : classifiers received as parameters are Classifier objects.
-        # since VotingClassifier deals with scikit models, we extract models from Classifier objects.
-        self.classifiers = [(classifier[0], classifier[1].model) for classifier in self.classifiers]
+            # hack : classifiers received as parameters are Classifier objects.
+            # since VotingClassifier deals with scikit models, we extract models from Classifier objects.
+            self.classifiers = [(classifier[0], classifier[1].model) for classifier in self.classifiers]
+
+    def get_name(self):
+        return "voting"
 
     def get_param_grid(self):
         return {}

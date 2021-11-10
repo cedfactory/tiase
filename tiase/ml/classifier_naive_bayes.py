@@ -12,6 +12,9 @@ class ClassifierGaussianNB(classifier.Classifier):
     def __init__(self, params = None):
         super().__init__(params)
 
+    def get_name(self):
+        return "gaussian naive bayes"
+
     def get_param_grid(self):
         return {}
 

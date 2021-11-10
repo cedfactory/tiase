@@ -36,6 +36,9 @@ class ClassifierXGBoost(classifier.Classifier):
     def get_model(self):
         return self.model
 
+    def get_name(self):
+        return "xgboost"
+
     def get_param_grid(self):
         return {'n_estimators': [50, 75, 100, 125, 150, 175, 200],
         'max_depth': [2, 3, 4, 5, 6],

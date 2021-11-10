@@ -1,7 +1,9 @@
 from tiase.ml import classifier,classifier_lstm,classifier_gaussian_process,classifier_mlp,classifier_naive,classifier_naive_bayes,classifier_svc,classifier_xgboost,classifier_decision_tree,hyper_parameters_tuning,meta_classifier
 import inspect
 
+import importlib
 
+g_classifiers_library = dict()
 
 class ClassifiersFactory:
     @staticmethod
@@ -44,6 +46,14 @@ class ClassifiersFactory:
         if classifier:
             available_classifiers = []
             if not inspect.isabstract(classifier):
+                module = importlib.import_module(classifier.__module__)
+                klass = getattr(module, classifier.__qualname__)
+                instance = klass()
+                print("################")
+                print(classifier.__qualname__)
+                print(instance.get_name())
+                print(instance.get_param_grid())
+
                 available_classifiers = [classifier.__name__]
             subclassifiers = classifier.__subclasses__()
             for subclassifier in subclassifiers:

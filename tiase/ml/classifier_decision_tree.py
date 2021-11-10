@@ -33,6 +33,9 @@ class ClassifierDecisionTree(classifier.Classifier):
         if isinstance(self.random_state, str):
             self.random_state = int(self.random_state)
 
+    def get_name(self):
+        return "decision tree"
+
     def get_param_grid(self):
         return {'max_depth': [2, 3, 4, 5, 6], 'criterion': ['gini', 'entropy'], 'splitter': ['best'], 'random_state': [1]}
 

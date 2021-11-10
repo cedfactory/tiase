@@ -15,9 +15,11 @@ class HPTGridSearch(classifier.Classifier):
             self.param_grid = params.get("param_grid", self.param_grid)
             self.scoring = params.get("scoring", self.scoring)
             self.classifier = params.get("classifier", self.classifier)
-
-        self.param_grid = self.classifier.get_param_grid()
+            self.param_grid = self.classifier.get_param_grid()
         
+    def get_name(self):
+        return "grid search"
+
     def get_param_grid(self):
         return {}
         

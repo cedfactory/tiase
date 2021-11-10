@@ -25,6 +25,9 @@ class ClassifierMLP(classifier.Classifier):
             self.solver = params.get("solver", self.solver)
             self.random_state = params.get("random_state", self.random_state)
 
+    def get_name(self):
+        return "mlp"
+
     def get_param_grid(self):
         return {'hidden_layer_sizes': [50, 75, 100, 125, 150, 200, 250, 300],
         'activation': ['identity', 'logistic', 'tanh', 'relu'],

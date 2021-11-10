@@ -25,6 +25,10 @@ class Classifier(metaclass = ABCMeta):
             self.seq_len = params.get("seq_len", self.seq_len)
 
     @abstractmethod
+    def get_name(self):
+        pass
+
+    @abstractmethod
     def get_param_grid(self):
         pass
 
