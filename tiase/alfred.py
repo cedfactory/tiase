@@ -113,7 +113,6 @@ def execute(filename):
                         out("[PREPROCESSING] discretization {} for {}".format(method, indicators))
                         indicators = indicators.split(',')
                         df = fdataprep.process_technical_indicators(df, ["discretization_"+method], indicators)
-                        df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
             if export_filename:
                 df.to_csv(get_full_path(export_filename))

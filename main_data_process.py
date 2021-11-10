@@ -25,14 +25,7 @@ def get_synthetic_dataframe():
 def check(action):
     print("check \"{}\"".format(action))
 
-    if action == "missing_values":
-        df = get_synthetic_dataframe()
-        df["open"][1] = np.nan
-        print(df.head())
-        df = fdataprep.process_technical_indicators(df, ['missing_values'])
-        print(df.head())
-        
-    elif action == "outliers_normalize_stdcutoff":
+    if action == "outliers_normalize_stdcutoff":
         df = get_real_dataframe()
         df = findicators.add_technical_indicators(df, ['simple_rtn'])
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
@@ -49,32 +42,6 @@ def check(action):
         print(df.head())
         df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'])
         print(df.head())
-
-    elif action == "discretization_supervised":
-        df = get_real_dataframe()
-        df = df.head(200)
-        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
-        # todo : integrate ['wma', 'ema', 'sma']
-        df = findicators.add_technical_indicators(df, technical_indicators)
-        print(df.head())
-        df = fdataprep.process_technical_indicators(df, ['discretization_supervised'])
-        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
-        print(df.head())
-        #df.to_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
-
-    elif action == "discretization_unsupervised":
-        df = get_real_dataframe()
-        df = df.head(200)
-        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
-        # todo : integrate ['wma', 'ema', 'sma']
-        df = findicators.add_technical_indicators(df, technical_indicators)
-        print(df.head())
-        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
-
-        df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
-        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
-        print(df.head())
-        #df.to_csv("./tiase/data/test/datapreprocess_discretization_unsupervised_reference.csv")
 
     elif action == "transformation_log":
         df = get_real_dataframe()
@@ -171,26 +138,6 @@ def cac40():
             df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'])
             visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_winsorize.png')
 
-
-            break
-            df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
-            df = fprocessfeature.process_features(df, ['correlation_reduction'])
-            df = fprocessfeature.process_features(df, ['smote'])
-            df = fprocessfeature.process_features(df, ['rfecv_reduction'])
-            df = fdataprep.process_technical_indicators(df, ['discretization'])
-            df = fprocessfeature.process_features(df, ['correlation_reduction'])
-            df = fprocessfeature.process_features(df, ['pca_reduction'])
-            df = fdataprep.process_technical_indicators(df, ['discretization'])
-            df = fprocessfeature.process_features(df, ['correlation_reduction'])
-            df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'])
-            df = fdataprep.process_technical_indicators(df, ['transformation_log'])
-            df = fdataprep.process_technical_indicators(df, ['transformation_x2'])
-            df = fdataprep.process_technical_indicators(df, ['outliers_stdcutoff'])
-            df = fdataprep.process_technical_indicators(df, ['outliers_ema'])
-            df = fdataprep.process_technical_indicators(df, ['outliers_mam'])
-            df = fdataprep.process_technical_indicators(df, ['outliers_winsorize'])
-
-            break
 
 _usage_str = """
 Options:

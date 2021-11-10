@@ -3,7 +3,10 @@ import numpy as np
 from tiase.fimport import fimport,synthetic
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
+from . import alfred
 import pytest
+
+g_generate_references = False
 
 class TestDataProcess:
 
@@ -39,33 +42,60 @@ class TestDataProcess:
 
     def test_discretization(self):
         df = self.get_real_dataframe()
-        df = df.head(200)
         technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
         df = findicators.add_technical_indicators(df, technical_indicators)
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
+        df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
         df = fdataprep.process_technical_indicators(df, ['discretization_supervised'], technical_indicators)
-        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
+        df = df.head(200)
+
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
         assert(df.equals(expected_df))
 
+    def test_discretization_with_alfred(self):
+        alfred.execute("./tiase/data/test/datapreprocess_alfred_discretization_supervised.xml")
+        df_generated = fimport.get_dataframe_from_csv("./tmp/out.csv")
+        df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "close", "adj_close", "volume", "target"])
+        df_generated = df_generated.head(200)
+
+        if g_generate_references:
+            df_generated.to_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
+        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
+
+        assert(df_generated.equals(df_expected))
+
     def test_discretization_unsupervised(self):
         df = self.get_real_dataframe()
-        df = df.head(200)
         technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
         df = findicators.add_technical_indicators(df, technical_indicators)
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
 
         df = fdataprep.process_technical_indicators(df, ['discretization_unsupervised'], technical_indicators)
+        
+        df = df.head(200)
 
-        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
-
-        #df.to_csv("./tiase/data/test/datapreprocess_discretization_unsupervised_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_discretization_unsupervised_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_discretization_unsupervised_reference.csv")
 
         assert(df.equals(expected_df))
 
+    def test_discretization_unsupervised_with_alfred(self):
+        alfred.execute("./tiase/data/test/datapreprocess_alfred_discretization_unsupervised.xml")
+        df_generated = fimport.get_dataframe_from_csv("./tmp/out.csv")
+        df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "close", "adj_close", "volume", "target"])
+        df_generated = df_generated.head(200)
+
+        if g_generate_references:
+            df_generated.to_csv("./tiase/data/test/datapreprocess_discretization_unsupervised_reference.csv")
+        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_discretization_unsupervised_reference.csv")
+
+        assert(df_generated.equals(df_expected))
 
     def test_normalize_outliers_std_cutoff(self):
         df = self.get_real_dataframe()

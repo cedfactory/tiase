@@ -40,7 +40,7 @@ def process_technical_indicators(df, preprocessing, features = []):
         elif preprocess == 'discretization_supervised':
             df = fdiscretize.data_discretization(df, features)
         elif preprocess == 'discretization_unsupervised':
-            strategy = 'kmeans'
+            strategy = 'uniform'
             nb_bins = 5
             df = fdiscretize.data_discretization_unsupervized(df, features, nb_bins, strategy)
 
