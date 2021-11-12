@@ -45,6 +45,7 @@ def normalize_outliers_std_cutoff(df, n_sigmas):
 
 
 def cut_outliers_std_cutoff(df, n_sigmas):
+    # todo : use simple_rtn directly from the dataframe
     d1 = pd.DataFrame(df['close'].copy())
     d1['simple_rtn'] = d1.close.pct_change()
     d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
@@ -112,7 +113,7 @@ def normalize_outliers_mam(df, n_sigmas):
 
     return df
 
-
+# ref : https://medium.com/swlh/identifying-outliers-part-three-257b09f5940b
 def normalize_outliers_ema(df, n_sigmas):
     # Using EMA and Standard Deviation as the Boundary
     d1 = pd.DataFrame(df['close'].copy())

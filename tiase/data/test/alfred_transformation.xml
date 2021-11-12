@@ -4,10 +4,8 @@
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
         <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
         <preprocessing export="out.csv">
-            <transformations>
-                <transformation method="log" indicators="rsi_30" />
-                <transformation method="x2" indicators="williams_%r" />
-            </transformations>
+            <transformation method="log" indicators="rsi_30" />
+            <transformation method="x2" indicators="williams_%r" />
         </preprocessing>
     </ding>
 </dings>
