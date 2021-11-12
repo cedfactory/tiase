@@ -38,11 +38,15 @@ def execute(filename):
         import_node = ding.find('import')
         if import_node is not None:
             value = import_node.get("value", None)
+            params = dict()
+            for param in ["start", "end", "period"]:
+                if param in import_node.attrib:
+                    params[param] = import_node.get(param)
             import_filename = import_node.get("filename", None)
             export_filename = import_node.get("export", None)
             if value:
                 out("value : {}".format(value))
-                df = fimport.get_dataframe_from_yahoo(value)
+                df = fimport.get_dataframe_from_yahoo(value, params)
             elif import_filename:
                 out("filename : {}".format(import_filename))
                 df = fimport.get_dataframe_from_csv(import_filename)

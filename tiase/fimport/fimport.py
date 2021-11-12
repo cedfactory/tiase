@@ -155,10 +155,16 @@ def download_from_yahoo(values, folder = ""):
         print(filename)
         data_df.to_csv(filename)
 
-def get_dataframe_from_yahoo(value):
+def get_dataframe_from_yahoo(value, params=None):
     result = yf.Ticker(value)
-    #print(result.info)
-    hist = result.history(period="max")
+    start=None
+    end=None
+    period="max"
+    if params:
+        start = params.get("start", start)
+        end = params.get("end", end)
+        period = params.get("period", period)
+    hist = result.history(start=start, end=end, period=period)
     return hist
 
 def get_dataframe_from_csv(csvfile):
