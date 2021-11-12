@@ -113,7 +113,7 @@ def add_technical_indicators(df, indicators):
         elif indicator == "on_balance_volume":
             # ref : https://medium.com/analytics-vidhya/analysis-of-stock-price-predictions-using-lstm-models-f993faa524c4
 
-            if "volume" not in df.columns or ("adj_close" not in df.columns and "adj_close" not in df.columns):
+            if "volume" not in df.columns or ("adj_close" not in df.columns and "close" not in df.columns):
                 print("!!! add_technical_indicators !!! on_balance_volume indicator : can't be evaluated")
                 return df
 
