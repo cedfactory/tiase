@@ -49,7 +49,7 @@ def execute(filename):
                 df = fimport.get_dataframe_from_yahoo(value, params)
             elif import_filename:
                 out("filename : {}".format(import_filename))
-                df = fimport.get_dataframe_from_csv(import_filename)
+                df = fimport.get_dataframe_from_csv(import_filename, params)
                 value = "" # value is used as name to export files, so we can't leave it with None value
             out(df.head())
 

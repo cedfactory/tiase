@@ -167,8 +167,12 @@ def get_dataframe_from_yahoo(value, params=None):
     hist = result.history(start=start, end=end, period=period)
     return hist
 
-def get_dataframe_from_csv(csvfile):
+def get_dataframe_from_csv(csvfile, params=None):
     dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
     dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
+    if params and params["start"]:
+        dataframe = dataframe.loc[params["start"]:]
+    if params and params["end"]:
+        dataframe = dataframe.loc[:params["end"]]
     dataframe.dropna(inplace=True) # remove incoherent values (null, NaN, ...)
     return dataframe

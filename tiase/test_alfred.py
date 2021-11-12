@@ -32,8 +32,11 @@ class TestAlfred:
 
         assert(compare_dataframes(df_generated, df_expected, df_expected.columns))
 
-    def test_import_start_end(self):
-        self.common_process("./tiase/data/test/alfred_import_start_end.xml", "./tiase/data/test/alfred_import_start_end_reference.csv")
+    def test_import_start_end_download(self):
+        self.common_process("./tiase/data/test/alfred_import_start_end_download.xml", "./tiase/data/test/alfred_import_start_end_download_reference.csv")
+
+    def test_import_start_end_load(self):
+        self.common_process("./tiase/data/test/alfred_import_start_end_load.xml", "./tiase/data/test/alfred_import_start_end_load_reference.csv")
 
     def test_indicators(self):
         self.common_process("./tiase/data/test/alfred_indicators.xml", "./tiase/data/test/alfred_indicators_reference.csv")
