@@ -11,6 +11,9 @@ class DataSplitter(metaclass = ABCMeta):
     def __init__(self):
         pass
 
+class DataSplitterCustom(DataSplitter):
+    def __init__(self):
+        pass
 
 class DataSplitterTrainTest(DataSplitter):
 

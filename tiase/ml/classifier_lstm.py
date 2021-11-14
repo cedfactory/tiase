@@ -5,7 +5,6 @@ import xml.etree.cElementTree as ET
 from rich import print,inspect
 
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Reshape, Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
@@ -17,12 +16,6 @@ from keras import Model
 from tensorflow import keras
 from tensorflow.keras import layers
 
-dump_data_to_df = ["tic", "train_size", "test_size", "sum_pred", "threshold",
-                   "pred_pos_rate","accuracy", "precision", "recall", "f1_score",
-                   "pred_pos_rate_0","accuracy_0", "precision_0", "recall_0", "f1_score_0",
-                   "pred_pos_rate_1","accuracy_1", "precision_1", "recall_1", "f1_score_1",
-                   "pred_pos_rate_2","accuracy_2", "precision_2", "recall_2", "f1_score_2",
-                   "pred_pos_rate_3","accuracy_3", "precision_3", "recall_3", "f1_score_3"]
 #
 # Simple LSTM for Sequence Classification
 # https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/
@@ -106,97 +99,6 @@ class ClassifierLSTM(classifier.Classifier):
 
         xmlfilename = filename+'.xml'
         tree.write(xmlfilename)
-
-
-    def evaluate_cross_validation(self, ds, target, debug=False):
-        results = {}
-        results["accuracies"] = []
-        results["average_accuracy"] = 0
-
-        lst_cv_splits = ds.split()
-
-        # data for debug
-        dump_analysis = pd.DataFrame(columns=dump_data_to_df)
-        dump_predictions = pd.DataFrame(columns=['iteration','y_test','y_test_prob','y_test_pred'])
-       
-        for index_lst_split in range(len(lst_cv_splits[0])):
-            split_index = len(lst_cv_splits[0][index_lst_split])
-            frames = [lst_cv_splits[0][index_lst_split], lst_cv_splits[1][index_lst_split]]
-            df_cv = pd.concat(frames)
-
-            self.X_train, self.y_train, self.X_test, self.y_test, self.x_normaliser = classifier.set_train_test_data(df_cv, self.seq_len, split_index, target)
-
-            # create the model
-            tf.random.set_seed(20)
-            np.random.seed(10)
-
-            self.X_train = self._transform_X(self.X_train)
-            self.X_test = self._transform_X(self.X_test)
-
-            self.build()
-            self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=10, verbose=0)
-
-            self.get_analysis()
-            results["accuracies"].append(self.analysis["accuracy"])
-
-            if debug:
-                iteration = index_lst_split
-
-                # for dump predictions
-                df_tmp = pd.DataFrame(columns=['iteration','y_test','y_test_prob','y_test_pred'])
-                df_tmp['iteration'] = [iteration] * len(self.y_test_prob)
-                df_tmp['y_test_prob'] = [x[0] for x in self.y_test_prob]
-                df_tmp['y_test'] = [x[0] for x in self.y_test]
-                df_tmp['y_test_pred'] = [x[0] for x in self.y_test_pred]
-
-                dump_predictions = pd.concat([dump_predictions, df_tmp], axis=0)
-                dump_predictions.reset_index(drop=True, inplace=True)
-
-                # for dump analysis
-                current_analysis = [iteration,
-                                len(self.y_train),
-                                round(self.analysis['test_size'],2),
-                                self.y_test_pred.sum(),
-                                self.threshold,
-
-                                round(self.analysis['pred_pos_rate'],2),
-                                round(self.analysis['accuracy'],2),
-                                round(self.analysis['precision'],2),
-                                round(self.analysis['recall'],2),
-                                round(self.analysis['f1_score'],2),
-
-                                round(self.analysis['pred_pos_rate_0'], 2),
-                                round(self.analysis['accuracy_0'], 2),
-                                round(self.analysis['precision_0'], 2),
-                                round(self.analysis['recall_0'], 2),
-                                round(self.analysis['f1_score_0'], 2),
-
-                                round(self.analysis['pred_pos_rate_1'], 2),
-                                round(self.analysis['accuracy_1'], 2),
-                                round(self.analysis['precision_1'], 2),
-                                round(self.analysis['recall_1'], 2),
-                                round(self.analysis['f1_score_1'], 2),
-
-                                round(self.analysis['pred_pos_rate_2'], 2),
-                                round(self.analysis['accuracy_2'], 2),
-                                round(self.analysis['precision_2'], 2),
-                                round(self.analysis['recall_2'], 2),
-                                round(self.analysis['f1_score_2'], 2),
-
-                                round(self.analysis['pred_pos_rate_3'], 2),
-                                round(self.analysis['accuracy_3'], 2),
-                                round(self.analysis['precision_3'], 2),
-                                round(self.analysis['recall_3'], 2),
-                                round(self.analysis['f1_score_3'], 2)
-                                ]
-                dump_analysis = toolbox.add_row_to_df(dump_analysis, current_analysis)
-  
-        if debug:
-            dump_predictions.to_csv('./tmp/cross_validation_results.csv')
-            dump_analysis.to_csv('./tmp/cross_validation_analysis.csv')
-
-        results["average_accuracy"] = sum(results["accuracies"]) / len(results["accuracies"])
-        return results
 
 '''
 LSTM1

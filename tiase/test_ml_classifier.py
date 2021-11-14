@@ -5,6 +5,17 @@ from tiase.findicators import findicators
 from tiase.ml import data_splitter,classifiers_factory
 import pytest
 
+def compare_dataframes(df1, df2):
+    if len(df1.columns) != len(df2.columns):
+        print("{} vs {}".format(len(df1.columns), len(df2.columns)))
+        return False
+    for column in df1.columns:
+        array1 = df1[column].to_numpy()
+        array2 = df2[column].to_numpy()
+        if np.allclose(array1, array2) == False:
+            return False
+    return True
+
 class TestMlClassifier:
 
     def get_dataframe(self):
@@ -28,12 +39,20 @@ class TestMlClassifier:
         model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5})
         model.fit(ds)
         ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
-        results = model.evaluate_cross_validation(ds, "target")
+        results = model.evaluate_cross_validation(ds, "target", True)
         print(results)
 
         equal = np.array_equal(results["accuracies"], [0.975, 0.975, 0.975, 0.975, 0.9625])
-        assert(results["average_accuracy"] == pytest.approx(0.972499, 0.00001))
         assert(equal)
+        assert(results["average_accuracy"] == pytest.approx(0.972499, 0.00001))
+
+        df_generated = pd.read_csv("./tmp/cross_validation_analysis.csv")
+        df_expected = pd.read_csv("./tiase/data/test/cross_validation_analysis_ref.csv")
+        assert(compare_dataframes(df_generated, df_expected))
+
+        df_generated = pd.read_csv("./tmp/cross_validation_results.csv")
+        df_expected = pd.read_csv("./tiase/data/test/cross_validation_results_ref.csv")
+        assert(compare_dataframes(df_generated, df_expected))
 
     def _test_classifier_common(self, model, expected_results, epsilon):
         ds = self.get_data_splitter()

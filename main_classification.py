@@ -24,10 +24,10 @@ def evaluate_cross_validation(value):
 
     ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
     ds.split(0.7)
-    model = classifier_lstm.ClassifierLSTM2(ds, params={'epochs': 5})
+    model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5})
     ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
     results = model.evaluate_cross_validation(ds, target)
-    #print("Averaged accuracy : ", results["average_accuracy"])
+    print("Averaged accuracy : ", results["average_accuracy"])
     print(results)
 
 def evaluate_hyper_parameters_tuning():
