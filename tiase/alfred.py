@@ -144,14 +144,14 @@ def execute(filename):
                     continue
                 data_splitter_id = data_splitter_node.get("id", None)
                 data_splitter_type = data_splitter_node.get("type", None)
-                data_splitter_seq_len = float(data_splitter_node.get('sequence_length', math.nan))
+                data_splitter_seq_len = int(data_splitter_node.get('sequence_length', math.nan))
                 if data_splitter_id == None or data_splitter_type == None or math.isnan(data_splitter_seq_len):
                     continue
 
                 if data_splitter_type == "simple":
                     index = float(data_splitter_node.get('index', math.nan))
                     if math.isnan(index) == False:
-                        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+                        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=data_splitter_seq_len)
                         ds.split(index)
                     else:
                         continue
@@ -181,6 +181,7 @@ def execute(filename):
                 classifier_id = classifier.get("id", None)
                 out("[CLASSIFIER] Treating {}".format(classifier_id))
                 classifier_type = classifier.get("type", None)
+                data_splitter_id = classifier.get("data_splitter_id", None)
                 export_filename = classifier.get("export", None)
 
                 parameters_node = classifier.find('parameters')
@@ -210,10 +211,14 @@ def execute(filename):
 
                             if parameter_value:
                                 params[parameter_name] = parameter_value
-
-                model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
-                model.fit(ds)
-                library_models[classifier_id] = model
+                
+                current_data_splitter = library_data_splitters[data_splitter_id]
+                if current_data_splitter:
+                    model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
+                    model.fit(current_data_splitter)
+                    library_models[classifier_id] = model
+                else:
+                    print("!!! can't find data splitter {}".format(data_splitter_id))
 
                 model_analysis = model.get_analysis()
                 out("Accuracy : {:.2f}".format(model_analysis["accuracy"]))
