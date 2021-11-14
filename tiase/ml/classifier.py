@@ -86,8 +86,8 @@ class Classifier(metaclass = ABCMeta):
             ds_tmp.normalizer = self.x_normaliser
             self.fit(ds_tmp)
 
-            self.get_analysis()
-            results["accuracies"].append(self.analysis["accuracy"])
+            current_analysis = self.get_analysis()
+            results["accuracies"].append(current_analysis["accuracy"])
 
             if debug:
                 iteration = index_lst_split
@@ -105,39 +105,39 @@ class Classifier(metaclass = ABCMeta):
                 # for dump analysis
                 current_analysis = [iteration,
                                 len(self.y_train),
-                                round(self.analysis['test_size'],2),
+                                round(current_analysis['test_size'],2),
                                 self.y_test_pred.sum(),
                                 self.threshold,
 
-                                round(self.analysis['pred_pos_rate'],2),
-                                round(self.analysis['accuracy'],2),
-                                round(self.analysis['precision'],2),
-                                round(self.analysis['recall'],2),
-                                round(self.analysis['f1_score'],2),
+                                round(current_analysis['pred_pos_rate'],2),
+                                round(current_analysis['accuracy'],2),
+                                round(current_analysis['precision'],2),
+                                round(current_analysis['recall'],2),
+                                round(current_analysis['f1_score'],2),
 
-                                round(self.analysis['pred_pos_rate_0'], 2),
-                                round(self.analysis['accuracy_0'], 2),
-                                round(self.analysis['precision_0'], 2),
-                                round(self.analysis['recall_0'], 2),
-                                round(self.analysis['f1_score_0'], 2),
+                                round(current_analysis['pred_pos_rate_0'], 2),
+                                round(current_analysis['accuracy_0'], 2),
+                                round(current_analysis['precision_0'], 2),
+                                round(current_analysis['recall_0'], 2),
+                                round(current_analysis['f1_score_0'], 2),
 
-                                round(self.analysis['pred_pos_rate_1'], 2),
-                                round(self.analysis['accuracy_1'], 2),
-                                round(self.analysis['precision_1'], 2),
-                                round(self.analysis['recall_1'], 2),
-                                round(self.analysis['f1_score_1'], 2),
+                                round(current_analysis['pred_pos_rate_1'], 2),
+                                round(current_analysis['accuracy_1'], 2),
+                                round(current_analysis['precision_1'], 2),
+                                round(current_analysis['recall_1'], 2),
+                                round(current_analysis['f1_score_1'], 2),
 
-                                round(self.analysis['pred_pos_rate_2'], 2),
-                                round(self.analysis['accuracy_2'], 2),
-                                round(self.analysis['precision_2'], 2),
-                                round(self.analysis['recall_2'], 2),
-                                round(self.analysis['f1_score_2'], 2),
+                                round(current_analysis['pred_pos_rate_2'], 2),
+                                round(current_analysis['accuracy_2'], 2),
+                                round(current_analysis['precision_2'], 2),
+                                round(current_analysis['recall_2'], 2),
+                                round(current_analysis['f1_score_2'], 2),
 
-                                round(self.analysis['pred_pos_rate_3'], 2),
-                                round(self.analysis['accuracy_3'], 2),
-                                round(self.analysis['precision_3'], 2),
-                                round(self.analysis['recall_3'], 2),
-                                round(self.analysis['f1_score_3'], 2)
+                                round(current_analysis['pred_pos_rate_3'], 2),
+                                round(current_analysis['accuracy_3'], 2),
+                                round(current_analysis['precision_3'], 2),
+                                round(current_analysis['recall_3'], 2),
+                                round(current_analysis['f1_score_3'], 2)
                                 ]
                 dump_analysis = toolbox.add_row_to_df(dump_analysis, current_analysis)
   
