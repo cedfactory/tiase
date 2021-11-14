@@ -4,6 +4,7 @@ from tiase.fdatapreprocessing import fdataprep
 from tiase.findicators import findicators
 from tiase.ml import data_splitter,classifiers_factory,analysis
 from datetime import datetime
+import math
 import os
 from rich import print,inspect
 
@@ -133,6 +134,41 @@ def execute(filename):
                 df.to_csv(get_full_path(export_filename))
                 for indicator in df.columns:
                         visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
+
+        # data splitter
+        library_data_splitters = {}
+        data_splitters_node = ding.find('data_splitters')
+        if data_splitters_node:
+            for data_splitter_node in data_splitters_node:
+                if data_splitter_node.tag != "data_splitter":
+                    continue
+                data_splitter_id = data_splitter_node.get("id", None)
+                data_splitter_type = data_splitter_node.get("type", None)
+                data_splitter_seq_len = float(data_splitter_node.get('sequence_length', math.nan))
+                if data_splitter_id == None or data_splitter_type == None or math.isnan(data_splitter_seq_len):
+                    continue
+
+                if data_splitter_type == "simple":
+                    index = float(data_splitter_node.get('index', math.nan))
+                    if math.isnan(index) == False:
+                        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+                        ds.split(index)
+                    else:
+                        continue
+                elif data_splitter_type == "cross_validation":
+                    nb_splits = int(data_splitter_node.get('nb_splits', math.nan))
+                    max_train_size = int(data_splitter_node.get('max_train_size', math.nan))
+                    test_size = int(data_splitter_node.get('test_size', math.nan))
+                    if math.isnan(nb_splits) == False and math.isnan(max_train_size) == False and math.isnan(test_size) == False:
+                        ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits, max_train_size, test_size)
+                        ds.split()
+                    else:
+                        continue
+                else:
+                    continue
+
+                library_data_splitters[data_splitter_id] = ds
+        print(library_data_splitters)
 
         # learning model
         classifiers_node = ding.find('classifiers')

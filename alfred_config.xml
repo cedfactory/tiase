@@ -13,6 +13,10 @@
         <featureengineering export="featureengineering.csv">
             <reduction method="correlation" threshold="0.95" />
         </featureengineering>-->
+        <data_splitters>
+            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="21"/>
+            <data_splitter id="ds_cv_1" type="cross_validation" sequence_length="21" nb_splits="5" max_train_size="500" test_size="100"/>
+        </data_splitters>
         <classifiers>
             <classifier id="decision_tree_3" type="decision tree" export="decision_tree_3" >
                 <parameters>
