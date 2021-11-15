@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<dings>
+    <ding export="./tmp/" debug="True">
+        <import filename="./tiase/data/test/google_stocks_data.csv"/>
+        <features indicators="" target="target"/>
+        <data_splitters>
+            <data_splitter id="ds_cv_1" type="cross_validation" sequence_length="21" nb_splits="5" max_train_size="500" test_size="100"/>
+        </data_splitters>
+        <classifiers>
+            <classifier id="lstm1_1" type="lstm1" data_splitter_id="ds_cv_1" export="lstm1_1">
+                <parameters>
+                    <parameter name="epochs" value="10"/>
+                </parameters>
+            </classifier>
+        </classifiers>
+    </ding>
+</dings>

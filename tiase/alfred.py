@@ -25,6 +25,10 @@ def execute(filename):
 |___|_|_|_|_  |
           |___|'''
     for ding in root.findall('ding'):
+        # global variables for the current ding execution
+        debug = ding.get("debug", False)
+        target = None
+
         export_root = ding.get("export", "./")
         if export_root and not os.path.isdir(export_root):
             os.mkdir(export_root)
@@ -71,7 +75,8 @@ def execute(filename):
 
                 out("Using the following technical indicators : {}".format(all_features))
                 df = findicators.add_technical_indicators(df, all_features)
-                findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
+                features_to_remove = [feature for feature in ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"] if feature not in all_features]
+                findicators.remove_features(df, features_to_remove)
                 df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
@@ -151,7 +156,7 @@ def execute(filename):
                 if data_splitter_type == "simple":
                     index = float(data_splitter_node.get('index', math.nan))
                     if math.isnan(index) == False:
-                        ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=data_splitter_seq_len)
+                        ds = data_splitter.DataSplitterTrainTestSimple(df, target=target, seq_len=data_splitter_seq_len)
                         ds.split(index)
                     else:
                         continue
@@ -173,7 +178,7 @@ def execute(filename):
         # learning model
         classifiers_node = ding.find('classifiers')
         if classifiers_node:
-            ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
+            ds = data_splitter.DataSplitterTrainTestSimple(df, target=target, seq_len=21)
             ds.split(0.7)
             library_models = {}
             test_vs_pred = []
@@ -215,7 +220,10 @@ def execute(filename):
                 current_data_splitter = library_data_splitters[data_splitter_id]
                 if current_data_splitter:
                     model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
-                    model.fit(current_data_splitter)
+                    if isinstance(current_data_splitter, data_splitter.DataSplitterTrainTestSimple):
+                        model.fit(current_data_splitter)
+                    elif isinstance(current_data_splitter, data_splitter.DataSplitterForCrossValidation):
+                        results = model.evaluate_cross_validation(current_data_splitter, target, debug)
                     library_models[classifier_id] = model
                 else:
                     print("!!! can't find data splitter {}".format(data_splitter_id))

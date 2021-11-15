@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
-from tiase.fimport import synthetic
+from tiase.fimport import synthetic,fimport
 from tiase.findicators import findicators
+from tiase.fdatapreprocessing import fdataprep
 from tiase.ml import data_splitter,classifiers_factory
+from tiase import alfred
 import pytest
 
 def compare_dataframes(df1, df2):
@@ -31,21 +33,35 @@ class TestMlClassifier:
         ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=21)
         ds.split(0.7)
         return ds
-
+ 
     def test_classifier_evaluate_cross_validation(self):
-        df = self.get_dataframe()
-        ds = self.get_data_splitter()
+        df = fimport.get_dataframe_from_csv("./tiase/data/test/google_stocks_data.csv")
+        df = findicators.add_technical_indicators(df, ["target"])
+        findicators.remove_features(df, ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"])
+        df = fdataprep.process_technical_indicators(df, ['missing_values'])
+        print(df.head())
 
-        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 5})
-        model.fit(ds)
+        model = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 10})
         ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits=5)
         results = model.evaluate_cross_validation(ds, "target", True)
         print(results)
 
-        equal = np.array_equal(results["accuracies"], [0.975, 0.975, 0.975, 0.975, 0.9625])
+        equal = np.array_equal(results["accuracies"], [0.45, 0.525, 0.5125, 0.45, 0.6])
         assert(equal)
-        assert(results["average_accuracy"] == pytest.approx(0.972499, 0.00001))
+        assert(results["average_accuracy"] == pytest.approx(0.5075, 0.0001))
 
+        df_generated = pd.read_csv("./tmp/cross_validation_analysis.csv")
+        df_expected = pd.read_csv("./tiase/data/test/cross_validation_analysis_ref.csv")
+        assert(compare_dataframes(df_generated, df_expected))
+
+        df_generated = pd.read_csv("./tmp/cross_validation_results.csv")
+        df_expected = pd.read_csv("./tiase/data/test/cross_validation_results_ref.csv")
+        assert(compare_dataframes(df_generated, df_expected))
+
+    def test_alfred_classifier_evaluate_cross_validation(self):
+        alfred.execute("./tiase/data/test/alfred_cross_validation.xml")
+
+        # expectations
         df_generated = pd.read_csv("./tmp/cross_validation_analysis.csv")
         df_expected = pd.read_csv("./tiase/data/test/cross_validation_analysis_ref.csv")
         assert(compare_dataframes(df_generated, df_expected))
