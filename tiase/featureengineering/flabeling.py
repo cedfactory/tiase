@@ -161,15 +161,40 @@ def get_labels(barriers):
             #set the profit taking and stop loss conditons
             condition_pt = (barriers.price[start: end] >= top_barrier).any()
             condition_sl = (barriers.price[start: end] <= bottom_barrier).any()
+            #set the first to reach the barrier
+            if condition_pt and condition_sl:
+                cpt_date = barriers.index[i]
+                condition_pt_loc = False
+                j=1
+                while (cpt_date <= end) and (condition_pt_loc == False):
+                    if(barriers.price[cpt_date] >= top_barrier):
+                        condition_pt_loc = cpt_date
+                    else:
+                        cpt_date = barriers.index[i+j]
+                        j=j+1
+                cpt_date = barriers.index[i]
+                condition_sl_loc = False
+                j=1
+                while (cpt_date <= end) and (condition_sl_loc == False):
+                    if(barriers.price[cpt_date] <= bottom_barrier):
+                        condition_sl_loc = cpt_date
+                    else:
+                        cpt_date = barriers.index[i+j]
+                        j=j+1
+                if condition_pt_loc < condition_sl_loc:
+                    condition_sl = False
+                else:
+                    condition_pt = False
             #assign the labels
             if condition_pt:
                 barriers['out'][i] = 1
             elif condition_sl:
                 barriers['out'][i] = -1
             else:
-                barriers['out'][i] = max([(price_final - price_initial) / (top_barrier - price_initial),
-                                          (price_final - price_initial) / (price_initial - bottom_barrier)],
-                                         key=abs)
+                barriers['out'][i] = 0
+                # barriers['out'][i] = max([(price_final - price_initial) / (top_barrier - price_initial),
+                #                           (price_final - price_initial) / (price_initial - bottom_barrier)],
+                #                          key=abs)
     return barriers
 
 def data_labeling(df):
