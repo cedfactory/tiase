@@ -23,26 +23,29 @@ def drop_duplicates(df):
     df.drop_duplicates(inplace=True)
     return df
 
+#
+# outliers :
+#
 # reference : https://python.plainenglish.io/identifying-outliers-part-one-c0a31d9faefa
-def normalize_outliers_std_cutoff(df, n_sigmas):
-    d1 = pd.DataFrame(df['close'].copy())
-    d1['simple_rtn'] = d1.close.pct_change()
-    d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
-
-    mu = d1_mean['mean']
-    sigma = d1_mean['std']
-
-    # normalize simple_rtn
-    d1["simple_rtn_normalized"] = d1["simple_rtn"].clip(lower = mu - sigma * n_sigmas, upper = mu + sigma * n_sigmas)
-    # revert pct_change to compute new close values
-    d1['close'] = df['close'][0] * (1. + d1['simple_rtn_normalized']).cumprod()
-    d1['close'][0] = df['close'][0]
-
-    # update close values in df
-    df['close'] = d1["close"]
-
+#
+def normalize_outliers_std_cutoff(df, features, n_sigmas):
+    for feature in features:
+        feature_info = df[feature].agg(['mean', 'std'])
+        mu = feature_info['mean']
+        sigma = feature_info['std']
+        df[feature] = df[feature].clip(lower = mu - sigma * n_sigmas, upper = mu + sigma * n_sigmas)
     return df
 
+def cut_outliers_std_cutoff_new(df, features, n_sigmas):
+    for feature in features:
+        feature_mean = df[feature].agg(['mean', 'std'])
+        mu = feature_mean['mean']
+        sigma = feature_mean['std']
+        cond = (df[feature] > mu + sigma * n_sigmas) | (df[feature] < mu - sigma * n_sigmas)
+        df['outliers'] = np.where(cond, 1, 0)
+        df.drop(df[df['outliers'] == 1].index, inplace=True)
+    
+    return df
 
 def cut_outliers_std_cutoff(df, n_sigmas):
     # todo : use simple_rtn directly from the dataframe

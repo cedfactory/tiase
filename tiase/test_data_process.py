@@ -97,15 +97,23 @@ class TestDataProcess:
 
         assert(df_generated.equals(df_expected))
 
-    def test_normalize_outliers_std_cutoff(self):
+    def test_normalize_outliers_std_cutoff_and_update_close(self):
         df = self.get_real_dataframe()
         df = df.head(200)
 
-        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'])
+        df = findicators.add_technical_indicators(df, ['simple_rtn'])
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'], ['simple_rtn'])
 
-        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
+        # update close
+        df_tmp = pd.DataFrame(df['close'].copy())
+        df_tmp['close'] = df['close'][0] * (1. + df['simple_rtn']).cumprod()
+        df_tmp['close'][0] = df['close'][0]
+        df['close'] = df_tmp['close']
 
-        #df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
+        df = findicators.remove_features(df, ['simple_rtn', 'high', 'low', 'open', 'adj_close', 'volume'])
+
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
         
         array = df['close'].to_numpy()
@@ -120,7 +128,8 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
         
         array = df['close'].to_numpy()
@@ -135,7 +144,8 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume", "simple_rtn"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_winsorize_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_winsorize_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_normalize_outliers_winsorize_reference.csv")
         
         array = df['close'].to_numpy()
@@ -151,7 +161,8 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_outliers_mam_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_outliers_mam_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_outliers_mam_reference.csv")
         
         array = df['close'].to_numpy()
@@ -167,7 +178,8 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_outliers_ema_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_outliers_ema_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_outliers_ema_reference.csv")
         
         array = df['close'].to_numpy()
@@ -185,7 +197,8 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_transformation_log_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_transformation_log_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_transformation_log_reference.csv")
         
         array = df['simple_rtn'].to_numpy()
@@ -203,7 +216,8 @@ class TestDataProcess:
 
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
-        #df.to_csv("./tiase/data/test/datapreprocess_transformation_x2_reference.csv")
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_transformation_x2_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_transformation_x2_reference.csv")
         
         array = df['simple_rtn'].to_numpy()

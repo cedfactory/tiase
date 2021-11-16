@@ -16,7 +16,7 @@ def process_technical_indicators(df, preprocessing, features = []):
             df = fprep.drop_duplicates(df)
         elif preprocess == 'outliers_normalize_stdcutoff':
             n_sigmas = 2
-            df = fprep.normalize_outliers_std_cutoff(df, n_sigmas)
+            df = fprep.normalize_outliers_std_cutoff(df, features, n_sigmas)
         elif preprocess == 'outliers_cut_stdcutoff':
             n_sigmas = 2
             df = fprep.cut_outliers_std_cutoff(df, n_sigmas)
