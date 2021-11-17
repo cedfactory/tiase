@@ -4,7 +4,7 @@
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
         <features indicators="simple_rtn" target="target"/>
         <preprocessing export="out.csv">
-            <outliers method="outliers_normalize_stdcutoff" />
+            <outliers method="outliers_normalize_stdcutoff" indicators="simple_rtn" />
         </preprocessing>
     </ding>
 </dings>

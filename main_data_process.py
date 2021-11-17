@@ -131,13 +131,6 @@ def cac40():
             df = fdataprep.process_technical_indicators(df, ['missing_values'])
             visu.display_histogram_from_dataframe(df, 'simple_rtn', 100, './tmp/' + value + '_close.png')
 
-            df_original = df.copy()
-            df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'])
-            visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_stdcutoff.png')
-
-            df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'])
-            visu.display_outliers_from_dataframe(df_original, df, './tmp/' + value + '_winsorize.png')
-
 
 _usage_str = """
 Options:

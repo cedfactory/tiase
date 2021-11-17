@@ -92,20 +92,23 @@ def execute(filename):
             for preprocess in preprocessing_node:
                 # outliers
                 if preprocess.tag == "outliers":
-                    out(preprocess.get("method", None))
                     method = preprocess.get("method", None)
+                    indicators = preprocess.get("indicators", None)
+                    if indicators:
+                        indicators = indicators.split(',')
                     if method:
                         out("[PREPROCESSING] outliers : {}".format(method))
-                        df = fdataprep.process_technical_indicators(df, [method])
+                        df = fdataprep.process_technical_indicators(df, [method], indicators)
                         df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
                 # transformation
                 elif preprocess.tag == "transformation":
                     method = preprocess.get("method", None)
                     indicators = preprocess.get("indicators", None)
+                    if indicators:
+                        indicators = indicators.split(',')
                     if method is not None and indicators is not None:
                         out("[PREPROCESSING] transformation {} for {}".format(method, indicators))
-                        indicators = indicators.split(',')
                         df = fdataprep.process_technical_indicators(df, ["transformation_"+method], indicators)
                         df = fdataprep.process_technical_indicators(df, ['missing_values'])
 

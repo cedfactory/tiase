@@ -19,10 +19,10 @@ def process_technical_indicators(df, preprocessing, features = []):
             df = fprep.normalize_outliers_std_cutoff(df, features, n_sigmas)
         elif preprocess == 'outliers_cut_stdcutoff':
             n_sigmas = 2
-            df = fprep.cut_outliers_std_cutoff(df, n_sigmas)
+            df = fprep.cut_outliers_std_cutoff(df, features, n_sigmas)
         elif preprocess == 'outliers_normalize_winsorize':
             outlier_cutoff = 0.03
-            df = fprep.normalize_outliers_winsorize(df, outlier_cutoff)
+            df = fprep.normalize_outliers_winsorize(df, features, outlier_cutoff)
         elif preprocess == 'outliers_normalize_mam':
             # Using Moving Average Mean
             n_sigmas = 2.5

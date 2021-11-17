@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tiase.fimport import fimport,synthetic
+from tiase.fimport import fimport,synthetic,visu
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
 from . import alfred
@@ -97,6 +97,31 @@ class TestDataProcess:
 
         assert(df_generated.equals(df_expected))
 
+    #
+    # Outliers
+    #
+
+    def test_normalize_outliers_std_cutoff(self):
+        df = self.get_real_dataframe()
+        df = df.head(200)
+
+        df = findicators.add_technical_indicators(df, ['simple_rtn'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        df_original = df.copy()
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_stdcutoff'], ['simple_rtn'])
+        df = findicators.remove_features(df, ['high', 'low', 'open', 'close', 'adj_close', 'volume'])
+
+        # debug
+        visu.display_outliers_from_dataframe(df_original, df, 'simple_rtn', './tmp/test_normalize_outliers_std_cutoff.png')
+
+        if g_generate_references:
+            df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
+
+        array = df['simple_rtn'].to_numpy()
+        array_expected = expected_df['simple_rtn'].to_numpy()
+        assert(np.allclose(array, array_expected))
+
     def test_normalize_outliers_std_cutoff_and_update_close(self):
         df = self.get_real_dataframe()
         df = df.head(200)
@@ -113,8 +138,8 @@ class TestDataProcess:
         df = findicators.remove_features(df, ['simple_rtn', 'high', 'low', 'open', 'adj_close', 'volume'])
 
         if g_generate_references:
-            df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
-        expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_reference.csv")
+            df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_and_update_close_reference.csv")
+        expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_normalize_outliers_std_cutoff_and_update_close_reference.csv")
         
         array = df['close'].to_numpy()
         array_expected = expected_df['close'].to_numpy()
@@ -124,32 +149,43 @@ class TestDataProcess:
         df = self.get_real_dataframe()
         df = df.head(200)
 
-        df = fdataprep.process_technical_indicators(df, ['outliers_cut_stdcutoff'])
+        df = findicators.add_technical_indicators(df, ['simple_rtn'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
+        df_original = df.copy()
 
-        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume"])
+        df = fdataprep.process_technical_indicators(df, ['outliers_cut_stdcutoff'], ['simple_rtn'])
 
-        if g_generate_references:
+        # debug
+        visu.display_outliers_from_dataframe(df_original, df, 'simple_rtn', './tmp/test_cut_outliers_std_cutoff.png')
+
+        if True or g_generate_references:
             df.to_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
         
-        array = df['close'].to_numpy()
-        array_expected = expected_df['close'].to_numpy()
+        array = df['simple_rtn'].to_numpy()
+        array_expected = expected_df['simple_rtn'].to_numpy()
         assert(np.allclose(array, array_expected))
 
     def test_normalize_outliers_winsorize(self):
         df = self.get_real_dataframe()
         df = df.head(200)
 
-        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'])
+        df = findicators.add_technical_indicators(df, ['simple_rtn'])
+        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+        df_original = df.copy()
+        df = fdataprep.process_technical_indicators(df, ['outliers_normalize_winsorize'], ['simple_rtn'])
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
 
-        df = findicators.remove_features(df, ["high", "low", "open", "adj_close", "volume", "simple_rtn"])
+        # debug
+        visu.display_outliers_from_dataframe(df_original, df, 'simple_rtn', './tmp/test_normalize_outliers_winsorize.png')
 
         if g_generate_references:
             df.to_csv("./tiase/data/test/datapreprocess_normalize_outliers_winsorize_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_normalize_outliers_winsorize_reference.csv")
         
-        array = df['close'].to_numpy()
-        array_expected = expected_df['close'].to_numpy()
+        array = df['simple_rtn'].to_numpy()
+        array_expected = expected_df['simple_rtn'].to_numpy()
         assert(np.allclose(array, array_expected))
 
     def test_normalize_outliers_normalize_mam(self):
@@ -185,6 +221,10 @@ class TestDataProcess:
         array = df['close'].to_numpy()
         array_expected = expected_df['close'].to_numpy()
         assert(np.allclose(array, array_expected))
+
+    #
+    # Transformations
+    # 
 
     def test_transformation_log(self):
         df = self.get_real_dataframe()

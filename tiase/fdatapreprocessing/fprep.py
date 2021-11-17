@@ -34,57 +34,27 @@ def normalize_outliers_std_cutoff(df, features, n_sigmas):
         mu = feature_info['mean']
         sigma = feature_info['std']
         df[feature] = df[feature].clip(lower = mu - sigma * n_sigmas, upper = mu + sigma * n_sigmas)
+        
     return df
 
-def cut_outliers_std_cutoff_new(df, features, n_sigmas):
+def cut_outliers_std_cutoff(df, features, n_sigmas):
     for feature in features:
         feature_mean = df[feature].agg(['mean', 'std'])
         mu = feature_mean['mean']
         sigma = feature_mean['std']
         cond = (df[feature] > mu + sigma * n_sigmas) | (df[feature] < mu - sigma * n_sigmas)
-        df['outliers'] = np.where(cond, 1, 0)
-        df.drop(df[df['outliers'] == 1].index, inplace=True)
+        df = df.drop(df[cond].index)
     
     return df
 
-def cut_outliers_std_cutoff(df, n_sigmas):
-    # todo : use simple_rtn directly from the dataframe
-    d1 = pd.DataFrame(df['close'].copy())
-    d1['simple_rtn'] = d1.close.pct_change()
-    d1_mean = d1['simple_rtn'].agg(['mean', 'std'])
-
-    mu = d1_mean.loc['mean']
-    sigma = d1_mean.loc['std']
-
-    cond = (d1['simple_rtn'] > mu + sigma * n_sigmas) | (d1['simple_rtn'] < mu - sigma * n_sigmas)
-    d1['outliers'] = np.where(cond, 1, 0)
-
-    nb_outliers = d1.outliers.value_counts()
-    print(nb_outliers)
-
-    # drop all outliers raws
-    df.drop(df[d1['outliers'] == 1].index, inplace=True)
-
-    return df
-
 # reference : https://python.plainenglish.io/identifying-outliers-part-one-c0a31d9faefa
-def normalize_outliers_winsorize(df, outlier_cutoff):
-    d1 = pd.DataFrame(df['close'].copy())
-    d1['simple_rtn'] = d1.close.pct_change()
-
-    d2 = pd.DataFrame(d1['simple_rtn'].copy())
-
-    # normalize simple_rtn
-    d2.pipe(lambda x: x.clip(lower=x.quantile(outlier_cutoff),
-                             upper=x.quantile(1 - outlier_cutoff),
-                             axis=1, inplace=True))
-
-    # revert pct_change to compute new close values
-    d2['close'] = df['close'][0] * (1. + d2['simple_rtn']).cumprod()
-    d2['close'][0] = df['close'][0]
-
-    # update close values in df
-    df['close'] = d2["close"]
+def normalize_outliers_winsorize(df, features, outlier_cutoff):
+    for feature in features:
+        df_tmp = pd.DataFrame(df[feature].copy())
+        df_tmp.pipe(lambda x: x.clip(lower=x.quantile(outlier_cutoff),
+                                upper=x.quantile(1 - outlier_cutoff),
+                                axis=1, inplace=True))
+        df[feature] = df_tmp[feature]
 
     return df
 

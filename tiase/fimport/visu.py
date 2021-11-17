@@ -36,15 +36,14 @@ def display_histogram_fitted_gaussian(data, bins="auto", export_name=""):
         plt.savefig(export_name)
     plt.close()
 
-def display_outliers_from_dataframe(df, d1, export_name=""):
-    df['simple_rtn'] = df.close.pct_change()
-    d1['simple_rtn'] = d1.close.pct_change()
-
+def display_outliers_from_dataframe(df_original, df_result, feature, export_name=""):
     plt.clf()
-
+    df_original.to_csv("./tmp/__original.csv")
+    df_result.to_csv("./tmp/__post.csv")
+      
     fig, ax = plt.subplots(figsize=(15,6))
-    ax.plot(df.index, df.simple_rtn, color='red', label='Normal')
-    ax.plot(d1.index, d1.simple_rtn, color='blue', label='Anomaly_removed')
+    ax.plot(df_original.index, df_original[feature], color='red', label='Original')
+    ax.plot(df_result.index, df_result[feature], color='blue', label='Outliers removed')
     #ax.set_title(str(len(df)))
     ax.legend(loc='lower right')
 
