@@ -6,6 +6,7 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from tiase.fdatapreprocessing import fdataprep
 
 def setup_plot_display():
     plt.style.use('seaborn')
@@ -19,12 +20,7 @@ def setup_plot_display():
     plt.rcParams['font.family'] = 'serif'
 
 
-def plot_barriers_out(barriers, filename="barriers_out"):
-    OUT_DIR = "./tmp_data_labeling/"
-    if (os.path.isdir(OUT_DIR) == False):
-        print("new results directory: ", OUT_DIR)
-        os.mkdir(OUT_DIR)
-
+def plot_barriers_out(barriers, filename):
     plt.style.use('seaborn')
     plt.rcParams['figure.figsize'] = [16, 9]
     plt.rcParams['figure.dpi'] = 300
@@ -43,15 +39,10 @@ def plot_barriers_out(barriers, filename="barriers_out"):
 
     plt.plot(barriers.out, 'bo')
 
-    plt.savefig(OUT_DIR + filename + '.png')
+    plt.savefig(filename + '.png')
     plt.clf()
 
-def plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic"):
-    OUT_DIR = "./tmp_data_labeling/"
-    if (os.path.isdir(OUT_DIR) == False):
-        print("new results directory: ", OUT_DIR)
-        os.mkdir(OUT_DIR)
-
+def plot_barriers_dynamic(barriers, t_final, filename):
     fig, ax = plt.subplots()
     ax.set(title='stock price', xlabel='date', ylabel='price')
     ax.plot(barriers.price[100: 200])
@@ -66,7 +57,7 @@ def plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic"):
     ax.plot([start, start], [lower_barrier, upper_barrier], 'r-')
     ax.plot([end, end], [lower_barrier, upper_barrier], 'r-')
 
-    fig.savefig(OUT_DIR + filename + '_1.png')
+    fig.savefig(filename + '_1.png')
 
     # dynamic graph
     fig, ax = plt.subplots()
@@ -84,7 +75,7 @@ def plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic"):
     ax.plot([start, start], [lower_barrier, upper_barrier], 'r-')
     ax.plot([end, end], [barriers.bottom_barrier[end], barriers.top_barrier[end]], 'r-')
 
-    fig.savefig(OUT_DIR + filename + '_2.png')
+    fig.savefig(filename + '_2.png')
 
 # for intraday data
 def get_daily_volatility_for_intraday_data(close,span0=100):
@@ -195,9 +186,18 @@ def get_labels(barriers):
                 # barriers['out'][i] = max([(price_final - price_initial) / (top_barrier - price_initial),
                 #                           (price_final - price_initial) / (price_initial - bottom_barrier)],
                 #                          key=abs)
+
     return barriers
 
-def data_labeling(df):
+def data_labeling(df, params = None):
+    debug = False
+    t_final = 10 # how many days we hold the stock which set the vertical barrier
+    target_name = "labeling_target"
+    if params:
+        debug = params.get('debug', debug)
+        t_final = params.get('t_final', t_final)
+        target_name = params.get('target_name', target_name)
+
     price = df["close"].copy()
 
     #set the boundary of barriers, based on 20 days EWM
@@ -208,16 +208,17 @@ def data_labeling(df):
 
     #align the index
     prices = price[daily_volatility.index]
-    
-    # how many days we hold the stock which set the vertical barrier
-    t_final = 10
 
     barriers = get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers)
 
     barriers = get_labels(barriers)
 
-    plot_barriers_out(barriers, filename="barriers_out")
+    if debug:
+        plot_barriers_out(barriers, filename="./tmp/labeling_barriers_out")
+        plot_barriers_dynamic(barriers, t_final, filename="./tmp/labeling_barriers_dynamic")
+        barriers = fdataprep.process_technical_indicators(barriers, ['missing_values']) # shit happens
+        barriers.to_csv("./tmp/labeling_barriers.csv")
 
-    plot_barriers_dynamic(barriers, t_final, filename="barriers_dynamic")
+    df[target_name] = barriers['out']
 
-    return barriers
+    return df

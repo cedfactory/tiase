@@ -31,7 +31,7 @@ def process_features(df, featureengineering, params=None):
         elif process == 'stationary_transform':
             df = fstationary.stationary_transform(df)
         elif process == 'data_labeling':
-            df = flabeling.data_labeling(df)
+            df = flabeling.data_labeling(df, params)
         elif process == 'sort_df_by_corr':
             col = 'close'
             method = 'corr'

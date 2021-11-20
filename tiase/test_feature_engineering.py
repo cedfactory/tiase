@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 from tiase.fimport import fimport
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
@@ -78,18 +79,32 @@ class TestFeatureEngineering:
     def test_data_labeling(self):
         df = self.get_real_dataframe()
         df = df.head(150)
-        df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"])
+        df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"], {'debug':True, 't_final':10, 'target_name':'target'})
         df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
+        df_labeling = findicators.remove_features(df_labeling, ['high', 'low', 'open', 'volume', 'adj_close'])
 
+        # final result
         ref_file = "./tiase/data/test/featureengineering_data_labeling_reference.csv"
         if g_generate_references:
             df_labeling.to_csv(ref_file)
         expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
 
         for column in df_labeling.columns:
-            print(column)
             array_expected = expected_df_labeling[column].to_numpy()
             if array_expected.dtype != object:
                 array = df_labeling[column].to_numpy(dtype = array_expected.dtype)
                 assert(np.allclose(array, array_expected))
 
+        # barriers for debug
+        gen_file = "./tmp/labeling_barriers.csv"
+        ref_file = "./tiase/data/test/featureengineering_data_labeling_barriers_reference.csv"
+        if g_generate_references:
+            os.rename(gen_file, ref_file)
+        ref_df_barriers = fimport.get_dataframe_from_csv(ref_file)
+        gen_df_barriers = fimport.get_dataframe_from_csv(gen_file)
+
+        for column in gen_df_barriers.columns:
+            ref_array = ref_df_barriers[column].to_numpy()
+            if ref_array.dtype != object:
+                gen_array = gen_df_barriers[column].to_numpy(dtype = ref_array.dtype)
+                assert(np.allclose(gen_array, ref_array))
