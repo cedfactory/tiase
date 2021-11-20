@@ -196,6 +196,8 @@ def data_labeling(df, params = None):
     if params:
         debug = params.get('debug', debug)
         t_final = params.get('t_final', t_final)
+        if isinstance(t_final, str):
+            t_final = int(t_final)
         target_name = params.get('target_name', target_name)
 
     price = df["close"].copy()
@@ -220,5 +222,5 @@ def data_labeling(df, params = None):
         barriers.to_csv("./tmp/labeling_barriers.csv")
 
     df[target_name] = barriers['out']
-
+    
     return df

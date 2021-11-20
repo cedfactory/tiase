@@ -5,6 +5,7 @@ from tiase.fimport import fimport
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
 from tiase.featureengineering import fbalance,fprocessfeature
+from . import alfred
 import pytest
 
 g_generate_references = False
@@ -14,12 +15,6 @@ class TestFeatureEngineering:
     def get_real_dataframe(self):
         filename = "./tiase/data/test/google_stocks_data.csv"
         df = fimport.get_dataframe_from_csv(filename)
-        df = findicators.normalize_column_headings(df)
-        return df
-
-    def get_synthetic_dataframe(self):
-        y = synthetic.get_sinusoid(length=5, amplitude=1, frequency=.1, phi=0, height = 0)
-        df = synthetic.create_dataframe(y, 0.)
         df = findicators.normalize_column_headings(df)
         return df
 
@@ -108,3 +103,17 @@ class TestFeatureEngineering:
             if ref_array.dtype != object:
                 gen_array = gen_df_barriers[column].to_numpy(dtype = ref_array.dtype)
                 assert(np.allclose(gen_array, ref_array))
+
+
+    def test_data_labeling_with_alfred(self):
+        alfred.execute("./tiase/data/test/featureengineering_alfred_data_labeling.xml")
+        df_generated = fimport.get_dataframe_from_csv("./tmp/out.csv")
+        df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "adj_close", "volume"])
+        df_generated = df_generated.head(137) # ref has been computed with 150 first values & t_final=10
+        df_generated["target"] = df_generated["target"].astype(int)
+
+        if g_generate_references:
+            df_generated.to_csv("./tiase/data/test/featureengineering_data_labeling_reference.csv")
+        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/featureengineering_data_labeling_reference.csv")
+
+        assert(df_generated.equals(df_expected))

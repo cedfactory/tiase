@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<dings>
+    <ding export="./tmp/">
+        <import filename="./tiase/data/test/google_stocks_data.csv"/>
+        <features indicators="close" target="target" />
+        <featureengineering export="out.csv">
+            <labeling t_final="10" target_name="target" />
+        </featureengineering>
+    </ding>
+</dings>

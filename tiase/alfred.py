@@ -1,6 +1,7 @@
 import xml.etree.cElementTree as ET
 from tiase.fimport import fimport,visu
 from tiase.fdatapreprocessing import fdataprep
+from tiase.featureengineering import fprocessfeature
 from tiase.findicators import findicators
 from tiase.ml import data_splitter,classifiers_factory,analysis
 from datetime import datetime
@@ -131,12 +132,22 @@ def execute(filename):
         if featureengineering_node is not None:
             export_filename = featureengineering_node.get("export", None)
 
-            # reduction
-            reduction_node = featureengineering_node.find('reduction')
-            if reduction_node is not None:
-                method = reduction_node.get("method", None)
-                if method is not None:
-                    out("[FEATURE ENGINEERING] reduction : {}".format(method))
+            for featureengineering in featureengineering_node:
+                # reduction
+                if featureengineering.tag == "reduction":
+                    method = featureengineering.get("method", None)
+                    if method is not None:
+                        out("[FEATURE ENGINEERING] reduction : {}".format(method))
+
+                # labeling
+                if featureengineering.tag == "labeling":
+                    out("[FEATURE ENGINEERING] labeling : ")
+                    params = dict()
+                    for param in ["t_final", "target_name"]:
+                        if param in featureengineering.attrib:
+                            params[param] = featureengineering.get(param)
+                            print("   {} : {}".format(param, params[param]))
+                    df = fprocessfeature.process_features(df.copy(), ["data_labeling"], params)
 
             if export_filename:
                 df.to_csv(get_full_path(export_filename))
