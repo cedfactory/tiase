@@ -42,13 +42,14 @@ class TestDataProcess:
 
     def test_discretization(self):
         df = self.get_real_dataframe()
-        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30']
+        technical_indicators = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30', 'sma_9', 'ema_9', 'wma_9']
+        technical_indicators_to_discretize = ['atr', 'mom', 'roc', 'er', 'adx', 'stc', 'stoch_%k', 'cci_30', 'macd', 'stoch_%d', 'williams_%r', 'rsi_30', 'sma', 'ema', 'wma']
         df = findicators.add_technical_indicators(df, technical_indicators)
-        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
-        df = fdataprep.process_technical_indicators(df, ['discretization_supervised'], technical_indicators)
+        df = fdataprep.process_technical_indicators(df, ['discretization_supervised'], technical_indicators_to_discretize)
 
+        df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         df = df.head(200)
 
         if g_generate_references:

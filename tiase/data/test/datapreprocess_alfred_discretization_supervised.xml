@@ -2,9 +2,9 @@
 <dings>
     <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="atr,mom,roc,er,adx,stc,stoch_%k,cci_30,macd,stoch_%d,williams_%r,rsi_30" target="target" />
+        <features indicators="atr,mom,roc,er,adx,stc,stoch_%k,cci_30,macd,stoch_%d,williams_%r,rsi_30,sma_9,ema_9,wma_9" target="target" />
         <preprocessing export="out.csv">
-            <discretization method="supervised" indicators="atr,mom,roc,er,adx,stc,stoch_%k,cci_30,macd,stoch_%d,williams_%r,rsi_30" />
+            <discretization method="supervised" indicators="atr,mom,roc,er,adx,stc,stoch_%k,cci_30,macd,stoch_%d,williams_%r,rsi_30,sma,ema,wma" />
         </preprocessing>
     </ding>
 </dings>

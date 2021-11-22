@@ -78,3 +78,13 @@ class TestAlfred:
         assert(os.path.isfile(out_file))
         if os.path.isfile(out_file):
             os.remove(out_file) 
+
+    def test_summary(self):
+        classifiers_list = alfred.summary()
+
+        expected_classifiers = {'ClassifierLSTM1', 'ClassifierLSTM2', 'ClassifierLSTM3', 'ClassifierLSTMHao2020', 'ClassifierBiLSTM', 'ClassifierCNNBiLSTM',
+                                'ClassifierGaussianProcess', 'ClassifierMLP', 'ClassifierGaussianNB', 'ClassifierXGBoost', 'ClassifierSVC', 'ClassifierDecisionTree',
+                                'HPTGridSearch', 'MetaClassifierVoting'}
+
+        assert(classifiers_list != None)
+        assert(all(x in classifiers_list for x in expected_classifiers))
