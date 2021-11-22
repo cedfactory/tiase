@@ -3,6 +3,7 @@ from tiase import alfred
 import numpy as np
 import pytest
 import os
+import filecmp
 
 g_generate_references = False
 
@@ -88,3 +89,10 @@ class TestAlfred:
 
         assert(classifiers_list != None)
         assert(all(x in classifiers_list for x in expected_classifiers))
+
+    def test_details(self):
+        alfred.details_for_value("tiase/data/test/google_stocks_data.csv")
+        generated_file = "./tmp/index_google_stocks_data.html"
+        expected_file = "tiase/data/test/index_google_stocks_data.html"
+        assert(filecmp.cmp(generated_file, expected_file))
+        

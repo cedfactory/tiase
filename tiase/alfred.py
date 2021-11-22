@@ -265,3 +265,75 @@ def execute(filename):
 def summary():
     classifiers = classifiers_factory.ClassifiersFactory.get_classifiers_list()
     return classifiers
+
+def details_for_value(value, root='./tmp/'):
+    name = ""
+    df = None
+    if value.endswith(".csv"):
+        name = value
+        df = fimport.get_dataframe_from_csv(value)
+        basename = os.path.basename(value)
+        value = os.path.splitext(basename)[0]
+    else:
+        if value in fimport.cac40:
+            name = fimport.cac40[value]
+        elif value in fimport.nasdaq100:
+            name = fimport.nasdaq100[value]
+        df = fimport.get_dataframe_from_yahoo(value)
+    
+    if df.empty:
+        return False
+
+    print("{} ({})".format(value, name))
+
+    technical_indicators = findicators.get_all_default_technical_indicators()
+    df = findicators.add_technical_indicators(df, technical_indicators)
+    df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+
+    trend_ratio_1d = findicators.get_stats_for_trend_up(df, 1)
+    trend_ratio_7d = findicators.get_stats_for_trend_up(df, 7)
+    trend_ratio_21d = findicators.get_stats_for_trend_up(df, 21)
+    print("{} ({});{:.2f};{:.2f};{:.2f}".format(value, name, trend_ratio_1d, trend_ratio_7d, trend_ratio_21d))
+
+    true_positive, true_negative, false_positive, false_negative = findicators.get_stats_on_trend_today_equals_trend_tomorrow(df)
+    print("{:.2f},{:.2f},{:.2f},{:.2f}".format(true_positive, true_negative, false_positive, false_negative))
+
+    # format for images
+    root = './tmp/'
+    prefix = value + '_'
+
+    # simple_rtn & histogram
+    simple_rtn = df["simple_rtn"].to_numpy()
+
+    visu.display_histogram_fitted_gaussian(simple_rtn, export_name = root + prefix + "simple_rtn_histogram_gaussian.png")
+    visu.display_histogram_from_dataframe(df, "simple_rtn", export_name = root + prefix + "simple_rtn_histogram.png")
+
+    # output index.html
+    f = open(root + "/index_"+value+".html", "w")
+    f.write("<html><body>")
+    f.write("<center><h1>"+value+" ("+name+")</h1></Center>")
+
+    f.write('<h3>trends</h3>')
+    f.write("<p>trend ratio d+1 : {:.2f}%</p>".format(trend_ratio_1d))
+    f.write("<p>trend ratio d+7 : {:.2f}%</p>".format(trend_ratio_7d))
+    f.write("<p>trend ratio d+21 : {:.2f}%</p>".format(trend_ratio_21d))
+
+    f.write('<h3>simple_rtn</h3>')
+    f.write('<p>mean : '+str(round(simple_rtn.mean(), 6))+'</p>')
+    f.write('<p>ratio # positive trends / # trends : '+str(round(len(simple_rtn[simple_rtn > 0])/len(simple_rtn), 6))+'</p>')
+
+    f.write('<p>mean of positive trend : '+str(round(simple_rtn[simple_rtn > 0].mean(), 6))+'</p>')
+    f.write('<p>mean of negative trend : '+str(round(simple_rtn[simple_rtn < 0].mean(), 6))+'</p>')
+    f.write('<p>histogram :<br><img width=25% src=' + prefix + "simple_rtn_histogram_gaussian.png" + ' />')
+    f.write('<br>')
+
+    f.write('Indicators : <br>')
+    for column in df.columns:
+        imgname = column + '.png'
+        visu.display_from_dataframe(df, column, root + prefix + imgname)
+        f.write('<img width=50% src=' + prefix + imgname + ' />')
+
+    f.write("</body></html>")
+    f.close()
+
+    return True
