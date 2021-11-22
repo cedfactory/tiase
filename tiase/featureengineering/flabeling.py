@@ -8,18 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tiase.fdatapreprocessing import fdataprep
 
-def setup_plot_display():
-    plt.style.use('seaborn')
-    plt.rcParams['figure.figsize'] = [16, 9]
-    plt.rcParams['figure.dpi'] = 300
-    plt.rcParams['font.size'] = 20
-    plt.rcParams['axes.labelsize'] = 20
-    plt.rcParams['axes.titlesize'] = 24
-    plt.rcParams['xtick.labelsize'] = 16
-    plt.rcParams['ytick.labelsize'] = 16
-    plt.rcParams['font.family'] = 'serif'
-
-
 def plot_barriers_out(barriers, filename):
     plt.style.use('seaborn')
     plt.rcParams['figure.figsize'] = [16, 9]
@@ -30,12 +18,6 @@ def plot_barriers_out(barriers, filename):
     plt.rcParams['xtick.labelsize'] = 16
     plt.rcParams['ytick.labelsize'] = 16
     plt.rcParams['font.family'] = 'serif'
-
-    # fig = plt.figure(figsize=(20, 16))
-    # fig = plt.figure(figsize=(16, 9), dpi=300)
-
-
-    # setup_plot_display()
 
     plt.plot(barriers.out, 'bo')
 
@@ -83,8 +65,7 @@ def get_daily_volatility_for_intraday_data(close,span0=100):
     df0=close.index.searchsorted(close.index-pd.Timedelta(days=1))
     df0=df0[df0>0]
     a = df0 -1 #using a variable to avoid the error message.
-    df0=pd.Series(close.index[a],
-                  index=close.index[close.shape[0]-df0.shape[0]:])
+    df0=pd.Series(close.index[a], index=close.index[close.shape[0]-df0.shape[0]:])
     df0=close.loc[df0.index]/close.loc[df0.values].values-1
     # daily returns
     df0=df0.ewm(span=span0).std()
@@ -139,13 +120,11 @@ def get_labels(barriers):
     condition_pt:top_barrier touching conditon
     condition_sl:bottom_barrier touching conditon
     '''
+    floating = False
     for i in range(len(barriers.index)):
         start = barriers.index[i]
         end = barriers.vert_barrier[i]
         if pd.notna(end):
-            # assign the initial and final price
-            price_initial = barriers.price[start]
-            price_final = barriers.price[end]
             # assign the top and bottom barriers
             top_barrier = barriers.top_barrier[i]
             bottom_barrier = barriers.bottom_barrier[i]
@@ -182,10 +161,14 @@ def get_labels(barriers):
             elif condition_sl:
                 barriers['out'][i] = -1
             else:
-                barriers['out'][i] = 0
-                # barriers['out'][i] = max([(price_final - price_initial) / (top_barrier - price_initial),
-                #                           (price_final - price_initial) / (price_initial - bottom_barrier)],
-                #                          key=abs)
+                if not floating:
+                    barriers['out'][i] = 0
+                else:
+                    price_initial = barriers.price[start]
+                    price_final = barriers.price[end]
+                    barriers['out'][i] = max([(price_final - price_initial) / (top_barrier - price_initial),
+                                            (price_final - price_initial) / (price_initial - bottom_barrier)],
+                                            key=abs)
 
     return barriers
 
@@ -193,25 +176,30 @@ def data_labeling(df, params = None):
     debug = False
     t_final = 10 # how many days we hold the stock which set the vertical barrier
     target_name = "labeling_target"
+    upper_multiplier = 2
+    lower_multiplier = 2
     if params:
         debug = params.get('debug', debug)
         t_final = params.get('t_final', t_final)
         if isinstance(t_final, str):
             t_final = int(t_final)
         target_name = params.get('target_name', target_name)
+        upper_multiplier = params.get('upper_multiplier', upper_multiplier)
+        if isinstance(upper_multiplier, str):
+            upper_multiplier = float(upper_multiplier)
+        lower_multiplier = params.get('lower_multiplier', lower_multiplier)
+        if isinstance(lower_multiplier, str):
+            lower_multiplier = float(lower_multiplier)
 
     price = df["close"].copy()
 
     #set the boundary of barriers, based on 20 days EWM
     daily_volatility = get_daily_volatility_for_daily_data(price)
 
-    #the up and low boundary multipliers
-    upper_lower_multipliers = [2, 2]
-
     #align the index
     prices = price[daily_volatility.index]
 
-    barriers = get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers)
+    barriers = get_3_barriers(prices, daily_volatility, t_final, [upper_multiplier, lower_multiplier])
 
     barriers = get_labels(barriers)
 

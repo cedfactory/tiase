@@ -74,7 +74,7 @@ class TestFeatureEngineering:
     def test_data_labeling(self):
         df = self.get_real_dataframe()
         df = df.head(150)
-        df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"], {'debug':True, 't_final':10, 'target_name':'target'})
+        df_labeling = fprocessfeature.process_features(df.copy(), ["data_labeling"], {'debug':True, 't_final':10, 'upper_multiplier':"2.", 'lower_multiplier':"2.", 'target_name':'target'})
         df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
         df_labeling = findicators.remove_features(df_labeling, ['high', 'low', 'open', 'volume', 'adj_close'])
 
