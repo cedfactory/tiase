@@ -2,6 +2,7 @@ from sklearn import metrics
 from collections import namedtuple
 import numpy as np
 import matplotlib.pyplot as plt
+from . import toolbox
 
 def get_mape(y_true, y_pred):
     """
@@ -34,7 +35,7 @@ def get_rmse(y_true, y_pred):
 def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
     result = {}
 
-    multiclass = len(np.unique(y_test)) > 2
+    multiclass = toolbox.is_multiclass(y_test)
 
     result["X_test"] = x_test
     result["y_test"] = y_test
@@ -109,7 +110,7 @@ testvspred = namedtuple('testvspred', ['classifiername', 'yTest', 'yPred'])
 
 def is_testvspreds_multiclass(testvspreds):
     for testvspred in testvspreds:
-        if len(np.unique(testvspred.yTest)) > 2:
+        if toolbox.is_multiclass(testvspred.yTest):
             return True
     return False
 

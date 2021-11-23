@@ -24,6 +24,13 @@ def serialize(scaler, filename):
 def deserialize(filename):
     return joblib.load(filename)
 
+def is_multiclass(obj, target="target"):
+    if isinstance(obj, np.ndarray):
+        return len(np.unique(obj)) > 2
+    elif isinstance(obj, pd.DataFrame):
+        return obj[target].nunique() > 2
+    return None
+
 def add_row_to_df(df,ls):
     """
     Given a dataframe and a list, append the list as a new row to the dataframe.

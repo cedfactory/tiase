@@ -57,3 +57,20 @@ class TestMlToolbox:
         assert(threshold == .4)
         y_test_pred_expected = np.array(([1], [1], [0], [1], [1], [0], [0], [1], [0], [0]))
         np.testing.assert_allclose(y_test_pred, np.array(y_test_pred_expected), 0.00001)
+
+
+    def test_is_multiclass(self):
+        multiclass = toolbox.is_multiclass(np.array([1, 1, 2, 2, 1]))
+        assert(multiclass == False)
+
+        multiclass = toolbox.is_multiclass(np.array([1, 1, 2, 2, 3]))
+        assert(multiclass == True)
+
+        df = pd.DataFrame([[1], [0], [1], [1], [0], [1], [0], [1]], columns = ['target'])
+        multiclass = toolbox.is_multiclass(df, target="target")
+        assert(multiclass == False)
+
+        df = pd.DataFrame([[1], [0], [1], [2], [0], [1], [0], [1]], columns = ['target'])
+        multiclass = toolbox.is_multiclass(df, target="target")
+        assert(multiclass == True)
+
