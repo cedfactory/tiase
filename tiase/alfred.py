@@ -310,8 +310,10 @@ def details_for_value(value, root='./tmp/'):
 
     # output index.html
     f = open(root + "/index_"+value+".html", "w")
-    f.write("<html><body>")
-    f.write("<center><h1>"+value+" ("+name+")</h1></Center>")
+    f.write('<!DOCTYPE html lang="en"><html>')
+    f.write("<head><title>"+value+"</title></head>")
+    f.write("<body>")
+    f.write("<h1>"+value+" ("+name+")</h1>")
 
     f.write('<h3>trends</h3>')
     f.write("<p>trend ratio d+1 : {:.2f}%</p>".format(trend_ratio_1d))
@@ -331,7 +333,7 @@ def details_for_value(value, root='./tmp/'):
     for column in df.columns:
         imgname = column + '.png'
         visu.display_from_dataframe(df, column, root + prefix + imgname)
-        f.write('<img width=50% src=' + prefix + imgname + ' />')
+        f.write('<img alt="'+column+'" width=50% src=' + prefix + imgname + ' />')
 
     f.write("</body></html>")
     f.close()
