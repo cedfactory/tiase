@@ -299,7 +299,6 @@ def details_for_value(value, root='./tmp/'):
     print("{:.2f},{:.2f},{:.2f},{:.2f}".format(true_positive, true_negative, false_positive, false_negative))
 
     # format for images
-    root = './tmp/'
     prefix = value + '_'
 
     # simple_rtn & histogram
