@@ -310,7 +310,7 @@ def details_for_value(value, root='./tmp/'):
 
     # output index.html
     f = open(root + "/index_"+value+".html", "w")
-    f.write('<!DOCTYPE html lang="en"><html>')
+    f.write('<!DOCTYPE html><html lang="en">')
     f.write("<head><title>"+value+"</title></head>")
     f.write("<body>")
     f.write("<h1>"+value+" ("+name+")</h1>")
@@ -326,7 +326,7 @@ def details_for_value(value, root='./tmp/'):
 
     f.write('<p>mean of positive trend : '+str(round(simple_rtn[simple_rtn > 0].mean(), 6))+'</p>')
     f.write('<p>mean of negative trend : '+str(round(simple_rtn[simple_rtn < 0].mean(), 6))+'</p>')
-    f.write('<p>histogram :<br><img width=25% src=' + prefix + "simple_rtn_histogram_gaussian.png" + ' />')
+    f.write('<p>histogram :<br><img alt="simple_rtn_histogram_gaussian" width=25% src=' + prefix + "simple_rtn_histogram_gaussian.png" + ' />')
     f.write('<br>')
 
     f.write('Indicators : <br>')
