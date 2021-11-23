@@ -5,6 +5,8 @@ from sklearn.model_selection import TimeSeriesSplit
 
 from abc import ABCMeta, abstractmethod
 
+from tiase import findicators
+
 class DataSplitter(metaclass = ABCMeta):
 
     @abstractmethod
@@ -91,7 +93,7 @@ class DataSplitterTrainTestWithLag(DataSplitterTrainTest):
             x_train.append(seq)
         x_train = np.array(x_train)
 
-        y_train = np.array([targets["target"][i + self.seq_len].copy() for i in range(len(targets) - self.seq_len)])
+        y_train = np.array([targets["target"][i + self.seq_len] for i in range(len(targets) - self.seq_len)])
         y_train = np.expand_dims(y_train, 1)
         
         return x_train, y_train
@@ -126,7 +128,7 @@ class DataSplitterTrainTestSimple(DataSplitterTrainTest):
             x_train.append(seq)
         x_train = np.array(x_train)
 
-        y_train = np.array([targets["target"][i + self.seq_len - 1].copy() for i in range(len(targets) - self.seq_len + 1)]).astype(int)
+        y_train = np.array([targets["target"][i + self.seq_len - 1] for i in range(len(targets) - self.seq_len + 1)]).astype(int)
         y_train = np.expand_dims(y_train, 1)
         
         return x_train, y_train

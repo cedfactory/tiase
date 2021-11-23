@@ -34,6 +34,8 @@ def get_rmse(y_true, y_pred):
 def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
     result = {}
 
+    multiclass = len(np.unique(y_test)) > 2
+
     result["X_test"] = x_test
     result["y_test"] = y_test
     result["test_size"] = len(x_test)
@@ -45,9 +47,13 @@ def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
 
     result["pred_pos_rate"] = y_test_pred.sum() / len(y_test_pred)
     result["accuracy"] = metrics.accuracy_score(y_test, y_test_pred)
-    result["precision"] = metrics.precision_score(y_test, y_test_pred)
-    result["recall"] = metrics.recall_score(y_test, y_test_pred)
-    result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average="binary")
+
+    average = 'binary'
+    if multiclass:
+        average = 'micro'
+    result["precision"] = metrics.precision_score(y_test, y_test_pred, average=average)
+    result["recall"] = metrics.recall_score(y_test, y_test_pred, average=average)
+    result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average=average)
 
     n_split = 4
     y_split_len = int(len(y_test)/n_split)
@@ -57,9 +63,9 @@ def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
 
         result["pred_pos_rate_" + str(i)] = y_test_pred_split.sum() / y_split_len
         result["accuracy_" + str(i)] = metrics.accuracy_score(y_test_split, y_test_pred_split)
-        result["precision_" + str(i)] = metrics.precision_score(y_test_split, y_test_pred_split)
-        result["recall_" + str(i)] = metrics.recall_score(y_test_split, y_test_pred_split)
-        result["f1_score_" + str(i)] = metrics.f1_score(y_test_split, y_test_pred_split, average="binary")
+        result["precision_" + str(i)] = metrics.precision_score(y_test_split, y_test_pred_split, average=average)
+        result["recall_" + str(i)] = metrics.recall_score(y_test_split, y_test_pred_split, average=average)
+        result["f1_score_" + str(i)] = metrics.f1_score(y_test_split, y_test_pred_split, average=average)
     return result
 
 def regression_analysis(model, x_test, y_test, y_normaliser = None):
@@ -100,7 +106,19 @@ colorSet = ['orange', 'greenyellow', 'deepskyblue', 'darkviolet', 'crimson', 'da
             'mediumturquoise', 'lime', 'teal', 'drive', 'sienna', 'sandybrown']
 
 testvspred = namedtuple('testvspred', ['classifiername', 'yTest', 'yPred'])
+
+def is_testvspreds_multiclass(testvspreds):
+    for testvspred in testvspreds:
+        if len(np.unique(testvspred.yTest)) > 2:
+            return True
+    return False
+
+# https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
 def export_roc_curves(testvspreds, filename, value):
+    if is_testvspreds_multiclass(testvspreds):
+        print("!!! export_roc_curves : can't deal with multiclass data")
+        return
+
     idfigroc = 1
     fig = plt.figure(idfigroc)
     plt.title('ROC-curve for {}'.format(value))

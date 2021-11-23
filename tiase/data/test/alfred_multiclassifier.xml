@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<dings>
+    <ding export="./tmp/">
+        <import filename="./tiase/data/test/google_stocks_data.csv"/>
+        <features indicators="close,simple_rtn" target="target"/>
+        <featureengineering export="out.csv">
+            <labeling t_final="10" upper_multiplier="2." lower_multiplier="2." target_name="target" />
+        </featureengineering>
+        <data_splitters>
+            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="21"/>
+        </data_splitters>
+        <classifiers>
+            <classifier id="mlp_1" type="mlp" data_splitter_id="ds_simple_1" export="mlp_1">
+                <parameters>
+                    <parameter name="epochs" value="20"/>
+                </parameters>
+            </classifier>
+        </classifiers>
+    </ding>
+</dings>
