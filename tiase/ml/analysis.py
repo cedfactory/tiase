@@ -87,6 +87,11 @@ def regression_analysis(model, x_test, y_test, y_normaliser = None):
 # ROC curves
 # https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-imbalanced-classification/
 def export_roc_curve(y_test, y_pred, filename):
+    if toolbox.is_multiclass(y_test):
+        print("!!! export_roc_curve : can't deal with multiclass data")
+        return
+
+
     idfigroc = 1
     fig = plt.figure(idfigroc)
     plt.title('ROC-curve for {}'.format("classifier"))

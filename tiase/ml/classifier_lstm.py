@@ -131,8 +131,12 @@ class ClassifierLSTM1(ClassifierLSTM):
             model = Sequential()
             model.add(Reshape((1, self.input_size), input_shape=(self.input_size,)))
             model.add(LSTM(self.lstm_size, input_shape=(1, self.input_size)))
-            model.add(Dense(1, activation='sigmoid'))
-            model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+            if hasattr(self.data_splitter, 'df') and toolbox.is_multiclass(self.data_splitter.df, "target"):
+                model.add(Dense(3, activation='softmax'))
+                model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+            else:
+                model.add(Dense(1, activation='sigmoid'))
+                model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
             return model
 
         self.model = KerasClassifier(model=create_keras_classifier)
@@ -171,8 +175,12 @@ class ClassifierLSTM2(ClassifierLSTM):
             model.add(Dropout(0.5))
             model.add(Dense(self.lstm_size, activation='sigmoid'))
             model.add(Dropout(0.5))
-            model.add(Dense(1, activation='sigmoid'))
-            model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+            if hasattr(self.data_splitter, 'df') and toolbox.is_multiclass(self.data_splitter.df, "target"):
+                model.add(Dense(3, activation='softmax'))
+                model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+            else:
+                model.add(Dense(1, activation='sigmoid'))
+                model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
             return model
 
         self.model = KerasClassifier(model=create_keras_classifier)
