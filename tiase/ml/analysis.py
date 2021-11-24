@@ -30,8 +30,11 @@ def get_rmse(y_true, y_pred):
     rmse = np.sqrt(np.mean(np.power((y_true - y_pred),2)))
     return rmse
 
-
-
+#
+# https://medium.com/usf-msds/choosing-the-right-metric-for-evaluating-machine-learning-models-part-2-86d5649a5428
+# https://arxiv.org/pdf/2008.05756.pdf
+# https://www.datascienceblog.net/post/machine-learning/performance-measures-multi-class-problems/
+#
 def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
     result = {}
 
@@ -51,10 +54,10 @@ def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
 
     average = 'binary'
     if multiclass:
-        average = 'micro'
-    result["precision"] = metrics.precision_score(y_test, y_test_pred, average=average)
-    result["recall"] = metrics.recall_score(y_test, y_test_pred, average=average)
-    result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average=average)
+        average = 'macro'
+    result["precision"] = metrics.precision_score(y_test, y_test_pred, average=average, zero_division=0)
+    result["recall"] = metrics.recall_score(y_test, y_test_pred, average=average, zero_division=0)
+    result["f1_score"] = metrics.f1_score(y_test, y_test_pred, average=average, zero_division=0)
 
     n_split = 4
     y_split_len = int(len(y_test)/n_split)
@@ -64,9 +67,10 @@ def classification_analysis(x_test, y_test, y_test_pred, y_test_prob):
 
         result["pred_pos_rate_" + str(i)] = y_test_pred_split.sum() / y_split_len
         result["accuracy_" + str(i)] = metrics.accuracy_score(y_test_split, y_test_pred_split)
-        result["precision_" + str(i)] = metrics.precision_score(y_test_split, y_test_pred_split, average=average)
-        result["recall_" + str(i)] = metrics.recall_score(y_test_split, y_test_pred_split, average=average)
-        result["f1_score_" + str(i)] = metrics.f1_score(y_test_split, y_test_pred_split, average=average)
+        result["precision_" + str(i)] = metrics.precision_score(y_test_split, y_test_pred_split, average=average, zero_division=0)
+        result["recall_" + str(i)] = metrics.recall_score(y_test_split, y_test_pred_split, average=average, zero_division=0)
+        result["f1_score_" + str(i)] = metrics.f1_score(y_test_split, y_test_pred_split, average=average, zero_division=0)
+
     return result
 
 def regression_analysis(model, x_test, y_test, y_normaliser = None):
