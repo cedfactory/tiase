@@ -10,9 +10,9 @@
             <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="21"/>
         </data_splitters>
         <classifiers>
-            <classifier id="mlp_1" type="mlp" data_splitter_id="ds_simple_1" export="mlp_1">
+            <classifier id="lstm_1" type="lstm1" data_splitter_id="ds_simple_1" export="lstm_1">
                 <parameters>
-                    <parameter name="epochs" value="20"/>
+                    <parameter name="epochs" value="100"/>
                 </parameters>
             </classifier>
         </classifiers>
