@@ -51,6 +51,18 @@ class DataSplitterTrainTest(DataSplitter):
         self.X_train, self.y_train = self.split_train_test(train_normalised_features, train_target)
         self.X_test, self.y_test = self.split_train_test(test_normalised_features, test_target)
 
+    def dump(self):
+        df_x_train = pd.DataFrame(self.X_train)
+        df_y_train = pd.DataFrame(self.y_train)
+        df_x_test = pd.DataFrame(self.X_test)
+        df_y_test = pd.DataFrame(self.y_test)
+        print("x train")
+        print(df_x_train.head())
+        print("y train")
+        print(self.y_train)
+
+
+
     def export(self, root="."):
         df_x_train = pd.DataFrame(self.X_train)
         df_y_train = pd.DataFrame(self.y_train)
