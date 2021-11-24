@@ -157,12 +157,12 @@ def get_labels(barriers):
                     condition_pt = False
             #assign the labels
             if condition_pt:
-                barriers['out'][i] = 1
+                barriers['out'][i] = 2.
             elif condition_sl:
-                barriers['out'][i] = -1
+                barriers['out'][i] = 0.
             else:
                 if not floating:
-                    barriers['out'][i] = 0
+                    barriers['out'][i] = 1.
                 else:
                     price_initial = barriers.price[start]
                     price_final = barriers.price[end]
