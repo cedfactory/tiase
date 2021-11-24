@@ -190,13 +190,20 @@ def execute(filename):
                     continue
 
                 library_data_splitters[data_splitter_id] = ds
-        print(library_data_splitters)
 
+        # dump data splitters library
+        print("[DATA SPLITTERS LIBRARY]")
+        #print(library_data_splitters)
+        for data_splitter_id, data_splitter_item in library_data_splitters.items():
+            if isinstance(data_splitter_item, data_splitter.DataSplitterTrainTestSimple):
+                print("DataSplitterTrainTestSimple {}".format(data_splitter_id))
+                #data_splitter_item.dump()
+            if isinstance(data_splitter_item, data_splitter.DataSplitterForCrossValidation):
+                print("DataSplitterForCrossValidation {}".format(data_splitter_id))
+ 
         # learning model
         classifiers_node = ding.find('classifiers')
         if classifiers_node:
-            ds = data_splitter.DataSplitterTrainTestSimple(df, target=target, seq_len=21)
-            ds.split(0.7)
             library_models = {}
             test_vs_pred = []
             for classifier in classifiers_node:
@@ -240,12 +247,13 @@ def execute(filename):
                     if isinstance(current_data_splitter, data_splitter.DataSplitterTrainTestSimple):
                         model.fit(current_data_splitter)
                     elif isinstance(current_data_splitter, data_splitter.DataSplitterForCrossValidation):
-                        results = model.evaluate_cross_validation(current_data_splitter, target, debug)
+                        model.evaluate_cross_validation(current_data_splitter, target, debug)
                     library_models[classifier_id] = model
                 else:
                     print("!!! can't find data splitter {}".format(data_splitter_id))
 
                 model_analysis = model.get_analysis()
+
                 out("Accuracy : {:.2f}".format(model_analysis["accuracy"]))
                 out("Precision : {:.2f}".format(model_analysis["precision"]))
                 out("Recall : {:.2f}".format(model_analysis["recall"]))
