@@ -2,9 +2,6 @@
 <dings>
     <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="close" target="target" />
-        <featureengineering export="out.csv">
-            <labeling t_final="10" upper_multiplier="2." lower_multiplier="2." target_name="target" />
-        </featureengineering>
+        <features indicators="close" target="labeling" export="out.csv" labeling_t_final="10" labeling_upper_multiplier="2." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="1" labeling_label_above="2" />
     </ding>
 </dings>

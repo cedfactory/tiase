@@ -109,7 +109,7 @@ def get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers):
     barriers['out'] = None
     return barriers
 
-def get_labels(barriers):
+def get_labels(barriers, label_below=0, label_middle=1, label_above=2):
     '''
     start: first day of the window
     end:last day of the window
@@ -157,12 +157,12 @@ def get_labels(barriers):
                     condition_pt = False
             #assign the labels
             if condition_pt:
-                barriers['out'][i] = 2.
+                barriers['out'][i] = label_above
             elif condition_sl:
-                barriers['out'][i] = 0.
+                barriers['out'][i] = label_below
             else:
                 if not floating:
-                    barriers['out'][i] = 1.
+                    barriers['out'][i] = label_middle
                 else:
                     price_initial = barriers.price[start]
                     price_final = barriers.price[end]
@@ -175,21 +175,31 @@ def get_labels(barriers):
 def data_labeling(df, params = None):
     debug = False
     t_final = 10 # how many days we hold the stock which set the vertical barrier
-    target_name = "labeling_target"
     upper_multiplier = 2
     lower_multiplier = 2
+    label_below = 0
+    label_middle = 1
+    label_above = 2
     if params:
-        debug = params.get('debug', debug)
-        t_final = params.get('t_final', t_final)
+        debug = params.get('labeling_debug', debug)
+        t_final = params.get('labeling_t_final', t_final)
         if isinstance(t_final, str):
             t_final = int(t_final)
-        target_name = params.get('target_name', target_name)
-        upper_multiplier = params.get('upper_multiplier', upper_multiplier)
+        upper_multiplier = params.get('labeling_upper_multiplier', upper_multiplier)
         if isinstance(upper_multiplier, str):
             upper_multiplier = float(upper_multiplier)
-        lower_multiplier = params.get('lower_multiplier', lower_multiplier)
+        lower_multiplier = params.get('labeling_lower_multiplier', lower_multiplier)
         if isinstance(lower_multiplier, str):
             lower_multiplier = float(lower_multiplier)
+        label_below = params.get('labeling_label_below', label_below)
+        if isinstance(label_below, str):
+            label_below = float(label_below)
+        label_middle = params.get('labeling_label_middle', label_middle)
+        if isinstance(label_middle, str):
+            label_middle = float(label_middle)
+        label_above = params.get('labeling_label_above', label_above)
+        if isinstance(label_above, str):
+            label_above = float(label_above)
 
     price = df["close"].copy()
 
@@ -201,7 +211,7 @@ def data_labeling(df, params = None):
 
     barriers = get_3_barriers(prices, daily_volatility, t_final, [upper_multiplier, lower_multiplier])
 
-    barriers = get_labels(barriers)
+    barriers = get_labels(barriers, label_below, label_middle, label_above)
 
     if debug:
         plot_barriers_out(barriers, filename="./tmp/labeling_barriers_out")
@@ -209,6 +219,6 @@ def data_labeling(df, params = None):
         barriers = fdataprep.process_technical_indicators(barriers, ['missing_values']) # shit happens
         barriers.to_csv("./tmp/labeling_barriers.csv")
 
-    df[target_name] = barriers['out']
+    df["labeling"] = barriers['out']
     
     return df

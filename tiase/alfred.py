@@ -65,24 +65,29 @@ def execute(filename):
         # indicators
         features_node = ding.find('features')
         if features_node is not None:
+            params = dict()
+            for name, value in features_node.attrib.items():
+                if name != "indicators" and name != "target" and name != "export":
+                    params[name] = value
+                    print("   {} : {}".format(name, value))
             features = features_node.get("indicators", None)
             target = features_node.get("target", None)
             export_filename = features_node.get("export", None)
-            if target:
-                all_features = []
-                if features:
-                    all_features = features.split(',')
-                all_features.append(target)
 
-                out("Using the following technical indicators : {}".format(all_features))
-                df = findicators.add_technical_indicators(df, all_features)
-                features_to_remove = [feature for feature in ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"] if feature not in all_features]
-                findicators.remove_features(df, features_to_remove)
-                df = fdataprep.process_technical_indicators(df, ['missing_values'])
-                if export_filename:
-                    df.to_csv(get_full_path(export_filename))
-                    for indicator in df.columns:
-                        visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
+            all_features = []
+            if features:
+                all_features = features.split(',')
+            all_features.append(target)
+
+            out("Using the following technical indicators : {}".format(all_features))
+            df = findicators.add_technical_indicators(df, all_features, params)
+            features_to_remove = [feature for feature in ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"] if feature not in all_features]
+            findicators.remove_features(df, features_to_remove)
+            df = fdataprep.process_technical_indicators(df, ['missing_values'])
+            if export_filename:
+                df.to_csv(get_full_path(export_filename))
+                for indicator in df.columns:
+                    visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
             out(df.head())
 
         # preprocessing
@@ -156,6 +161,15 @@ def execute(filename):
                 df.to_csv(get_full_path(export_filename))
                 for indicator in df.columns:
                         visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
+
+        print("[FINAL DATAFRAME]")
+        print(df.head())
+        print("target : {}".format(target))
+        print(df[target].value_counts())
+
+        # in the following, the target column should be named "target"
+        df = df.rename(columns={target: "target"})
+        target="target"
 
         # data splitter
         library_data_splitters = {}

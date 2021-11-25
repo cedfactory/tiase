@@ -1,11 +1,15 @@
 from tiase.fimport import fimport
 from tiase.findicators import findicators
 from tiase.fdatapreprocessing import fdataprep
+from . import alfred
 import pandas as pd
 # todo : try to use from pandas._testing import assert_frame_equal
 import numpy as np
 import pytest
+import os
 import datetime
+
+g_generate_references = False
 
 class TestIndicators:
     
@@ -17,11 +21,12 @@ class TestIndicators:
 
     def test_get_all_default_technical_indicators(self):
         ti = findicators.get_all_default_technical_indicators()
-        assert(len(ti) == 28)
+        assert(len(ti) == 29)
         expected_ti = ["trend_1d","macd","macds","macdh","bbands","rsi_30","cci_30","dx_30","williams_%r","stoch_%k","stoch_%d","er","stc","atr","adx","roc","mom","simple_rtn"]
         expected_ti.extend(["wma_5","wma_10","wma_15"])
         expected_ti.extend(["sma_5","sma_10","sma_15","sma_20"])
         expected_ti.extend(["ema_10","ema_20","ema_50"])
+        expected_ti.extend(["labeling"])
         assert(ti == expected_ti)
 
     def test_number_colums(self):
@@ -110,6 +115,54 @@ class TestIndicators:
             array = df[column].to_numpy()
             array_expected = expected_df[column].to_numpy()
             assert(np.allclose(array, array_expected))
+
+
+    def test_labeling(self):
+        df = self.get_real_dataframe()
+        df = df.head(150)
+        df_labeling = findicators.add_technical_indicators(df, ['labeling'], {'labeling_debug':True, 'labeling_t_final':10, 'labeling_upper_multiplier':"2.", 'labeling_lower_multiplier':"2."})
+        df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
+        df_labeling = findicators.remove_features(df_labeling, ['high', 'low', 'open', 'volume', 'adj_close'])
+
+        # final result
+        ref_file = "./tiase/data/test/featureengineering_data_labeling_reference.csv"
+        if g_generate_references:
+            df_labeling.to_csv(ref_file)
+        expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
+
+        for column in df_labeling.columns:
+            array_expected = expected_df_labeling[column].to_numpy()
+            if array_expected.dtype != object:
+                array = df_labeling[column].to_numpy(dtype = array_expected.dtype)
+                assert(np.allclose(array, array_expected))
+
+        # barriers for debug
+        gen_file = "./tmp/labeling_barriers.csv"
+        ref_file = "./tiase/data/test/featureengineering_data_labeling_barriers_reference.csv"
+        if g_generate_references:
+            os.rename(gen_file, ref_file)
+        ref_df_barriers = fimport.get_dataframe_from_csv(ref_file)
+        gen_df_barriers = fimport.get_dataframe_from_csv(gen_file)
+
+        for column in gen_df_barriers.columns:
+            ref_array = ref_df_barriers[column].to_numpy()
+            if ref_array.dtype != object:
+                gen_array = gen_df_barriers[column].to_numpy(dtype = ref_array.dtype)
+                assert(np.allclose(gen_array, ref_array))
+
+
+    def test_labeling_with_alfred(self):
+        alfred.execute("./tiase/data/test/featureengineering_alfred_data_labeling.xml")
+        df_generated = fimport.get_dataframe_from_csv("./tmp/out.csv")
+        df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "adj_close", "volume"])
+        df_generated = df_generated.head(137) # ref has been computed with 150 first values & t_final=10
+        df_generated["labeling"] = df_generated["labeling"].astype(int)
+
+        if g_generate_references:
+            df_generated.to_csv("./tiase/data/test/featureengineering_data_labeling_reference.csv")
+        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/featureengineering_data_labeling_reference.csv")
+
+        assert(df_generated.equals(df_expected))
 
 
     def test_temporal_indicators(self):

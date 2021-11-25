@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from . import vsa
+from tiase.featureengineering import flabeling # todo : move this code into findicators
 
 # https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
 from stockstats import StockDataFrame as Sdf
@@ -70,9 +71,10 @@ def get_all_default_technical_indicators():
     technical_indicators.extend(["wma_5","wma_10","wma_15"])
     technical_indicators.extend(["sma_5","sma_10","sma_15","sma_20"])
     technical_indicators.extend(["ema_10","ema_20","ema_50"])
+    technical_indicators.extend(["labeling"])
     return technical_indicators
 
-def add_technical_indicators(df, indicators):
+def add_technical_indicators(df, indicators, params=None):
     """
     calculate technical indicators
     use stockstats package to add technical indicators
@@ -191,6 +193,9 @@ def add_technical_indicators(df, indicators):
 
         elif indicator == 'simple_rtn':
             df['simple_rtn'] = df['close'].pct_change()
+
+        elif indicator == 'labeling':
+            df = flabeling.data_labeling(df, params)
 
         elif indicator == 'vsa':
             days = [1, 2, 3, 5, 20, 40, 60]
