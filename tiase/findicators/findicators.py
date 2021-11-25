@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from . import vsa
-from tiase.featureengineering import flabeling # todo : move this code into findicators
+from . import flabeling
 
 # https://pythondata.com/stockstats-python-module-various-stock-market-statistics-indicators/
 from stockstats import StockDataFrame as Sdf
