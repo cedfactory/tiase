@@ -24,12 +24,15 @@ def serialize(scaler, filename):
 def deserialize(filename):
     return joblib.load(filename)
 
-def is_multiclass(obj, target="target"):
+def get_n_classes(obj, target="target"):
     if isinstance(obj, np.ndarray):
-        return len(np.unique(obj)) > 2
+        return len(np.unique(obj))
     elif isinstance(obj, pd.DataFrame):
-        return obj[target].nunique() > 2
-    return None
+        return obj[target].nunique()
+    return 0
+
+def is_multiclass(obj, target="target"):
+    return get_n_classes(obj, target) > 2
 
 def add_row_to_df(df,ls):
     """

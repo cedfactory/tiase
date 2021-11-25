@@ -74,3 +74,17 @@ class TestMlToolbox:
         multiclass = toolbox.is_multiclass(df, target="target")
         assert(multiclass == True)
 
+    def test_get_n_classes(self):
+        n_classes = toolbox.get_n_classes(np.array([1, 1, 2, 2, 1]))
+        assert(n_classes == 2)
+
+        n_classes = toolbox.get_n_classes(np.array([1, 1, 2, 2, 3]))
+        assert(n_classes == 3)
+
+        df = pd.DataFrame([[1], [0], [1], [1], [0], [1], [0], [1]], columns = ['target'])
+        n_classes = toolbox.get_n_classes(df, target="target")
+        assert(n_classes == 2)
+
+        df = pd.DataFrame([[1], [0], [1], [2], [0], [1], [0], [1]], columns = ['target'])
+        n_classes = toolbox.get_n_classes(df, target="target")
+        assert(n_classes == 3)
