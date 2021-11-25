@@ -164,6 +164,8 @@ def execute(filename):
 
         print("[FINAL DATAFRAME]")
         print(df.head())
+        if target == None:
+            continue
         print("target : {}".format(target))
         print(df[target].value_counts())
 
