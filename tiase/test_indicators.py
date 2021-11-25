@@ -125,7 +125,7 @@ class TestIndicators:
         df_labeling = findicators.remove_features(df_labeling, ['high', 'low', 'open', 'volume', 'adj_close'])
 
         # final result
-        ref_file = "./tiase/data/test/featureengineering_data_labeling_reference.csv"
+        ref_file = "./tiase/data/test/findicators_data_labeling_reference.csv"
         if g_generate_references:
             df_labeling.to_csv(ref_file)
         expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
@@ -138,7 +138,7 @@ class TestIndicators:
 
         # barriers for debug
         gen_file = "./tmp/labeling_barriers.csv"
-        ref_file = "./tiase/data/test/featureengineering_data_labeling_barriers_reference.csv"
+        ref_file = "./tiase/data/test/findicators_data_labeling_barriers_reference.csv"
         if g_generate_references:
             os.rename(gen_file, ref_file)
         ref_df_barriers = fimport.get_dataframe_from_csv(ref_file)
@@ -152,15 +152,15 @@ class TestIndicators:
 
 
     def test_labeling_with_alfred(self):
-        alfred.execute("./tiase/data/test/featureengineering_alfred_data_labeling.xml")
+        alfred.execute("./tiase/data/test/findicators_alfred_data_labeling.xml")
         df_generated = fimport.get_dataframe_from_csv("./tmp/out.csv")
         df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "adj_close", "volume"])
         df_generated = df_generated.head(137) # ref has been computed with 150 first values & t_final=10
         df_generated["labeling"] = df_generated["labeling"].astype(int)
 
         if g_generate_references:
-            df_generated.to_csv("./tiase/data/test/featureengineering_data_labeling_reference.csv")
-        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/featureengineering_data_labeling_reference.csv")
+            df_generated.to_csv("./tiase/data/test/findicators_data_labeling_reference.csv")
+        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/findicators_data_labeling_reference.csv")
 
         assert(df_generated.equals(df_expected))
 
