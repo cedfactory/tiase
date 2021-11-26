@@ -9,8 +9,11 @@ import math
 import os
 from rich import print,inspect
 
-def out(msg):
-    print(msg)
+def out(msg, format=None):
+    if format:
+        print("["+format+"]"+ msg + "[/"+format+"]")
+    else:
+        print(msg)       
 
 def execute(filename):
     tree = ET.parse(filename)
@@ -41,6 +44,7 @@ def execute(filename):
         out(ding_msg)
 
         # import
+        out("\U0001F449 [IMPORT]", "bold red")
         import_node = ding.find('import')
         if import_node is not None:
             value = import_node.get("value", None)
@@ -57,12 +61,16 @@ def execute(filename):
                 out("filename : {}".format(import_filename))
                 df = fimport.get_dataframe_from_csv(import_filename, params)
                 value = "" # value is used as name to export files, so we can't leave it with None value
-            out(df.head())
 
+            out(df.head())
             if export_filename:
                 df.to_csv(get_full_path(export_filename))
+ 
+            df = findicators.normalize_column_headings(df)
+            initial_columns = list(df.columns)
 
         # indicators
+        out("\U0001F449 [INDICATORS]", "bold red")
         features_node = ding.find('features')
         if features_node is not None:
             params = dict()
@@ -77,11 +85,12 @@ def execute(filename):
             all_features = []
             if features:
                 all_features = features.split(',')
-            all_features.append(target)
+            if target != None:
+                all_features.append(target)
 
             out("Using the following technical indicators : {}".format(all_features))
             df = findicators.add_technical_indicators(df, all_features, params)
-            features_to_remove = [feature for feature in ["open", "high", "low", "adj_close", "volume", "dividends", "stock_splits"] if feature not in all_features]
+            features_to_remove = [feature for feature in initial_columns if feature not in all_features]
             findicators.remove_features(df, features_to_remove)
             df = fdataprep.process_technical_indicators(df, ['missing_values'])
             if export_filename:
@@ -91,6 +100,7 @@ def execute(filename):
             out(df.head())
 
         # preprocessing
+        out("\U0001F449 [PREPROCESSING]", "bold red")
         preprocessing_node = ding.find('preprocessing')
         if preprocessing_node:
             export_filename = preprocessing_node.get("export", None)
@@ -133,6 +143,7 @@ def execute(filename):
                     visu.display_from_dataframe(df, indicator, get_full_path(value + '_preprocessing_'+indicator+'.png'))
 
         # feature engineering
+        out("\U0001F449 [FEATURE ENGINEERING]", "bold red")
         featureengineering_node = ding.find('featureengineering')
         if featureengineering_node is not None:
             export_filename = featureengineering_node.get("export", None)
@@ -162,12 +173,20 @@ def execute(filename):
                 for indicator in df.columns:
                         visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
 
-        print("[FINAL DATAFRAME]")
-        print(df.head())
+        out("\U0001F449 [FINAL DATAFRAME]", "bold red")
+        out(df.head())
+
+        # target
+        out("\U0001F449 [TARGET]", "bold red")
         if target == None:
+            target_node = ding.find('target')
+            if target_node is not None:
+                target = target_node.text
+        if target == None:
+            out("!!! no target !!!")
             continue
-        print("target : {}".format(target))
-        print(df[target].value_counts())
+        out("target : {}".format(target))
+        out(df[target].value_counts())
 
         # in the following, the target column should be named "target"
         df = df.rename(columns={target: "target"})
@@ -208,7 +227,7 @@ def execute(filename):
                 library_data_splitters[data_splitter_id] = ds
 
         # dump data splitters library
-        print("[DATA SPLITTERS LIBRARY]")
+        out("\U0001F449 [DATA SPLITTERS LIBRARY]", "bold red")
         #print(library_data_splitters)
         for data_splitter_id, data_splitter_item in library_data_splitters.items():
             if isinstance(data_splitter_item, data_splitter.DataSplitterTrainTestSimple):
@@ -218,13 +237,14 @@ def execute(filename):
                 print("DataSplitterForCrossValidation {}".format(data_splitter_id))
  
         # learning model
+        out("\U0001F449 [CLASSIFIERS]", "bold red")
         classifiers_node = ding.find('classifiers')
         if classifiers_node:
             library_models = {}
             test_vs_pred = []
             for classifier in classifiers_node:
                 classifier_id = classifier.get("id", None)
-                out("[CLASSIFIER] Treating {}".format(classifier_id))
+                out("[CLASSIFIER] Treating {}".format(classifier_id), "red")
                 classifier_type = classifier.get("type", None)
                 data_splitter_id = classifier.get("data_splitter_id", None)
                 export_filename = classifier.get("export", None)
@@ -266,7 +286,7 @@ def execute(filename):
                         model.evaluate_cross_validation(current_data_splitter, target, debug)
                     library_models[classifier_id] = model
                 else:
-                    print("!!! can't find data splitter {}".format(data_splitter_id))
+                    out("!!! can't find data splitter {}".format(data_splitter_id))
 
                 model_analysis = model.get_analysis()
 
@@ -282,7 +302,7 @@ def execute(filename):
             analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves.png", "")
 
         end = datetime.now()
-        out("elapsed time : {}".format(end-start))
+        out("\U0001F3C1 elapsed time : {}".format(end-start), "bold red")
 
     return 0
 

@@ -2,7 +2,7 @@
 <dings>
     <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="simple_rtn" target="target"/>
+        <features indicators="close,simple_rtn" target="target"/>
         <preprocessing export="out.csv">
             <outliers method="outliers_normalize_stdcutoff" indicators="simple_rtn" />
         </preprocessing>

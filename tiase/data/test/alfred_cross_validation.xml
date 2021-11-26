@@ -2,7 +2,7 @@
 <dings>
     <ding export="./tmp/" debug="True">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="" target="target"/>
+        <features indicators="close" target="target"/>
         <data_splitters>
             <data_splitter id="ds_cv_1" type="cross_validation" sequence_length="21" nb_splits="5" max_train_size="500" test_size="100"/>
         </data_splitters>

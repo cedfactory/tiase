@@ -2,7 +2,7 @@
 <dings>
     <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="simple_rtn,rsi_30,williams_%r" target="target"/>
+        <features indicators="close,simple_rtn,rsi_30,williams_%r" target="target"/>
         <data_splitters>
             <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="21"/>
         </data_splitters>

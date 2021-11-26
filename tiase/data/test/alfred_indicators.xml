@@ -2,6 +2,6 @@
 <dings>
     <ding export="./tmp/">
         <import filename="./tiase/data/CAC40/AI.PA.csv"/>
-        <features indicators="simple_rtn,rsi_30,williams_%r" target="target" export="out.csv"/>
+        <features indicators="close,simple_rtn,rsi_30,williams_%r" target="target" export="out.csv"/>
     </ding>
 </dings>
