@@ -9,6 +9,7 @@ import math
 import os
 from rich import print,inspect
 
+step_format = "bold red"
 def out(msg, format=None):
     if format:
         print("["+format+"]"+ msg + "[/"+format+"]")
@@ -44,7 +45,7 @@ def execute(filename):
         out(ding_msg)
 
         # import
-        out("\U0001F449 [IMPORT]", "bold red")
+        out("\U0001F449 [IMPORT]", step_format)
         import_node = ding.find('import')
         if import_node is not None:
             value = import_node.get("value", None)
@@ -70,7 +71,7 @@ def execute(filename):
             initial_columns = list(df.columns)
 
         # indicators
-        out("\U0001F449 [INDICATORS]", "bold red")
+        out("\U0001F449 [INDICATORS]", step_format)
         features_node = ding.find('features')
         if features_node is not None:
             params = dict()
@@ -100,7 +101,7 @@ def execute(filename):
             out(df.head())
 
         # preprocessing
-        out("\U0001F449 [PREPROCESSING]", "bold red")
+        out("\U0001F449 [PREPROCESSING]", step_format)
         preprocessing_node = ding.find('preprocessing')
         if preprocessing_node:
             export_filename = preprocessing_node.get("export", None)
@@ -143,7 +144,7 @@ def execute(filename):
                     visu.display_from_dataframe(df, indicator, get_full_path(value + '_preprocessing_'+indicator+'.png'))
 
         # feature engineering
-        out("\U0001F449 [FEATURE ENGINEERING]", "bold red")
+        out("\U0001F449 [FEATURE ENGINEERING]", step_format)
         featureengineering_node = ding.find('featureengineering')
         if featureengineering_node is not None:
             export_filename = featureengineering_node.get("export", None)
@@ -173,11 +174,11 @@ def execute(filename):
                 for indicator in df.columns:
                         visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
 
-        out("\U0001F449 [FINAL DATAFRAME]", "bold red")
+        out("\U0001F449 [FINAL DATAFRAME]", step_format)
         out(df.head())
 
         # target
-        out("\U0001F449 [TARGET]", "bold red")
+        out("\U0001F449 [TARGET]", step_format)
         if target == None:
             target_node = ding.find('target')
             if target_node is not None:
@@ -227,7 +228,7 @@ def execute(filename):
                 library_data_splitters[data_splitter_id] = ds
 
         # dump data splitters library
-        out("\U0001F449 [DATA SPLITTERS LIBRARY]", "bold red")
+        out("\U0001F449 [DATA SPLITTERS LIBRARY]", step_format)
         #print(library_data_splitters)
         for data_splitter_id, data_splitter_item in library_data_splitters.items():
             if isinstance(data_splitter_item, data_splitter.DataSplitterTrainTestSimple):
@@ -237,7 +238,7 @@ def execute(filename):
                 print("DataSplitterForCrossValidation {}".format(data_splitter_id))
  
         # learning model
-        out("\U0001F449 [CLASSIFIERS]", "bold red")
+        out("\U0001F449 [CLASSIFIERS]", step_format)
         classifiers_node = ding.find('classifiers')
         if classifiers_node:
             library_models = {}
@@ -302,7 +303,7 @@ def execute(filename):
             analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves.png", "")
 
         end = datetime.now()
-        out("\U0001F3C1 elapsed time : {}".format(end-start), "bold red")
+        out("\U0001F3C1 elapsed time : {}".format(end-start), step_format)
 
     return 0
 

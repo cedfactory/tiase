@@ -52,9 +52,10 @@ class TestDataProcess:
         df = findicators.remove_features(df, ["high", "low", "open", "close", "adj_close", "volume"])
         df = df.head(200)
 
+        ref_file = "./tiase/data/test/datapreprocess_discretization_reference.csv"
         if g_generate_references:
-            df.to_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
-        expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
+            df.to_csv(ref_file)
+        expected_df = fimport.get_dataframe_from_csv(ref_file)
         assert(df.equals(expected_df))
 
     def test_discretization_with_alfred(self):
@@ -63,9 +64,10 @@ class TestDataProcess:
         df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "close", "adj_close", "volume", "target"])
         df_generated = df_generated.head(200)
 
+        ref_file = "./tiase/data/test/datapreprocess_discretization_reference.csv"
         if g_generate_references:
-            df_generated.to_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
-        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_discretization_reference.csv")
+            df_generated.to_csv(ref_file)
+        df_expected = fimport.get_dataframe_from_csv(ref_file)
 
         assert(df_generated.equals(df_expected))
 
@@ -160,7 +162,7 @@ class TestDataProcess:
         # debug
         visu.display_outliers_from_dataframe(df_original, df, 'simple_rtn', './tmp/test_cut_outliers_std_cutoff.png')
 
-        if True or g_generate_references:
+        if g_generate_references:
             df.to_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
         expected_df = fimport.get_dataframe_from_csv("./tiase/data/test/datapreprocess_cut_outliers_std_cutoff_reference.csv")
         

@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <dings>
     <ding export="./tmp/">
-        <!--<import filename="./tiase/data/test/google_stocks_data.csv"/>-->
-        <import value="AI.PA"/>
+        <import filename="./tiase/data/test/google_stocks_data.csv"/>
         <features indicators="close,simple_rtn,labeling" labeling_t_final="10" labeling_upper_multiplier="2." labeling_lower_multiplier="2." labeling_label_below="0." labeling_label_middle="0." labeling_label_above="1." />
         <target>labeling</target>
         <data_splitters>

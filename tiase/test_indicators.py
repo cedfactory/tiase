@@ -158,9 +158,10 @@ class TestIndicators:
         df_generated = df_generated.head(137) # ref has been computed with 150 first values & t_final=10
         df_generated["labeling"] = df_generated["labeling"].astype(int)
 
+        ref_file = "./tiase/data/test/findicators_data_labeling_reference.csv"
         if g_generate_references:
-            df_generated.to_csv("./tiase/data/test/findicators_data_labeling_reference.csv")
-        df_expected = fimport.get_dataframe_from_csv("./tiase/data/test/findicators_data_labeling_reference.csv")
+            df_generated.to_csv(ref_file)
+        df_expected = fimport.get_dataframe_from_csv(ref_file)
 
         assert(df_generated.equals(df_expected))
 
