@@ -48,6 +48,10 @@ class ClassifierLSTM(classifier.Classifier):
         self.x_normaliser = self.data_splitter.normalizer
         self.input_size = self.X_train.shape[1]
 
+        self.n_classes = 2
+        if hasattr(self.data_splitter, 'df'):
+            self.n_classes = toolbox.get_n_classes(self.data_splitter.df, "target")
+
         # create the model
         tf.random.set_seed(20)
         np.random.seed(10)
@@ -66,7 +70,10 @@ class ClassifierLSTM(classifier.Classifier):
     def get_analysis(self):
         self.y_test_prob = self.model.predict(self.X_test)
 
-        self.threshold, self.y_test_pred = toolbox.get_classification_threshold("naive", self.y_test, self.y_test_prob)
+        if self.n_classes == 2:
+            self.threshold, self.y_test_pred = toolbox.get_classification_threshold("naive", self.y_test, self.y_test_prob)
+        else:
+            self.y_test_pred = self.y_test_prob
         
         self.analysis = analysis.classification_analysis(self.X_test, self.y_test, self.y_test_pred, self.y_test_prob)
         self.analysis["history"] = self.model.history_
@@ -132,12 +139,8 @@ class ClassifierLSTM1(ClassifierLSTM):
             model.add(Reshape((1, self.input_size), input_shape=(self.input_size,)))
             model.add(LSTM(self.lstm_size, input_shape=(1, self.input_size)))
 
-            n_classes = 2
-            if hasattr(self.data_splitter, 'df'):
-                n_classes = toolbox.get_n_classes(self.data_splitter.df, "target")
-            
-            if n_classes > 2:
-                model.add(Dense(n_classes, activation='softmax'))
+            if self.n_classes > 2:
+                model.add(Dense(self.n_classes, activation='softmax'))
                 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             else:
                 model.add(Dense(1, activation='sigmoid'))
@@ -180,13 +183,9 @@ class ClassifierLSTM2(ClassifierLSTM):
             model.add(Dropout(0.5))
             model.add(Dense(self.lstm_size, activation='sigmoid'))
             model.add(Dropout(0.5))
-            
-            n_classes = 2
-            if hasattr(self.data_splitter, 'df'):
-                n_classes = toolbox.get_n_classes(self.data_splitter.df, "target")
-            
-            if n_classes > 2:
-                model.add(Dense(n_classes, activation='softmax'))
+
+            if self.n_classes > 2:
+                model.add(Dense(self.n_classes, activation='softmax'))
                 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             else:
                 model.add(Dense(1, activation='sigmoid'))
