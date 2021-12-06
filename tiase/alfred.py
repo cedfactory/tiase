@@ -185,10 +185,8 @@ def execute(filename):
                 target = target_node.text
                 shift = target_node.get("shift", None)
                 if shift:
-                    print(df.head())
                     df = findicators.shift(df, target, shift)
                     df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
-                    print(df.head())
                     
                 export_filename = target_node.get("export", None)
                 if export_filename:
