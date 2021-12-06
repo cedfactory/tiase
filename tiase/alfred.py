@@ -195,7 +195,7 @@ def execute(filename):
                     df.to_csv(get_full_path(export_filename))
 
         if target == None:
-            out("!!! no target !!!")
+            out("\U0001F4A5 no target \U0001F4A5")
             continue
         out("target : {}".format(target))
         out(df[target].value_counts())
