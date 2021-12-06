@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<dings>
+    <ding export="./tmp/">
+        <import filename="./tiase/data/test/google_stocks_data.csv"/>
+        <features indicators="close,target,trend_1d" />
+        <target shift="-1" export="out.csv">trend_1d</target>
+    </ding>
+</dings>

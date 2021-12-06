@@ -212,6 +212,13 @@ def add_technical_indicators(df, indicators, params=None):
     
     return df
 
+def shift(df, indicator, shift):
+    if isinstance(shift, str):
+        shift = int(shift)
+    
+    df[indicator] = df[indicator].shift(shift)
+    return df
+
 def get_trend_info(df):
     tmp = pd.concat([df['close']], axis=1, keys=['close'])
     tmp = add_technical_indicators(tmp, ["trend_1d"])

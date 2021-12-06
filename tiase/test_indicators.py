@@ -165,6 +165,27 @@ class TestIndicators:
 
         assert(df_generated.equals(df_expected))
 
+    def test_shift(self):
+        data = {'close':[20., 21., 23., 19., 18., 24., 25., 26., 16.]}
+        df = pd.DataFrame(data)
+
+        df = findicators.shift(df, "close", 2)
+
+        array = df.loc[:,'close'].values
+        assert(np.array_equal(array, [np.NaN, np.NaN, 20., 21., 23., 19., 18., 24., 25.], equal_nan=True))
+
+    def test_shift_with_alfred(self):
+        alfred.execute("./tiase/data/test/alfred_shift.xml")
+        df_generated = fimport.get_dataframe_from_csv("./tmp/out.csv")
+        df_generated = findicators.remove_features(df_generated, ["high", "low", "open", "adj_close", "volume"])
+        df_generated = df_generated.head(50)
+
+        ref_file = "./tiase/data/test/findicators_shift_reference.csv"
+        if g_generate_references:
+            df_generated.to_csv(ref_file)
+        df_expected = fimport.get_dataframe_from_csv(ref_file)
+
+        assert(df_generated.equals(df_expected))
 
     def test_temporal_indicators(self):
         idx = pd.Index(pd.date_range("19991231", periods=10), name='Date')
