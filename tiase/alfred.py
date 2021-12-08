@@ -5,6 +5,7 @@ from tiase.featureengineering import fprocessfeature
 from tiase.findicators import findicators
 from tiase.ml import data_splitter,classifiers_factory,analysis
 from datetime import datetime
+import pandas as pd
 import math
 import os
 from rich import print,inspect
@@ -14,7 +15,11 @@ def out(msg, format=None):
     if format:
         print("["+format+"]"+ msg + "[/"+format+"]")
     else:
-        print(msg)       
+        if isinstance(msg, pd.DataFrame):
+            with pd.option_context('display.max_rows',10):
+                print(msg)
+        else:
+            print(msg)       
 
 def execute(filename):
     tree = ET.parse(filename)
@@ -63,7 +68,7 @@ def execute(filename):
                 df = fimport.get_dataframe_from_csv(import_filename, params)
                 value = "" # value is used as name to export files, so we can't leave it with None value
 
-            out(df.head())
+            out(df)
             if export_filename:
                 df.to_csv(get_full_path(export_filename))
  
@@ -98,7 +103,7 @@ def execute(filename):
                 df.to_csv(get_full_path(export_filename))
                 for indicator in df.columns:
                     visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
-            out(df.head())
+            out(df)
 
         # preprocessing
         out("\U0001F449 [PREPROCESSING]", step_format)
@@ -175,7 +180,7 @@ def execute(filename):
                         visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
 
         out("\U0001F449 [FINAL DATAFRAME]", step_format)
-        out(df.head())
+        out(df)
 
         # target
         out("\U0001F449 [TARGET]", step_format)
