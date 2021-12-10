@@ -90,7 +90,10 @@ def get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers):
         if (days_passed + t_final < len(daily_volatility.index) and t_final != 0):
             vert_barrier = daily_volatility.index[days_passed + t_final]
         else:
-            vert_barrier = np.nan
+            # Labeling with decreasing ending
+            vert_barrier = daily_volatility.index[len(daily_volatility.index) - 1]
+            # Labeling with nan ending
+            #vert_barrier = np.nan
         #set the top barrier
         if upper_lower_multipliers[0] > 0:
             top_barrier = prices.loc[day] + prices.loc[day] * upper_lower_multipliers[0] * vol
