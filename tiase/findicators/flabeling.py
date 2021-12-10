@@ -219,6 +219,6 @@ def data_labeling(df, params = None):
         barriers = fdataprep.process_technical_indicators(barriers, ['missing_values']) # shit happens
         barriers.to_csv("./tmp/labeling_barriers.csv")
 
-    df["labeling"] = barriers['out']
+    df["labeling"] = barriers['out'].copy()
     
     return df
