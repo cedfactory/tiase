@@ -68,12 +68,16 @@ def execute(filename):
                 df = fimport.get_dataframe_from_csv(import_filename, params)
                 value = "" # value is used as name to export files, so we can't leave it with None value
 
-            out(df)
-            if export_filename:
-                df.to_csv(get_full_path(export_filename))
- 
-            df = findicators.normalize_column_headings(df)
-            initial_columns = list(df.columns)
+        if not isinstance(df, pd.DataFrame):
+            out("\U0001F4A5 no input data")
+            continue
+
+        out(df)
+        if export_filename:
+            df.to_csv(get_full_path(export_filename))
+
+        df = findicators.normalize_column_headings(df)
+        initial_columns = list(df.columns)
 
         # indicators
         out("\U0001F449 [INDICATORS]", step_format)
@@ -198,7 +202,7 @@ def execute(filename):
                     df.to_csv(get_full_path(export_filename))
 
         if target == None:
-            out("\U0001F4A5 no target \U0001F4A5")
+            out("\U0001F4A5 no target")
             continue
         out("target : {}".format(target))
         out(df[target].value_counts())
