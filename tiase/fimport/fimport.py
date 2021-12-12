@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import datetime
+from rich import print,inspect
 
 cac40 = {
     "AI.PA": "Air Liquide",
@@ -157,6 +158,8 @@ def download_from_yahoo(values, folder = ""):
 
 def get_dataframe_from_yahoo(value, params=None):
     result = yf.Ticker(value)
+    if result == None or result.isin == '-':
+        return None
     start=None
     end=None
     period="max"
