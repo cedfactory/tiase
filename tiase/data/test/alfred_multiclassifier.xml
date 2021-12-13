@@ -2,15 +2,16 @@
 <dings>
     <ding export="./tmp/">
         <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="close,simple_rtn,labeling" labeling_t_final="10" labeling_upper_multiplier="2." labeling_lower_multiplier="2." labeling_label_below="0." labeling_label_middle="0." labeling_label_above="1." />
+        <features indicators="trend_1d,labeling"  labeling_t_final="10" labeling_upper_multiplier="2." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" />
         <target>labeling</target>
+        
         <data_splitters>
-            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="21"/>
+            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="3"/>
         </data_splitters>
         <classifiers>
             <classifier id="lstm_1" type="lstm1" data_splitter_id="ds_simple_1" export="lstm_1">
                 <parameters>
-                    <parameter name="epochs" value="100"/>
+                    <parameter name="epochs" value="30"/>
                 </parameters>
             </classifier>
         </classifiers>
