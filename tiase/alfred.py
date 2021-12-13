@@ -195,19 +195,6 @@ def execute(filename):
                         if method is not None:
                             out("[FEATURE ENGINEERING] reduction : {}".format(method))
 
-                    # labeling
-                    if featureengineering.tag == "labeling":
-                        out("[FEATURE ENGINEERING] labeling : ")
-                        params = dict()
-                        for param in ["t_final", "target_name", "upper_multiplier", "lower_multiplier"]:
-                            if param in featureengineering.attrib:
-                                params[param] = featureengineering.get(param)
-                                print("   {} : {}".format(param, params[param]))
-                        df = fprocessfeature.process_features(df.copy(), ["data_labeling"], params)
-                        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
-                        val_counts = df['target'].value_counts()
-                        print("value_counts :\n{}".format(val_counts))
-
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
                     for indicator in df.columns:
