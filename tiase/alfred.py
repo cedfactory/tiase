@@ -49,276 +49,306 @@ def execute(filename):
         start = datetime.now()
         out(ding_msg)
 
+        #
         # import
+        #
         out("\U0001F449 [IMPORT]", step_format)
+        dict_values = dict()
         import_node = ding.find('import')
         if import_node is not None:
-            value = import_node.get("value", None)
+            attributes_values = import_node.get("value", None)
+            values = None
+            if attributes_values:
+                values = attributes_values.split(',')
             params = dict()
             for param in ["start", "end", "period"]:
                 if param in import_node.attrib:
                     params[param] = import_node.get(param)
             import_filename = import_node.get("filename", None)
             export_filename = import_node.get("export", None)
-            if value:
-                out("value : {}".format(value))
-                df = fimport.get_dataframe_from_yahoo(value, params)
+
+            if values:
+                for value in values:
+                    out("value : {}".format(value))
+                    df = fimport.get_dataframe_from_yahoo(value, params)
+
+                    if not isinstance(df, pd.DataFrame):
+                        out("\U0001F4A5 no input data for {}".format(value))
+                        continue
+
+                    if export_filename:
+                        if len(values) > 1:
+                            export_filename = value + '_' + export_filename
+                        df.to_csv(get_full_path(export_filename))
+
+                    df = findicators.normalize_column_headings(df)
+                    dict_values[value] = df
+
             elif import_filename:
                 out("filename : {}".format(import_filename))
                 df = fimport.get_dataframe_from_csv(import_filename, params)
+                if not isinstance(df, pd.DataFrame):
+                    out("\U0001F4A5 no input data for {}".format(value))
+                    continue
+                
+                if export_filename:
+                        df.to_csv(get_full_path(export_filename))
+
+                df = findicators.normalize_column_headings(df)
+
                 value = "" # value is used as name to export files, so we can't leave it with None value
+                dict_values[value] = df
+            
+        out("dict_values : {}".format(dict_values.keys()))
 
-        if not isinstance(df, pd.DataFrame):
-            out("\U0001F4A5 no input data")
-            continue
-
-        out(df)
-        if export_filename:
-            df.to_csv(get_full_path(export_filename))
-
-        df = findicators.normalize_column_headings(df)
-        initial_columns = list(df.columns)
-
-        # indicators
-        out("\U0001F449 [INDICATORS]", step_format)
-        features_node = ding.find('features')
-        if features_node is not None:
-            params = dict()
-            for name, value in features_node.attrib.items():
-                if name != "indicators" and name != "target" and name != "export":
-                    params[name] = value
-                    print("   {} : {}".format(name, value))
-            features = features_node.get("indicators", None)
-            target = features_node.get("target", None)
-            export_filename = features_node.get("export", None)
-
-            all_features = []
-            if features:
-                all_features = features.split(',')
-            if target != None:
-                all_features.append(target)
-
-            out("Using the following technical indicators : {}".format(all_features))
-            df = findicators.add_technical_indicators(df, all_features, params)
-            features_to_remove = [feature for feature in initial_columns if feature not in all_features]
-            findicators.remove_features(df, features_to_remove)
-            df = fdataprep.process_technical_indicators(df, ['missing_values'])
-            if export_filename:
-                df.to_csv(get_full_path(export_filename))
-                for indicator in df.columns:
-                    visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
+        for key in dict_values:
+            value = key
+            df = dict_values[key]
+            out("\U0001F7E2 dealing with {}".format(value))
             out(df)
 
-        # preprocessing
-        out("\U0001F449 [PREPROCESSING]", step_format)
-        preprocessing_node = ding.find('preprocessing')
-        if preprocessing_node:
-            export_filename = preprocessing_node.get("export", None)
-            
-            for preprocess in preprocessing_node:
-                # outliers
-                if preprocess.tag == "outliers":
-                    method = preprocess.get("method", None)
-                    indicators = preprocess.get("indicators", None)
-                    if indicators:
-                        indicators = indicators.split(',')
-                    if method:
-                        out("[PREPROCESSING] outliers : {}".format(method))
-                        df = fdataprep.process_technical_indicators(df, [method], indicators)
-                        df = fdataprep.process_technical_indicators(df, ['missing_values'])
+            initial_columns = list(df.columns)
 
-                # transformation
-                elif preprocess.tag == "transformation":
-                    method = preprocess.get("method", None)
-                    indicators = preprocess.get("indicators", None)
-                    if indicators:
-                        indicators = indicators.split(',')
-                    if method is not None and indicators is not None:
-                        out("[PREPROCESSING] transformation {} for {}".format(method, indicators))
-                        df = fdataprep.process_technical_indicators(df, ["transformation_"+method], indicators)
-                        df = fdataprep.process_technical_indicators(df, ['missing_values'])
+            # indicators
+            out("\U0001F449 [INDICATORS]", step_format)
+            features_node = ding.find('features')
+            if features_node is not None:
+                params = dict()
+                for name, value in features_node.attrib.items():
+                    if name != "indicators" and name != "target" and name != "export":
+                        params[name] = value
+                        print("   {} : {}".format(name, value))
+                features = features_node.get("indicators", None)
+                target = features_node.get("target", None)
+                export_filename = features_node.get("export", None)
 
-                elif preprocess.tag == "discretization":
-                    # discretization
-                    indicators = preprocess.get("indicators", None)
-                    method = preprocess.get("method", None)
-                    if indicators is not None and method is not None:
-                        out("[PREPROCESSING] discretization {} for {}".format(method, indicators))
-                        indicators = indicators.split(',')
-                        df = fdataprep.process_technical_indicators(df, ["discretization_"+method], indicators)
+                all_features = []
+                if features:
+                    all_features = features.split(',')
+                if target != None:
+                    all_features.append(target)
 
-            if export_filename:
-                df.to_csv(get_full_path(export_filename))
-                for indicator in df.columns:
-                    visu.display_from_dataframe(df, indicator, get_full_path(value + '_preprocessing_'+indicator+'.png'))
-
-        # feature engineering
-        out("\U0001F449 [FEATURE ENGINEERING]", step_format)
-        featureengineering_node = ding.find('featureengineering')
-        if featureengineering_node is not None:
-            export_filename = featureengineering_node.get("export", None)
-
-            for featureengineering in featureengineering_node:
-                # reduction
-                if featureengineering.tag == "reduction":
-                    method = featureengineering.get("method", None)
-                    if method is not None:
-                        out("[FEATURE ENGINEERING] reduction : {}".format(method))
-
-                # labeling
-                if featureengineering.tag == "labeling":
-                    out("[FEATURE ENGINEERING] labeling : ")
-                    params = dict()
-                    for param in ["t_final", "target_name", "upper_multiplier", "lower_multiplier"]:
-                        if param in featureengineering.attrib:
-                            params[param] = featureengineering.get(param)
-                            print("   {} : {}".format(param, params[param]))
-                    df = fprocessfeature.process_features(df.copy(), ["data_labeling"], params)
-                    df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
-                    val_counts = df['target'].value_counts()
-                    print("value_counts :\n{}".format(val_counts))
-
-            if export_filename:
-                df.to_csv(get_full_path(export_filename))
-                for indicator in df.columns:
-                        visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
-
-        out("\U0001F449 [FINAL DATAFRAME]", step_format)
-        out(df)
-
-        # target
-        out("\U0001F449 [TARGET]", step_format)
-        if target == None:
-            target_node = ding.find('target')
-            if target_node is not None:
-                target = target_node.text
-                shift = target_node.get("shift", None)
-                if shift:
-                    df = findicators.shift(df, target, shift)
-                    df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
-                    
-                export_filename = target_node.get("export", None)
+                out("Using the following technical indicators : {}".format(all_features))
+                df = findicators.add_technical_indicators(df, all_features, params)
+                features_to_remove = [feature for feature in initial_columns if feature not in all_features]
+                findicators.remove_features(df, features_to_remove)
+                df = fdataprep.process_technical_indicators(df, ['missing_values'])
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
+                    for indicator in df.columns:
+                        visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
+                out(df)
 
-        if target == None:
-            out("\U0001F4A5 no target")
-            continue
-        out("target : {}".format(target))
-        out(df[target].value_counts())
-
-        # in the following, the target column should be named "target"
-        df = df.rename(columns={target: "target"})
-        target="target"
-
-        # data splitter
-        library_data_splitters = {}
-        data_splitters_node = ding.find('data_splitters')
-        if data_splitters_node:
-            for data_splitter_node in data_splitters_node:
-                if data_splitter_node.tag != "data_splitter":
-                    continue
-                data_splitter_id = data_splitter_node.get("id", None)
-                data_splitter_type = data_splitter_node.get("type", None)
-                data_splitter_seq_len = int(data_splitter_node.get('sequence_length', math.nan))
-                if data_splitter_id == None or data_splitter_type == None or math.isnan(data_splitter_seq_len):
-                    continue
-
-                if data_splitter_type == "simple":
-                    index = float(data_splitter_node.get('index', math.nan))
-                    if math.isnan(index) == False:
-                        ds = data_splitter.DataSplitterTrainTestSimple(df, target=target, seq_len=data_splitter_seq_len)
-                        ds.split(index)
-                    else:
-                        continue
-                elif data_splitter_type == "cross_validation":
-                    nb_splits = int(data_splitter_node.get('nb_splits', math.nan))
-                    max_train_size = int(data_splitter_node.get('max_train_size', math.nan))
-                    test_size = int(data_splitter_node.get('test_size', math.nan))
-                    if math.isnan(nb_splits) == False and math.isnan(max_train_size) == False and math.isnan(test_size) == False:
-                        ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits, max_train_size, test_size)
-                        ds.split()
-                    else:
-                        continue
-                else:
-                    continue
-
-                library_data_splitters[data_splitter_id] = ds
-
-        # dump data splitters library
-        out("\U0001F449 [DATA SPLITTERS LIBRARY]", step_format)
-        #print(library_data_splitters)
-        for data_splitter_id, data_splitter_item in library_data_splitters.items():
-            if isinstance(data_splitter_item, data_splitter.DataSplitterTrainTestSimple):
-                print("DataSplitterTrainTestSimple {}".format(data_splitter_id))
-                #data_splitter_item.dump()
-            if isinstance(data_splitter_item, data_splitter.DataSplitterForCrossValidation):
-                print("DataSplitterForCrossValidation {}".format(data_splitter_id))
- 
-        # learning model
-        out("\U0001F449 [CLASSIFIERS]", step_format)
-        classifiers_node = ding.find('classifiers')
-        if classifiers_node:
-            library_models = {}
-            test_vs_pred = []
-            for classifier in classifiers_node:
-                classifier_id = classifier.get("id", None)
-                out("[CLASSIFIER] Treating {}".format(classifier_id), "red")
-                classifier_type = classifier.get("type", None)
-                data_splitter_id = classifier.get("data_splitter_id", None)
-                export_filename = classifier.get("export", None)
-
-                parameters_node = classifier.find('parameters')
-                params = {}
-                if parameters_node:
-                    for parameter in parameters_node:
-                        parameter_name = parameter.get("name", None)
-                        parameter_value = parameter.get("value", None)
-                        if parameter_name != None and parameter_value != None:
-
-                            def get_classifier_from_name(classifier_name):
-                                classifier_value = library_models[classifier_name]
-                                if classifier_value != None:
-                                    out("{} found ({})".format(classifier_name, classifier_value))
-                                else:
-                                    out("!!! {} not found !!!".format(parameter_value))
-                                return classifier_value
-
-                            # replace classifier name with classifier model
-                            if parameter_name == "classifier":
-                                parameter_value = get_classifier_from_name(parameter_value)
-
-                            elif parameter_name == "classifiers":
-                                classifier_names = parameter_value.split(',')
-                                parameter_value = [(classifier_name, get_classifier_from_name(classifier_name)) for classifier_name in classifier_names]
-                                out(parameter_value)
-
-                            if parameter_value:
-                                params[parameter_name] = parameter_value
+            # preprocessing
+            out("\U0001F449 [PREPROCESSING]", step_format)
+            preprocessing_node = ding.find('preprocessing')
+            if preprocessing_node:
+                export_filename = preprocessing_node.get("export", None)
                 
-                current_data_splitter = library_data_splitters[data_splitter_id]
-                if current_data_splitter:
-                    model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
-                    if isinstance(current_data_splitter, data_splitter.DataSplitterTrainTestSimple):
-                        model.fit(current_data_splitter)
-                    elif isinstance(current_data_splitter, data_splitter.DataSplitterForCrossValidation):
-                        model.evaluate_cross_validation(current_data_splitter, target, debug)
-                    library_models[classifier_id] = model
-                else:
-                    out("!!! can't find data splitter {}".format(data_splitter_id))
+                for preprocess in preprocessing_node:
+                    # outliers
+                    if preprocess.tag == "outliers":
+                        method = preprocess.get("method", None)
+                        indicators = preprocess.get("indicators", None)
+                        if indicators:
+                            indicators = indicators.split(',')
+                        if method:
+                            out("[PREPROCESSING] outliers : {}".format(method))
+                            df = fdataprep.process_technical_indicators(df, [method], indicators)
+                            df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
-                model_analysis = model.get_analysis()
+                    # transformation
+                    elif preprocess.tag == "transformation":
+                        method = preprocess.get("method", None)
+                        indicators = preprocess.get("indicators", None)
+                        if indicators:
+                            indicators = indicators.split(',')
+                        if method is not None and indicators is not None:
+                            out("[PREPROCESSING] transformation {} for {}".format(method, indicators))
+                            df = fdataprep.process_technical_indicators(df, ["transformation_"+method], indicators)
+                            df = fdataprep.process_technical_indicators(df, ['missing_values'])
 
-                out("Accuracy : {:.2f}".format(model_analysis["accuracy"]))
-                out("Precision : {:.2f}".format(model_analysis["precision"]))
-                out("Recall : {:.2f}".format(model_analysis["recall"]))
-                out("f1_score : {:.2f}".format(model_analysis["f1_score"]))
+                    elif preprocess.tag == "discretization":
+                        # discretization
+                        indicators = preprocess.get("indicators", None)
+                        method = preprocess.get("method", None)
+                        if indicators is not None and method is not None:
+                            out("[PREPROCESSING] discretization {} for {}".format(method, indicators))
+                            indicators = indicators.split(',')
+                            df = fdataprep.process_technical_indicators(df, ["discretization_"+method], indicators)
+
                 if export_filename:
-                    model.save(get_full_path(export_filename))
+                    df.to_csv(get_full_path(export_filename))
+                    for indicator in df.columns:
+                        visu.display_from_dataframe(df, indicator, get_full_path(value + '_preprocessing_'+indicator+'.png'))
 
-                test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
+            # feature engineering
+            out("\U0001F449 [FEATURE ENGINEERING]", step_format)
+            featureengineering_node = ding.find('featureengineering')
+            if featureengineering_node is not None:
+                export_filename = featureengineering_node.get("export", None)
 
-            analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves.png", "")
+                for featureengineering in featureengineering_node:
+                    # reduction
+                    if featureengineering.tag == "reduction":
+                        method = featureengineering.get("method", None)
+                        if method is not None:
+                            out("[FEATURE ENGINEERING] reduction : {}".format(method))
+
+                    # labeling
+                    if featureengineering.tag == "labeling":
+                        out("[FEATURE ENGINEERING] labeling : ")
+                        params = dict()
+                        for param in ["t_final", "target_name", "upper_multiplier", "lower_multiplier"]:
+                            if param in featureengineering.attrib:
+                                params[param] = featureengineering.get(param)
+                                print("   {} : {}".format(param, params[param]))
+                        df = fprocessfeature.process_features(df.copy(), ["data_labeling"], params)
+                        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+                        val_counts = df['target'].value_counts()
+                        print("value_counts :\n{}".format(val_counts))
+
+                if export_filename:
+                    df.to_csv(get_full_path(export_filename))
+                    for indicator in df.columns:
+                            visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
+
+            out("\U0001F449 [FINAL DATAFRAME]", step_format)
+            out(df)
+
+            # target
+            out("\U0001F449 [TARGET]", step_format)
+            if target == None:
+                target_node = ding.find('target')
+                if target_node is not None:
+                    target = target_node.text
+                    shift = target_node.get("shift", None)
+                    if shift:
+                        df = findicators.shift(df, target, shift)
+                        df = fdataprep.process_technical_indicators(df, ['missing_values']) # shit happens
+                        
+                    export_filename = target_node.get("export", None)
+                    if export_filename:
+                        df.to_csv(get_full_path(export_filename))
+
+            if target == None:
+                out("\U0001F4A5 no target")
+                continue
+            out("target : {}".format(target))
+            out(df[target].value_counts())
+
+            # in the following, the target column should be named "target"
+            df = df.rename(columns={target: "target"})
+            target="target"
+
+            # data splitter
+            library_data_splitters = {}
+            data_splitters_node = ding.find('data_splitters')
+            if data_splitters_node:
+                for data_splitter_node in data_splitters_node:
+                    if data_splitter_node.tag != "data_splitter":
+                        continue
+                    data_splitter_id = data_splitter_node.get("id", None)
+                    data_splitter_type = data_splitter_node.get("type", None)
+                    data_splitter_seq_len = int(data_splitter_node.get('sequence_length', math.nan))
+                    if data_splitter_id == None or data_splitter_type == None or math.isnan(data_splitter_seq_len):
+                        continue
+
+                    if data_splitter_type == "simple":
+                        index = float(data_splitter_node.get('index', math.nan))
+                        if math.isnan(index) == False:
+                            ds = data_splitter.DataSplitterTrainTestSimple(df, target=target, seq_len=data_splitter_seq_len)
+                            ds.split(index)
+                        else:
+                            continue
+                    elif data_splitter_type == "cross_validation":
+                        nb_splits = int(data_splitter_node.get('nb_splits', math.nan))
+                        max_train_size = int(data_splitter_node.get('max_train_size', math.nan))
+                        test_size = int(data_splitter_node.get('test_size', math.nan))
+                        if math.isnan(nb_splits) == False and math.isnan(max_train_size) == False and math.isnan(test_size) == False:
+                            ds = data_splitter.DataSplitterForCrossValidation(df.copy(), nb_splits, max_train_size, test_size)
+                            ds.split()
+                        else:
+                            continue
+                    else:
+                        continue
+
+                    library_data_splitters[data_splitter_id] = ds
+
+            # dump data splitters library
+            out("\U0001F449 [DATA SPLITTERS LIBRARY]", step_format)
+            #print(library_data_splitters)
+            for data_splitter_id, data_splitter_item in library_data_splitters.items():
+                if isinstance(data_splitter_item, data_splitter.DataSplitterTrainTestSimple):
+                    print("DataSplitterTrainTestSimple {}".format(data_splitter_id))
+                    #data_splitter_item.dump()
+                if isinstance(data_splitter_item, data_splitter.DataSplitterForCrossValidation):
+                    print("DataSplitterForCrossValidation {}".format(data_splitter_id))
+    
+            # learning model
+            out("\U0001F449 [CLASSIFIERS]", step_format)
+            classifiers_node = ding.find('classifiers')
+            if classifiers_node:
+                library_models = {}
+                test_vs_pred = []
+                for classifier in classifiers_node:
+                    classifier_id = classifier.get("id", None)
+                    out("[CLASSIFIER] Treating {}".format(classifier_id), "red")
+                    classifier_type = classifier.get("type", None)
+                    data_splitter_id = classifier.get("data_splitter_id", None)
+                    export_filename = classifier.get("export", None)
+
+                    parameters_node = classifier.find('parameters')
+                    params = {}
+                    if parameters_node:
+                        for parameter in parameters_node:
+                            parameter_name = parameter.get("name", None)
+                            parameter_value = parameter.get("value", None)
+                            if parameter_name != None and parameter_value != None:
+
+                                def get_classifier_from_name(classifier_name):
+                                    classifier_value = library_models[classifier_name]
+                                    if classifier_value != None:
+                                        out("{} found ({})".format(classifier_name, classifier_value))
+                                    else:
+                                        out("!!! {} not found !!!".format(parameter_value))
+                                    return classifier_value
+
+                                # replace classifier name with classifier model
+                                if parameter_name == "classifier":
+                                    parameter_value = get_classifier_from_name(parameter_value)
+
+                                elif parameter_name == "classifiers":
+                                    classifier_names = parameter_value.split(',')
+                                    parameter_value = [(classifier_name, get_classifier_from_name(classifier_name)) for classifier_name in classifier_names]
+                                    out(parameter_value)
+
+                                if parameter_value:
+                                    params[parameter_name] = parameter_value
+                    
+                    current_data_splitter = library_data_splitters[data_splitter_id]
+                    if current_data_splitter:
+                        model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
+                        if isinstance(current_data_splitter, data_splitter.DataSplitterTrainTestSimple):
+                            model.fit(current_data_splitter)
+                        elif isinstance(current_data_splitter, data_splitter.DataSplitterForCrossValidation):
+                            model.evaluate_cross_validation(current_data_splitter, target, debug)
+                        library_models[classifier_id] = model
+                    else:
+                        out("!!! can't find data splitter {}".format(data_splitter_id))
+
+                    model_analysis = model.get_analysis()
+
+                    out("Accuracy : {:.2f}".format(model_analysis["accuracy"]))
+                    out("Precision : {:.2f}".format(model_analysis["precision"]))
+                    out("Recall : {:.2f}".format(model_analysis["recall"]))
+                    out("f1_score : {:.2f}".format(model_analysis["f1_score"]))
+                    if export_filename:
+                        model.save(get_full_path(export_filename))
+
+                    test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
+
+                analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves.png", "")
 
         end = datetime.now()
         out("\U0001F3C1 elapsed time : {}".format(end-start), step_format)
