@@ -313,9 +313,13 @@ def execute(filename):
                                 if parameter_value:
                                     params[parameter_name] = parameter_value
                     
+                    model = None
                     current_data_splitter = library_data_splitters[data_splitter_id]
                     if current_data_splitter:
                         model = classifiers_factory.ClassifiersFactory.get_classifier(type=classifier_type, params=params)
+                        if model == None:
+                            out("!!! model {} ({}) is None".format(classifier_id, classifier_type))
+                            continue
                         if isinstance(current_data_splitter, data_splitter.DataSplitterTrainTestSimple):
                             model.fit(current_data_splitter)
                         elif isinstance(current_data_splitter, data_splitter.DataSplitterForCrossValidation):
