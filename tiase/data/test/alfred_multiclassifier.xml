@@ -1,17 +1,30 @@
 <?xml version="1.0"?>
 <dings>
     <ding export="./tmp/">
-        <import filename="./tiase/data/test/google_stocks_data.csv"/>
-        <features indicators="trend_1d,labeling"  labeling_t_final="10" labeling_upper_multiplier="2." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" />
+        <import value="AI.PA,AIR.PA"/>
+        <features indicators="trend_1d,labeling"  labeling_t_final="3" labeling_upper_multiplier="1." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" export="indicators"/>
         <target>labeling</target>
-        
+        <!--<preprocessing>
+            <outliers method="outliers_normalize_stdcutoff" indicators="trend_1d" />
+        </preprocessing>-->
         <data_splitters>
-            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="3"/>
+            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="4"/>
         </data_splitters>
         <classifiers>
-            <classifier id="lstm_1" type="lstm1" data_splitter_id="ds_simple_1" export="lstm_1">
+            <classifier id="mlp_1" type="mlp" data_splitter_id="ds_simple_1" export="mlp_1">
+            </classifier>
+            <classifier id="svc_1" type="svc" data_splitter_id="ds_simple_1" export="svc_1">
+            </classifier>
+            <classifier id="dt_1" type="decision tree" data_splitter_id="ds_simple_1" export="dc_1">
+            </classifier>
+            <classifier id="lstm1_1" type="lstm1" data_splitter_id="ds_simple_1" export="lstm1_1">
                 <parameters>
-                    <parameter name="epochs" value="30"/>
+                    <parameter name="epochs" value="60"/>
+                </parameters>
+            </classifier>
+            <classifier id="lstm2_1" type="lstm2" data_splitter_id="ds_simple_1" export="lstm2_1">
+                <parameters>
+                    <parameter name="epochs" value="60"/>
                 </parameters>
             </classifier>
         </classifiers>

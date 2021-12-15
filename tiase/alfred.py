@@ -101,11 +101,14 @@ def execute(filename):
             
         out("dict_values : {}".format(dict_values.keys()))
 
+        values_classifiers_results = {}
         for key in dict_values:
-            value = key
+            current_value = key
             df = dict_values[key]
-            out("\U0001F7E2 dealing with {}".format(value))
+            out("\U0001F7E2 dealing with {}".format(current_value))
             out(df)
+
+            values_classifiers_results[current_value] = {}
 
             initial_columns = list(df.columns)
 
@@ -334,12 +337,16 @@ def execute(filename):
                     out("Precision : {:.2f}".format(model_analysis["precision"]))
                     out("Recall : {:.2f}".format(model_analysis["recall"]))
                     out("f1_score : {:.2f}".format(model_analysis["f1_score"]))
+                    values_classifiers_results[current_value][classifier_id] = model_analysis
+
                     if export_filename:
                         model.save(get_full_path(export_filename))
 
                     test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
-                analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves.png", "")
+                analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves_"+current_value+".png", "")
+            
+            analysis.export_classifiers_performances(values_classifiers_results, export_root + "/values_classifiers_results.csv")
 
         end = datetime.now()
         out("\U0001F3C1 elapsed time : {}".format(end-start), step_format)
