@@ -80,9 +80,9 @@ def get_daily_volatility_for_daily_data(close,span0=20):
     df0.dropna(inplace=True)
     return df0
 
-def get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers):
+def get_3_barriers(prices, high, low, daily_volatility, t_final, upper_lower_multipliers):
     #create a container
-    barriers = pd.DataFrame(columns=['days_passed', 'price', 'vert_barrier', 'top_barrier', 'bottom_barrier'],
+    barriers = pd.DataFrame(columns=['days_passed', 'price', 'high', 'low', 'vert_barrier', 'top_barrier', 'bottom_barrier'],
                             index = daily_volatility.index)
     for day, vol in daily_volatility.iteritems():
         days_passed = len(daily_volatility.loc[daily_volatility.index[0] : day])
@@ -109,12 +109,13 @@ def get_3_barriers(prices, daily_volatility, t_final, upper_lower_multipliers):
             #set it to NaNs
             bottom_barrier = pd.Series(index=prices.index)
 
-        barriers.loc[day, ['days_passed', 'price', 'vert_barrier','top_barrier', 'bottom_barrier']] = days_passed, prices.loc[day], vert_barrier, top_barrier, bottom_barrier
+        barriers.loc[day, ['days_passed', 'price', 'high', 'low', 'vert_barrier','top_barrier', 'bottom_barrier']] = days_passed, prices.loc[day], high.loc[day], low.loc[day], vert_barrier, top_barrier, bottom_barrier
 
     barriers['out'] = None
     return barriers
 
-def get_labels(barriers, label_below=0, label_middle=1, label_above=2):
+
+def get_labels(barriers, label_below=0, label_middle=1, label_above=2, use_high_low=True):
     '''
     start: first day of the window
     end:last day of the window
@@ -134,15 +135,22 @@ def get_labels(barriers, label_below=0, label_middle=1, label_above=2):
             top_barrier = barriers.top_barrier[i]
             bottom_barrier = barriers.bottom_barrier[i]
             #set the profit taking and stop loss conditons
-            condition_pt = (barriers.price[start: end] >= top_barrier).any()
-            condition_sl = (barriers.price[start: end] <= bottom_barrier).any()
+            if use_high_low == True:
+                high_price = barriers.high[start: end].copy()
+                low_price = barriers.low[start: end].copy()
+            else:
+                high_price = barriers.price[start: end].copy()
+                low_price = barriers.price[start: end].copy()
+
+            condition_pt = (high_price >= top_barrier).any()
+            condition_sl = (low_price <= bottom_barrier).any()
             #set the first to reach the barrier
             if condition_pt and condition_sl:
                 cpt_date = barriers.index[i]
                 condition_pt_loc = False
                 j=1
                 while (cpt_date <= end) and (condition_pt_loc == False):
-                    if(barriers.price[cpt_date] >= top_barrier):
+                    if(high_price[cpt_date] >= top_barrier):
                         condition_pt_loc = cpt_date
                     else:
                         cpt_date = barriers.index[i+j]
@@ -151,7 +159,7 @@ def get_labels(barriers, label_below=0, label_middle=1, label_above=2):
                 condition_sl_loc = False
                 j=1
                 while (cpt_date <= end) and (condition_sl_loc == False):
-                    if(barriers.price[cpt_date] <= bottom_barrier):
+                    if(low_price[cpt_date] <= bottom_barrier):
                         condition_sl_loc = cpt_date
                     else:
                         cpt_date = barriers.index[i+j]
@@ -174,8 +182,70 @@ def get_labels(barriers, label_below=0, label_middle=1, label_above=2):
                     barriers['out'][i] = max([(price_final - price_initial) / (top_barrier - price_initial),
                                             (price_final - price_initial) / (price_initial - bottom_barrier)],
                                             key=abs)
-
     return barriers
+
+def is_in_half_brackets(df, limit_high, limit_low):
+    if ((df.out.sum() <= limit_high) and (df.out.sum() >= limit_low)):
+        return True
+    else:
+        return False
+
+def is_over_brackets(df, limit_high):
+    if (df.out.sum() >= limit_high):
+        return True
+    else:
+        return False
+
+def is_under_brackets(df, limit_low):
+    if (df.out.sum() <= limit_low):
+        return True
+    else:
+        return False
+
+def get_balanced_upper_multiplier(prices, highs, lows,
+                                  daily_volatility, t_final,
+                                  upper_multiplier, lower_multiplier,
+                                  label_below, label_middle, label_above):
+    min_max_range = 0.5          # Range between the max upper_multiplier and min upper_multiplier
+    coef_threshold = 0.001       # Balance +/- coef precision
+    use_high_low = True
+    upper_multiplier_max = upper_multiplier + upper_multiplier * min_max_range
+    upper_multiplier_min = upper_multiplier - upper_multiplier * min_max_range
+    high_threshold = int(len(prices) * 0.5 + len(prices) * coef_threshold)
+    low_threshold = int(len(prices) * 0.5 - len(prices) * coef_threshold)
+
+    barriers = get_3_barriers(prices, highs, lows, daily_volatility, t_final, [upper_multiplier_max, lower_multiplier])
+    barriers = get_labels(barriers, label_below, label_middle, label_above, use_high_low)
+
+    if is_in_half_brackets(barriers, high_threshold, low_threshold):
+        return barriers
+    else:
+        if is_over_brackets(barriers, high_threshold):
+            # upper_multiplier over boundaries
+            return barriers
+
+    barriers = get_3_barriers(prices, highs, lows, daily_volatility, t_final, [upper_multiplier_min, lower_multiplier])
+    barriers = get_labels(barriers, label_below, label_middle, label_above, use_high_low)
+
+    if is_in_half_brackets(barriers, high_threshold, low_threshold):
+        return barriers
+    else:
+        if is_under_brackets(barriers, low_threshold):
+            # upper_multiplier under boundaries
+            return barriers
+    while True:
+        upper_multiplier_step = upper_multiplier_min + (upper_multiplier_max - upper_multiplier_min) * 0.5
+        barriers = get_3_barriers(prices, highs, lows, daily_volatility, t_final, [upper_multiplier_step, lower_multiplier])
+        barriers = get_labels(barriers, label_below, label_middle, label_above, use_high_low)
+
+        if is_in_half_brackets(barriers, high_threshold, low_threshold):
+            print("Upper multiplier coef: ",upper_multiplier_step)
+            return barriers
+        else:
+            if is_under_brackets(barriers, low_threshold):
+                upper_multiplier_max = upper_multiplier_step
+            else:
+                upper_multiplier_min = upper_multiplier_step
 
 def data_labeling(df, params = None):
     debug = False
@@ -207,16 +277,22 @@ def data_labeling(df, params = None):
             label_above = float(label_above)
 
     price = df["close"].copy()
+    high = df["high"].copy()
+    low = df["low"].copy()
 
     #set the boundary of barriers, based on 20 days EWM
     daily_volatility = get_daily_volatility_for_daily_data(price)
 
     #align the index
     prices = price[daily_volatility.index]
+    highs = high[daily_volatility.index]
+    lows = low[daily_volatility.index]
 
-    barriers = get_3_barriers(prices, daily_volatility, t_final, [upper_multiplier, lower_multiplier])
-
-    barriers = get_labels(barriers, label_below, label_middle, label_above)
+    # Find optimized upper_multiplier coef in order to get balanced labeling feature
+    barriers = get_balanced_upper_multiplier(prices, highs, lows,
+                                             daily_volatility, t_final,
+                                             upper_multiplier, lower_multiplier,
+                                             label_below, label_middle, label_above)
 
     if debug:
         plot_barriers_out(barriers, filename="./tmp/labeling_barriers_out")
