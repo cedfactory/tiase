@@ -115,7 +115,7 @@ def get_3_barriers(prices, high, low, daily_volatility, t_final, upper_lower_mul
     return barriers
 
 
-def get_labels(barriers, label_below=0, label_middle=1, label_above=2, use_high_low=True):
+def get_labels(barriers, label_below=0, label_middle=1, label_above=2, use_high_low=False):
     '''
     start: first day of the window
     end:last day of the window
@@ -255,6 +255,7 @@ def data_labeling(df, params = None):
     label_below = 0
     label_middle = 1
     label_above = 2
+    use_balanced_upper_multiplier = False
     if params:
         debug = params.get('labeling_debug', debug)
         t_final = params.get('labeling_t_final', t_final)
@@ -275,6 +276,7 @@ def data_labeling(df, params = None):
         label_above = params.get('labeling_label_above', label_above)
         if isinstance(label_above, str):
             label_above = float(label_above)
+        use_balanced_upper_multiplier = params.get('use_balanced_upper_multiplier', use_balanced_upper_multiplier)
 
     price = df["close"].copy()
     high = df["high"].copy()
@@ -288,11 +290,15 @@ def data_labeling(df, params = None):
     highs = high[daily_volatility.index]
     lows = low[daily_volatility.index]
 
-    # Find optimized upper_multiplier coef in order to get balanced labeling feature
-    barriers = get_balanced_upper_multiplier(prices, highs, lows,
-                                             daily_volatility, t_final,
-                                             upper_multiplier, lower_multiplier,
-                                             label_below, label_middle, label_above)
+    if use_balanced_upper_multiplier:
+        # Find optimized upper_multiplier coef in order to get balanced labeling feature
+        barriers = get_balanced_upper_multiplier(prices, highs, lows,
+                                                daily_volatility, t_final,
+                                                upper_multiplier, lower_multiplier,
+                                                label_below, label_middle, label_above)
+    else:
+        barriers = get_3_barriers(prices, highs, lows, daily_volatility, t_final, [upper_multiplier, lower_multiplier])
+        barriers = get_labels(barriers, label_below, label_middle, label_above)
 
     if debug:
         plot_barriers_out(barriers, filename="./tmp/labeling_barriers_out")
