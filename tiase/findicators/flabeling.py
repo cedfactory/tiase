@@ -277,6 +277,8 @@ def data_labeling(df, params = None):
         if isinstance(label_above, str):
             label_above = float(label_above)
         use_balanced_upper_multiplier = params.get('use_balanced_upper_multiplier', use_balanced_upper_multiplier)
+        if isinstance(use_balanced_upper_multiplier, str):
+            use_balanced_upper_multiplier = bool(use_balanced_upper_multiplier)
 
     price = df["close"].copy()
     high = df["high"].copy()

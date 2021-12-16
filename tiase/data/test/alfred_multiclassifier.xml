@@ -2,7 +2,10 @@
 <dings>
     <ding export="./tmp/">
         <import value="AI.PA,AIR.PA"/>
-        <features indicators="trend_1d,labeling"  labeling_t_final="3" labeling_upper_multiplier="1." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" export="indicators"/>
+        <!--
+            <features indicators="trend_1d,labeling"  labeling_t_final="3" labeling_upper_multiplier="1." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" export="indicators"/>
+        -->
+            <features indicators="trend_1d,labeling"  labeling_t_final="3" use_balanced_upper_multiplier="1" labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" export="indicators"/>
         <target>labeling</target>
         <!--<preprocessing>
             <outliers method="outliers_normalize_stdcutoff" indicators="trend_1d" />
