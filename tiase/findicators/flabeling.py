@@ -205,10 +205,10 @@ def is_under_brackets(df, limit_low):
 def get_balanced_upper_multiplier(prices, highs, lows,
                                   daily_volatility, t_final,
                                   upper_multiplier, lower_multiplier,
-                                  label_below, label_middle, label_above):
+                                  label_below, label_middle, label_above, use_high_low):
     min_max_range = 0.5          # Range between the max upper_multiplier and min upper_multiplier
     coef_threshold = 0.001       # Balance +/- coef precision
-    use_high_low = True
+    
     upper_multiplier_max = upper_multiplier + upper_multiplier * min_max_range
     upper_multiplier_min = upper_multiplier - upper_multiplier * min_max_range
     high_threshold = int(len(prices) * 0.5 + len(prices) * coef_threshold)
@@ -256,6 +256,7 @@ def data_labeling(df, params = None):
     label_middle = 1
     label_above = 2
     use_balanced_upper_multiplier = False
+    use_high_low = False
     if params:
         debug = params.get('labeling_debug', debug)
         t_final = params.get('labeling_t_final', t_final)
@@ -279,6 +280,9 @@ def data_labeling(df, params = None):
         use_balanced_upper_multiplier = params.get('use_balanced_upper_multiplier', use_balanced_upper_multiplier)
         if isinstance(use_balanced_upper_multiplier, str):
             use_balanced_upper_multiplier = bool(use_balanced_upper_multiplier)
+        use_high_low = params.get('use_high_low', use_high_low)
+        if isinstance(use_high_low, str):
+            use_high_low = bool(use_high_low)
 
     price = df["close"].copy()
     high = df["high"].copy()
@@ -297,7 +301,7 @@ def data_labeling(df, params = None):
         barriers = get_balanced_upper_multiplier(prices, highs, lows,
                                                 daily_volatility, t_final,
                                                 upper_multiplier, lower_multiplier,
-                                                label_below, label_middle, label_above)
+                                                label_below, label_middle, label_above, use_high_low)
     else:
         barriers = get_3_barriers(prices, highs, lows, daily_volatility, t_final, [upper_multiplier, lower_multiplier])
         barriers = get_labels(barriers, label_below, label_middle, label_above)
