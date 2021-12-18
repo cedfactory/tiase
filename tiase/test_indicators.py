@@ -116,19 +116,17 @@ class TestIndicators:
             array_expected = expected_df[column].to_numpy()
             assert(np.allclose(array, array_expected))
 
-
-    def test_labeling(self):
+    def labeling_common(self, dict_params, ref_csvfile, ref_barriers_csvfile):
         df = self.get_real_dataframe()
         df = df.head(150)
-        df_labeling = findicators.add_technical_indicators(df, ['labeling'], {'labeling_debug':True, 'labeling_t_final':10, 'labeling_upper_multiplier':"2.", 'labeling_lower_multiplier':"2."})
+        df_labeling = findicators.add_technical_indicators(df, ['labeling'], dict_params)
         df_labeling = fdataprep.process_technical_indicators(df_labeling, ['missing_values']) # shit happens
         df_labeling = findicators.remove_features(df_labeling, ['high', 'low', 'open', 'volume', 'adj_close'])
 
         # final result
-        ref_file = "./tiase/data/test/findicators_data_labeling_reference.csv"
         if g_generate_references:
-            df_labeling.to_csv(ref_file)
-        expected_df_labeling = fimport.get_dataframe_from_csv(ref_file)
+            df_labeling.to_csv(ref_csvfile)
+        expected_df_labeling = fimport.get_dataframe_from_csv(ref_csvfile)
 
         for column in df_labeling.columns:
             array_expected = expected_df_labeling[column].to_numpy()
@@ -138,10 +136,9 @@ class TestIndicators:
 
         # barriers for debug
         gen_file = "./tmp/labeling_barriers.csv"
-        ref_file = "./tiase/data/test/findicators_data_labeling_barriers_reference.csv"
         if g_generate_references:
-            os.rename(gen_file, ref_file)
-        ref_df_barriers = fimport.get_dataframe_from_csv(ref_file)
+            os.rename(gen_file, ref_barriers_csvfile)
+        ref_df_barriers = fimport.get_dataframe_from_csv(ref_barriers_csvfile)
         gen_df_barriers = fimport.get_dataframe_from_csv(gen_file)
 
         for column in gen_df_barriers.columns:
@@ -149,6 +146,30 @@ class TestIndicators:
             if ref_array.dtype != object:
                 gen_array = gen_df_barriers[column].to_numpy(dtype = ref_array.dtype)
                 assert(np.allclose(gen_array, ref_array))
+
+    def test_labeling_close_unbalanced(self):
+        dict_params = {'labeling_debug':True, 'labeling_t_final':10, 'labeling_upper_multiplier':"2.", 'labeling_lower_multiplier':"2."}
+        ref_csvfile = "./tiase/data/test/findicators_data_labeling_reference.csv"
+        ref_barriers_csvfile = "./tiase/data/test/findicators_data_labeling_barriers_reference.csv"
+        self.labeling_common(dict_params, ref_csvfile, ref_barriers_csvfile)
+
+    def test_labeling_high_low_unbalanced(self):
+        dict_params = {'labeling_debug':True, 'use_high_low':'1', 'labeling_t_final':10, 'labeling_upper_multiplier':"2.", 'labeling_lower_multiplier':"2."}
+        ref_csvfile = "./tiase/data/test/findicators_data_labeling_high_low_reference.csv"
+        ref_barriers_csvfile = "./tiase/data/test/findicators_data_labeling_high_low_barriers_reference.csv"
+        self.labeling_common(dict_params, ref_csvfile, ref_barriers_csvfile)
+
+    def test_labeling_close_balanced(self):
+        dict_params = {'labeling_debug':True, "use_balanced_upper_multiplier":1, 'labeling_t_final':10, 'labeling_upper_multiplier':"2.", 'labeling_lower_multiplier':"2.",  "labeling_label_below":"0", "labeling_label_middle":"0", "labeling_label_above":"1"}
+        ref_csvfile = "./tiase/data/test/findicators_data_labeling_close_balanced_reference.csv"
+        ref_barriers_csvfile = "./tiase/data/test/findicators_data_labeling_close_balanced_barriers_reference.csv"
+        self.labeling_common(dict_params, ref_csvfile, ref_barriers_csvfile)
+
+    def test_labeling_high_low_balanced(self):
+        dict_params = {'labeling_debug':True, 'use_high_low':'1', "use_balanced_upper_multiplier":1, 'labeling_t_final':10, 'labeling_upper_multiplier':"2.", 'labeling_lower_multiplier':"2.",  "labeling_label_below":"0", "labeling_label_middle":"0", "labeling_label_above":"1"}
+        ref_csvfile = "./tiase/data/test/findicators_data_labeling_high_low_balanced_reference.csv"
+        ref_barriers_csvfile = "./tiase/data/test/findicators_data_labeling_high_low_balanced_barriers_reference.csv"
+        self.labeling_common(dict_params, ref_csvfile, ref_barriers_csvfile)
 
 
     def test_labeling_with_alfred(self):
