@@ -67,6 +67,12 @@ def execute(filename):
             import_filename = import_node.get("filename", None)
             export_filename = import_node.get("export", None)
 
+            if "cac40" in values:
+                values.remove("cac40")
+                for key in fimport.cac40.keys():
+                    if key not in values:
+                        values.append(key)
+
             if values:
                 for value in values:
                     out("value : {}".format(value))
