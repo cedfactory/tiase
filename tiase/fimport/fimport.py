@@ -38,7 +38,7 @@ cac40 = {
     "STM.PA": "STMicroElectronics",
     "TEP.PA": "Teleperformance",
     "HO.PA": "Thales",
-    "FP.PA": "Total",
+    "TTE.PA": "TotalEnergies",
     "URW.AS": "Unibail-Rodamco-Westfield",
     "VIE.PA": "Veolia Environnement",
     "DG.PA": "Vinci",
@@ -158,7 +158,7 @@ def download_from_yahoo(values, folder = ""):
 
 def get_dataframe_from_yahoo(value, params=None):
     result = yf.Ticker(value)
-    if result == None or result.isin == '-':
+    if result == None or result.ticker != value:
         return None
     start=None
     end=None
