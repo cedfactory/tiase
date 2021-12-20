@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <dings>
     <ding export="./tmp/">
-        <import value="cac40"/>
+        <import value="cac40" start="2010-01-01"/>
         <!--
             <features indicators="trend_1d,labeling"  labeling_t_final="3" labeling_upper_multiplier="1." labeling_lower_multiplier="2." labeling_label_below="0" labeling_label_middle="0" labeling_label_above="1" export="indicators"/>
         -->
@@ -14,18 +14,26 @@
             <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="4"/>
         </data_splitters>
         <classifiers>
-            <classifier id="mlp_1" type="mlp" data_splitter_id="ds_simple_1" export="mlp_1">
-            </classifier>
-            <classifier id="svc_1" type="svc" data_splitter_id="ds_simple_1" export="svc_1">
-            </classifier>
-            <classifier id="dt_1" type="decision tree" data_splitter_id="ds_simple_1" export="dc_1">
-            </classifier>
+            <classifier id="mlp_1" type="mlp" data_splitter_id="ds_simple_1" export="mlp_1" />
+            <classifier id="svc_1" type="svc" data_splitter_id="ds_simple_1" export="svc_1" />
+            <classifier id="dt_1" type="decision tree" data_splitter_id="ds_simple_1" export="dc_1" />
+            <classifier id="gp_1" type="gaussian process" data_splitter_id="ds_simple_1" export="gp_1" />
             <classifier id="lstm1_1" type="lstm1" data_splitter_id="ds_simple_1" export="lstm1_1">
                 <parameters>
                     <parameter name="epochs" value="60"/>
                 </parameters>
             </classifier>
             <classifier id="lstm2_1" type="lstm2" data_splitter_id="ds_simple_1" export="lstm2_1">
+                <parameters>
+                    <parameter name="epochs" value="60"/>
+                </parameters>
+            </classifier>
+            <classifier id="lstm3_1" type="lstm3" data_splitter_id="ds_simple_1" export="lstm3_1">
+                <parameters>
+                    <parameter name="epochs" value="60"/>
+                </parameters>
+            </classifier>
+            <classifier id="bilstm_1" type="bilstm" data_splitter_id="ds_simple_1" export="bilstm_1">
                 <parameters>
                     <parameter name="epochs" value="60"/>
                 </parameters>
