@@ -11,7 +11,7 @@
             <outliers method="outliers_normalize_stdcutoff" indicators="trend_1d" />
         </preprocessing>-->
         <data_splitters>
-            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="4"/>
+            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="10"/>
         </data_splitters>
         <classifiers>
             <classifier id="mlp_1" type="mlp" data_splitter_id="ds_simple_1" export="mlp_1" />
