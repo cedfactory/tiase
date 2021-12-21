@@ -67,13 +67,13 @@ def execute(filename):
             import_filename = import_node.get("filename", None)
             export_filename = import_node.get("export", None)
 
-            if "cac40" in values:
-                values.remove("cac40")
-                for key in fimport.cac40.keys():
-                    if key not in values:
-                        values.append(key)
-
             if values:
+                if "cac40" in values:
+                    values.remove("cac40")
+                    for key in fimport.cac40.keys():
+                        if key not in values:
+                            values.append(key)
+
                 for value in values:
                     out("value : {}".format(value))
                     df = fimport.get_dataframe_from_yahoo(value, params)
@@ -112,6 +112,9 @@ def execute(filename):
             current_value = key
             df = dict_values[key]
             out("\U0001F7E2 dealing with {}".format(current_value))
+            if df.empty:
+                out("\U0001F4A5 Empty DataFrame")
+                continue
             out(df)
 
             values_classifiers_results[current_value] = {}
@@ -210,6 +213,9 @@ def execute(filename):
                             visu.display_from_dataframe(df, indicator, get_full_path(value + '_featureengineering_'+indicator+'.png'))
 
             out("\U0001F449 [FINAL DATAFRAME]", step_format)
+            if df.empty:
+                out("\U0001F4A5 Empty DataFrame")
+                continue
             out(df)
 
             # target
