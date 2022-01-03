@@ -1,3 +1,4 @@
+import xml.etree.cElementTree as ET
 from . import classifier,analysis
 from sklearn.model_selection import GridSearchCV
 
@@ -12,11 +13,11 @@ class HPTGridSearch(classifier.Classifier):
         self.param_grid = None
         self.scoring = 'roc_auc' # \in {'roc_auc', ''}
         if params:
-            self.param_grid = params.get("param_grid", self.param_grid)
-            self.scoring = params.get("scoring", self.scoring)
             self.classifier = params.get("classifier", self.classifier)
+            self.scoring = params.get("scoring", self.scoring)
             self.param_grid = self.classifier.get_param_grid()
-        
+            self.param_grid = params.get("param_grid", self.param_grid)
+
     def get_name(self):
         return "grid search"
 
@@ -35,10 +36,27 @@ class HPTGridSearch(classifier.Classifier):
 
     def get_analysis(self):
         y_test_pred, y_test_prob = classifier.get_pred_and_prob_with_predict_pred_and_predict_proba(self.model, self.data_splitter)
-        return analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, y_test_pred, y_test_prob)
+        result = analysis.classification_analysis(self.data_splitter.X_test, self.data_splitter.y_test, y_test_pred, y_test_prob)
+        result["best_param"] = self.model.best_params_
+        return result
 
     def save(self, filename):
-        print("HPTGridSearch.save() is not implemented")
+
+        model_analysis = self.get_analysis()
+
+        root = ET.Element("model")
+        ET.SubElement(root, "param_grid").text = str(self.param_grid)
+        ET.SubElement(root, "best_param").text = str(model_analysis["best_param"])
+        ET.SubElement(root, "accuracy").text = "{:.2f}".format(model_analysis["accuracy"])
+        ET.SubElement(root, "precision").text = "{:.2f}".format(model_analysis["precision"])
+        ET.SubElement(root, "recall").text = "{:.2f}".format(model_analysis["recall"])
+        ET.SubElement(root, "f1_score").text = "{:.2f}".format(model_analysis["f1_score"])
+        tree = ET.ElementTree(root)
+
+        xmlfilename = filename+'.xml'
+        tree.write(xmlfilename)
+
+        print("HPTGridSearch.save() writing {}".format(xmlfilename))
 
     def load(self, filename):
         print("HPTGridSearch.load() is not implemented")
