@@ -8,6 +8,7 @@ from datetime import datetime
 import pandas as pd
 import math
 import os
+import json
 from rich import print,inspect
 
 step_format = "bold red"
@@ -324,6 +325,10 @@ def execute(filename):
                                     classifier_names = parameter_value.split(',')
                                     parameter_value = [(classifier_name, get_classifier_from_name(classifier_name)) for classifier_name in classifier_names]
                                     out(parameter_value)
+                                
+                                elif parameter_name == "param_grid":
+                                    parameter_value = parameter_value.replace("'", "\"")
+                                    parameter_value = json.loads(parameter_value)
 
                                 if parameter_value:
                                     params[parameter_name] = parameter_value
