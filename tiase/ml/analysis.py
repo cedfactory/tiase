@@ -132,7 +132,7 @@ def export_roc_curves(testvspreds, filename, value):
 
     idfigroc = 1
     fig = plt.figure(idfigroc)
-    plt.title('ROC-curve for {}'.format(value))
+    plt.title('ROC-curves for {}'.format(value))
     plt.xlim([-0.05, 1.0])
     plt.ylim([0.0, 1.05])
     plt.ylabel("True positive rate")
