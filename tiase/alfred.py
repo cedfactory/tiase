@@ -149,7 +149,7 @@ def execute(filename):
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
                     for indicator in df.columns:
-                        visu.display_from_dataframe(df, indicator, get_full_path(indicator+'.png'))
+                        visu.display_from_dataframe(df, indicator, get_full_path(current_value+'_'+indicator+'.png'))
                 out(df)
 
             # preprocessing
@@ -357,11 +357,11 @@ def execute(filename):
                     values_classifiers_results[current_value][classifier_id] = model_analysis
 
                     if export_filename:
-                        model.save(get_full_path(export_filename))
+                        model.save(get_full_path(current_value+"_"+classifier_id))
 
                     test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
-                analysis.export_roc_curves(test_vs_pred, export_root + "/roc_curves_"+current_value+".png", "")
+                analysis.export_roc_curves(test_vs_pred, export_root + "/"+current_value+"_roc_curves.png", current_value)
             
             analysis.export_classifiers_performances(values_classifiers_results, export_root + "/values_classifiers_results.csv")
 
