@@ -99,7 +99,7 @@ def execute(filename):
                     continue
                 
                 if export_filename:
-                        df.to_csv(get_full_path(export_filename))
+                    df.to_csv(get_full_path(export_filename))
 
                 df = findicators.normalize_column_headings(df)
 
@@ -149,7 +149,10 @@ def execute(filename):
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
                     for indicator in df.columns:
-                        visu.display_from_dataframe(df, indicator, get_full_path(current_value+'_'+indicator+'.png'))
+                        prefix = ""
+                        if current_value:
+                            prefix = current_value+'_'
+                        visu.display_from_dataframe(df, indicator, get_full_path(prefix+indicator+'.png'))
                 out(df)
 
             # preprocessing
@@ -357,13 +360,16 @@ def execute(filename):
                     values_classifiers_results[current_value][classifier_id] = model_analysis
 
                     if export_filename:
-                        model.save(get_full_path(current_value+"_"+classifier_id))
+                        prefix = ""
+                        if current_value:
+                            prefix = current_value+'_'
+                        model.save(get_full_path(prefix+classifier_id))
 
                     test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
                 analysis.export_roc_curves(test_vs_pred, export_root + "/"+current_value+"_roc_curves.png", current_value)
             
-            analysis.export_classifiers_performances(values_classifiers_results, export_root + "/values_classifiers_results.csv")
+        analysis.export_classifiers_performances(values_classifiers_results, export_root + "/values_classifiers_results.csv")
 
         end = datetime.now()
         out("\U0001F3C1 elapsed time : {}".format(end-start), step_format)
