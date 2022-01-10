@@ -10,6 +10,7 @@ import math
 import os
 import json
 from rich import print,inspect
+from tiase.toolbox import export_csv,export_pdf,export_mail
 
 step_format = "bold red"
 def out(msg, format=None):
@@ -21,6 +22,13 @@ def out(msg, format=None):
                 print(msg)
         else:
             print(msg)       
+
+def make_report_for_value(current_value, library_models, test_vs_pred):
+    export_pdf.make_report_for_value(current_value, library_models, test_vs_pred)
+
+def make_report(values_classifiers_results, filename):
+    export_csv.make_report(values_classifiers_results, filename+'.csv')
+    export_pdf.make_report(values_classifiers_results, filename+'.pdf')
 
 def execute(filename):
     tree = ET.parse(filename)
@@ -368,8 +376,9 @@ def execute(filename):
                     test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
                 analysis.export_roc_curves(test_vs_pred, export_root + "/"+current_value+"_roc_curves.png", current_value)
+                make_report_for_value(current_value, library_models, test_vs_pred)
             
-        analysis.export_classifiers_performances(values_classifiers_results, export_root + "/values_classifiers_results.csv")
+        make_report(values_classifiers_results, export_root + "/values_classifiers_results")
 
         end = datetime.now()
         out("\U0001F3C1 elapsed time : {}".format(end-start), step_format)
