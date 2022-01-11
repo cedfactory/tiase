@@ -1,10 +1,18 @@
-from reportlab.lib import colors
+from reportlab.lib import colors,utils
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.platypus import Paragraph,Table,TableStyle,Image
 from reportlab.lib.styles import getSampleStyleSheet
 
+cm = 2.54
+
 def float_to_string(value, n_decimals=4):
     return '{:.{n_decimals}f}'.format(value, n_decimals=n_decimals)
+
+def get_image(path, width=70*cm):
+    img = utils.ImageReader(path)
+    iw, ih = img.getSize()
+    aspect = ih / float(iw)
+    return Image(path, width=width, height=(width * aspect))
 
 def make_report(values_classifiers_results, filename):
 
@@ -23,7 +31,6 @@ def make_report(values_classifiers_results, filename):
 
     elements = []
 
-    cm = 2.54
     doc = SimpleDocTemplate(filename, rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
 
     table = Table(data)
@@ -58,7 +65,7 @@ def make_report(values_classifiers_results, filename):
 
 
 def make_report_for_value(current_value, library_models, test_vs_pred):
-    cm = 2.54
+    
     doc = SimpleDocTemplate("{}.pdf".format(current_value.replace('.','_')), rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
 
     styles = getSampleStyleSheet()
@@ -68,10 +75,7 @@ def make_report_for_value(current_value, library_models, test_vs_pred):
 
     from tiase.ml import analysis
     analysis.export_roc_curves(test_vs_pred, "tmp.png", current_value)
-    I = Image("tmp.png")
-    I.drawHeight = I.drawHeight/3
-    I.drawWidth = I.drawWidth/3
-    story.append(I)
+    story.append(get_image("tmp.png"))
 
     for classifier_id in library_models:
         story.append(Paragraph(classifier_id, styles["Normal"]))
@@ -82,13 +86,8 @@ def make_report_for_value(current_value, library_models, test_vs_pred):
         analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], classifier_id+"tmp2.png")
         analysis.export_confusion_matrix(model_analysis["confusion_matrix"], classifier_id+"tmp3.png")
 
-        I2 = Image(classifier_id+"tmp2.png")
-        I2.drawHeight = I2.drawHeight/4
-        I2.drawWidth = I2.drawWidth/4
-
-        I3 = Image(classifier_id+"tmp3.png")
-        I3.drawHeight = I3.drawHeight/4
-        I3.drawWidth = I3.drawWidth/4
+        I2 = get_image(classifier_id+"tmp2.png")
+        I3 = get_image(classifier_id+"tmp3.png")
 
         data = [[I2, I3]]
         table = Table(data)
