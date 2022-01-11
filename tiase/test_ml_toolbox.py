@@ -5,17 +5,6 @@ from tiase.ml import toolbox
 from sklearn import preprocessing
 import os
 
-def compare_dataframes(df1, df2, columns):
-    if len(df1.columns) != len(df2.columns):
-        return False
-    for column in columns:
-        array1 = df1[column].to_numpy()
-        array2 = df2[column].to_numpy()
-        if np.allclose(array1, array2) == False:
-            return False
-    return True
-
-
 class TestMlToolbox:
 
     def test_minmaxscaler_serialization(self):

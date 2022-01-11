@@ -7,17 +7,6 @@ from tiase.ml import data_splitter,classifiers_factory
 from tiase import alfred
 import pytest
 
-def compare_dataframes(df1, df2):
-    if len(df1.columns) != len(df2.columns):
-        print("{} vs {}".format(len(df1.columns), len(df2.columns)))
-        return False
-    for column in df1.columns:
-        array1 = df1[column].to_numpy()
-        array2 = df2[column].to_numpy()
-        if np.allclose(array1, array2) == False:
-            return False
-    return True
-
 class TestMlMultiClassifier:
 
     def get_dataframe_multiclass(self):
