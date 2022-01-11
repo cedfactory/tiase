@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<dings>
+    <ding export="./tmp/">
+        <import filename="./tiase/data/test/google_stocks_data.csv"/>
+        <features indicators="close" target="target"/>
+        <data_splitters>
+            <data_splitter id="ds_simple_1" type="simple" index=".7" sequence_length="21"/>
+        </data_splitters>
+        <classifiers>
+            <classifier id="dt_1" type="decision tree" data_splitter_id="ds_simple_1" export="dt_1" />
+            <classifier id="hpt_1" type="grid search" data_splitter_id="ds_simple_1" export="hpt_1" >
+                <parameters>
+                    <parameter name="classifier" value="dt_1"/>
+                </parameters>
+            </classifier>
+        </classifiers>
+    </ding>
+</dings>
