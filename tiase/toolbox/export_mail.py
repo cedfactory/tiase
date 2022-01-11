@@ -8,14 +8,16 @@ import mimetypes # For guessing MIME type based on file name extension
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
 
-def send_mail(password, message, attachments=None):
-    print("[send_mail]")
+def send_mail(message, attachments=None):
     smtp_server = "smtp.gmail.com"
     port = 587  # For starttls
-    sender_email = "cedfactory33@gmail.com"
-    receiver_email = "cedfactory33@gmail.com"
-    #password = input("Type your password and press enter: ")
+    sender_email = os.environ.get("EMAIL_USER")
+    receiver_email = os.environ.get("EMAIL_USER")
+    password = os.environ.get("EMAIL_PASS")
+    if sender_email == "" or password == "":
+        return 1
 
     # Create a secure SSL context
     context = ssl.create_default_context()
@@ -53,4 +55,7 @@ def send_mail(password, message, attachments=None):
         # Print any error messages to stdout
         print(e)
     finally:
-        server.quit() 
+        server.quit()
+
+    return 0
+

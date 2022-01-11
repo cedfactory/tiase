@@ -29,6 +29,7 @@ def make_report_for_value(current_value, library_models, test_vs_pred):
 def make_report(values_classifiers_results, filename):
     export_csv.make_report(values_classifiers_results, filename+'.csv')
     export_pdf.make_report(values_classifiers_results, filename+'.pdf')
+    export_mail.send_mail("alfred report", [filename+'.pdf'])
 
 def execute(filename):
     tree = ET.parse(filename)
