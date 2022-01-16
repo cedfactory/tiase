@@ -2,6 +2,7 @@ from reportlab.lib import colors,utils
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.platypus import Paragraph,Table,TableStyle,Image
 from reportlab.lib.styles import getSampleStyleSheet
+from tiase.ml import analysis
 
 cm = 2.54
 
@@ -15,6 +16,11 @@ def get_image(path, width=70*cm):
     return Image(path, width=width, height=(width * aspect))
 
 def make_report(values_classifiers_results, filename):
+    doc = SimpleDocTemplate(filename, rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
+    styles = getSampleStyleSheet()
+    
+    elements = []
+    elements.append(Paragraph("Alfred report", styles['Heading1']))
 
     # format data to be treated by the reportlab Table
     data = []
@@ -29,9 +35,6 @@ def make_report(values_classifiers_results, filename):
                         float_to_string(result["recall"]),
                         float_to_string(result["f1_score"])])
 
-    elements = []
-
-    doc = SimpleDocTemplate(filename, rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
 
     table = Table(data)
     table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.25, colors.black), ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)]))
@@ -59,8 +62,20 @@ def make_report(values_classifiers_results, filename):
             if float(value) < .54:
                 table_style.add('BACKGROUND', (column, row), (column, row), colors.red)
     table.setStyle(table_style)
-
     elements.append(table)
+
+
+    # details for each value
+    for value in values_classifiers_results:
+        classifiers_results = values_classifiers_results[value]
+        test_vs_pred = []
+        for classifier_id in classifiers_results:
+            model_analysis = classifiers_results[classifier_id]
+            test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
+        analysis.export_roc_curves(test_vs_pred, "/tmp/"+value+"_roc_curves.png", value)
+        elements.append(get_image("/tmp/"+value+"_roc_curves.png"))
+
+
     doc.build(elements)
 
 
