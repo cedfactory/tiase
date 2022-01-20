@@ -1,8 +1,7 @@
 from reportlab.lib import colors,utils
 from reportlab.platypus import SimpleDocTemplate
-from reportlab.platypus import Paragraph,Table,TableStyle,Image
-from reportlab.lib.styles import getSampleStyleSheet
-from tiase.ml import analysis
+from reportlab.platypus import Paragraph,Table,TableStyle,Image,PageBreak
+from reportlab.lib.styles import getSampleStyleSheet,ParagraphStyle
 
 cm = 2.54
 
@@ -15,18 +14,36 @@ def get_image(path, width=70*cm):
     aspect = ih / float(iw)
     return Image(path, width=width, height=(width * aspect))
 
-def make_report(values_classifiers_results, filename):
+def make_report(report, filename):
+    print("\U0001F4D6 [EXPORT PDF] {}".format(filename))
     doc = SimpleDocTemplate(filename, rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
     styles = getSampleStyleSheet()
     
     elements = []
+
+    # header
     elements.append(Paragraph("Alfred report", styles['Heading1']))
+
+    # xmlfile
+    with open(report["xmlfile"], "r") as file:
+        xmlcontent = file.read()
+        xmlcontent = xmlcontent.replace('<','&lt;')
+        xmlcontent = xmlcontent.replace('>','&gt;')
+        xmlcontent = xmlcontent.replace(' ','&nbsp;')
+        xmlcontent = xmlcontent.replace('\n','<br/>')
+
+        elements.append(Paragraph("Input :", styles['Heading2']))
+        elements.append(Paragraph(xmlcontent, ParagraphStyle('xml', fontName="Courier", fontSize=6)))
+
+    # break
+    elements.append(PageBreak())
 
     # format data to be treated by the reportlab Table
     data = []
     data.append(["value", "classifier id", "Accuracy", "Precision", "Recall", "F1 score"])
+    values_classifiers_results = report["values_classifiers_results"]
     for value in values_classifiers_results:
-        classifiers_results = values_classifiers_results[value]
+        classifiers_results = values_classifiers_results[value]["classifiers"]
         for classifier_id in classifiers_results:
             result = classifiers_results[classifier_id]
             data.append([value, classifier_id,
@@ -68,12 +85,8 @@ def make_report(values_classifiers_results, filename):
     # details for each value
     for value in values_classifiers_results:
         classifiers_results = values_classifiers_results[value]
-        test_vs_pred = []
-        for classifier_id in classifiers_results:
-            model_analysis = classifiers_results[classifier_id]
-            test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
-        analysis.export_roc_curves(test_vs_pred, "/tmp/"+value+"_roc_curves.png", value)
-        elements.append(get_image("/tmp/"+value+"_roc_curves.png"))
+        roc_curves_filename = classifiers_results["roc_curves_filename"]
+        elements.append(get_image(roc_curves_filename))
 
 
     doc.build(elements)

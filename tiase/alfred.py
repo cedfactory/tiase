@@ -26,10 +26,10 @@ def out(msg, format=None):
 def make_report_for_value(current_value, library_models, test_vs_pred):
     export_pdf.make_report_for_value(current_value, library_models, test_vs_pred)
 
-def make_report(values_classifiers_results, filename):
-    export_csv.make_report(values_classifiers_results, filename+'.csv')
-    export_pdf.make_report(values_classifiers_results, filename+'.pdf')
-    export_mail.send_mail("alfred report", [filename+'.pdf'])
+def make_report(report, filename):
+    export_csv.make_report(report, filename+'.csv')
+    export_pdf.make_report(report, filename+'.pdf')
+    #export_mail.send_mail("alfred report", [filename+'.pdf'])
 
 def execute(filename):
     tree = ET.parse(filename)
@@ -128,6 +128,7 @@ def execute(filename):
             out(df)
 
             values_classifiers_results[current_value] = {}
+            values_classifiers_results[current_value]["classifiers"] = {}
 
             initial_columns = list(df.columns)
 
@@ -366,7 +367,7 @@ def execute(filename):
                     out("Precision : {:.2f}".format(model_analysis["precision"]))
                     out("Recall : {:.2f}".format(model_analysis["recall"]))
                     out("f1_score : {:.2f}".format(model_analysis["f1_score"]))
-                    values_classifiers_results[current_value][classifier_id] = model_analysis
+                    values_classifiers_results[current_value]["classifiers"][classifier_id] = model_analysis
 
                     if export_filename:
                         prefix = ""
@@ -378,8 +379,12 @@ def execute(filename):
 
                 analysis.export_roc_curves(test_vs_pred, export_root + "/"+current_value+"_roc_curves.png", current_value)
                 make_report_for_value(current_value, library_models, test_vs_pred)
+                values_classifiers_results[current_value]["roc_curves_filename"] = export_root + "/"+current_value+"_roc_curves.png"
             
-        make_report(values_classifiers_results, export_root + "/values_classifiers_results")
+        final_report = {}
+        final_report["xmlfile"] = filename
+        final_report["values_classifiers_results"] = values_classifiers_results
+        make_report(final_report, export_root + "/report")
 
         end = datetime.now()
         out("\U0001F3C1 elapsed time : {}".format(end-start), step_format)
