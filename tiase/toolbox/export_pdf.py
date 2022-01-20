@@ -76,8 +76,10 @@ def make_report(report, filename):
         for column, value in enumerate(values):
             if column < 2:
                 continue
-            if float(value) < .54:
+            if float(value) < .55:
                 table_style.add('BACKGROUND', (column, row), (column, row), colors.red)
+            if float(value) >= .6:
+                table_style.add('BACKGROUND', (column, row), (column, row), colors.green)
     table.setStyle(table_style)
     elements.append(table)
 
@@ -85,8 +87,9 @@ def make_report(report, filename):
     # details for each value
     for value in values_classifiers_results:
         classifiers_results = values_classifiers_results[value]
-        roc_curves_filename = classifiers_results["roc_curves_filename"]
-        elements.append(get_image(roc_curves_filename))
+        roc_curves_filename = classifiers_results.get("roc_curves_filename", "")
+        if roc_curves_filename:
+            elements.append(get_image(roc_curves_filename))
 
 
     doc.build(elements)
