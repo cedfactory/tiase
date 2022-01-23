@@ -25,6 +25,9 @@ class ClassifierMLP(classifier.Classifier):
             self.solver = params.get("solver", self.solver)
             self.random_state = params.get("random_state", self.random_state)
 
+        if isinstance(self.hidden_layer_sizes, str):
+            self.hidden_layer_sizes = int(self.hidden_layer_sizes)
+
     def get_name(self):
         return "mlp"
 
