@@ -26,7 +26,7 @@ def out(msg, format=None):
 def make_report(report, filename):
     export_csv.make_report(report, filename+'.csv')
     export_pdf.make_report(report, filename+'.pdf')
-    #export_mail.send_mail("alfred report", [filename+'.pdf'])
+    export_mail.send_mail("alfred report", [filename+'.pdf'])
 
 def execute(filename):
     tree = ET.parse(filename)
