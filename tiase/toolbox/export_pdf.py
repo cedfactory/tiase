@@ -14,6 +14,18 @@ def get_image(path, width=70*cm):
     aspect = ih / float(iw)
     return Image(path, width=width, height=(width * aspect))
 
+def format_data_for_table(values_classifiers_results):
+    data = []
+    data.append(["classifier id", "Accuracy", "Precision", "Recall", "F1 score"])
+    for classifier_id in values_classifiers_results:
+        data.append([classifier_id,
+                    float_to_string(values_classifiers_results[classifier_id]["accuracy"]),
+                    float_to_string(values_classifiers_results[classifier_id]["precision"]),
+                    float_to_string(values_classifiers_results[classifier_id]["recall"]),
+                    float_to_string(values_classifiers_results[classifier_id]["f1_score"])])
+
+    return data
+
 def make_report(report, filename):
     print("\U0001F4D6 [EXPORT PDF] {}".format(filename))
     doc = SimpleDocTemplate(filename, rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
@@ -35,93 +47,57 @@ def make_report(report, filename):
         elements.append(Paragraph("Input :", styles['Heading2']))
         elements.append(Paragraph(xmlcontent, ParagraphStyle('xml', fontName="Courier", fontSize=6)))
 
-    # break
-    elements.append(PageBreak())
-
-    # format data to be treated by the reportlab Table
-    data = []
-    data.append(["value", "classifier id", "Accuracy", "Precision", "Recall", "F1 score"])
-    values_classifiers_results = report["values_classifiers_results"]
-    for value in values_classifiers_results:
-        classifiers_results = values_classifiers_results[value]["classifiers"]
-        for classifier_id in classifiers_results:
-            result = classifiers_results[classifier_id]
-            data.append([value, classifier_id,
-                        float_to_string(result["accuracy"]),
-                        float_to_string(result["precision"]),
-                        float_to_string(result["recall"]),
-                        float_to_string(result["f1_score"])])
-
-
-    table = Table(data)
-    table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.25, colors.black), ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)]))
-
-    # alternative color on the lines
-    '''
-    data_len = len(data)
-    for each in range(1, data_len):
-        if each % 2 == 0:
-            bg_color = colors.whitesmoke
-        else:
-            bg_color = colors.lightgrey
-
-        table.setStyle(TableStyle([('BACKGROUND', (0, each), (-1, each), bg_color)]))
-    '''
-
-    # Loop through list of lists creating styles for cells with negative value.
-    table_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT')])
-    for row, values, in enumerate(data):
-        if row == 0:
-            continue
-        for column, value in enumerate(values):
-            if column < 2:
-                continue
-            if float(value) < .55:
-                table_style.add('BACKGROUND', (column, row), (column, row), colors.red)
-            if float(value) >= .6:
-                table_style.add('BACKGROUND', (column, row), (column, row), colors.green)
-    table.setStyle(table_style)
-    elements.append(table)
-
-
     # details for each value
-    for value in values_classifiers_results:
-        classifiers_results = values_classifiers_results[value]
+    for value in report["values_classifiers_results"]:
+        elements.append(PageBreak()) # break
+        elements.append(Paragraph("{}".format(value), styles['Heading1']))
+
+        classifiers_results = report["values_classifiers_results"][value]
         roc_curves_filename = classifiers_results.get("roc_curves_filename", "")
         if roc_curves_filename:
             elements.append(get_image(roc_curves_filename))
 
+        data = format_data_for_table(report["values_classifiers_results"][value]["classifiers"])
+
+        table = Table(data)
+        table.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.25, colors.black), ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)]))
+        
+        # alternative color on the lines
+        '''
+        data_len = len(data)
+        for each in range(1, data_len):
+            if each % 2 == 0:
+                bg_color = colors.whitesmoke
+            else:
+                bg_color = colors.lightgrey
+
+            table.setStyle(TableStyle([('BACKGROUND', (0, each), (-1, each), bg_color)]))
+        '''
+
+        # Loop through data creating styles for cells
+        table_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT')])
+        for row, current_values, in enumerate(data):
+            if row == 0:
+                continue
+            for column, current_value in enumerate(current_values):
+                if column < 1:
+                    continue
+                if float(current_value) < .55:
+                    table_style.add('BACKGROUND', (column, row), (column, row), colors.red)
+                if float(current_value) >= .6:
+                    table_style.add('BACKGROUND', (column, row), (column, row), colors.green)
+        table.setStyle(table_style)
+
+        elements.append(table)
+
+        for key in report["values_classifiers_results"][value]["classifiers"]:
+            elements.append(Paragraph("{}".format(key), styles['Heading2']))
+            classifier_model_analysis = report["values_classifiers_results"][value]["classifiers"][key]
+            I2 = get_image(classifier_model_analysis["roc_curve_filename"])
+            I3 = get_image(classifier_model_analysis["confusion_matrix_fiename"])
+
+            data = [[I2, I3]]
+            table = Table(data)
+            elements.append(table)
 
     doc.build(elements)
-
-
-def make_report_for_value(current_value, library_models, test_vs_pred):
-    
-    doc = SimpleDocTemplate("{}.pdf".format(current_value.replace('.','_')), rightMargin=0, leftMargin=0, topMargin=0.3 * cm, bottomMargin=0)
-
-    styles = getSampleStyleSheet()
-
-    story = []
-    story.append(Paragraph("Alfred : {}".format(current_value), styles['Heading1']))
-
-    from tiase.ml import analysis
-    analysis.export_roc_curves(test_vs_pred, "tmp.png", current_value)
-    story.append(get_image("tmp.png"))
-
-    for classifier_id in library_models:
-        story.append(Paragraph(classifier_id, styles["Normal"]))
-        model = library_models[classifier_id]
-
-        model_analysis=model.get_analysis()
-        #analysis.export_history("tmp1.png", model_analysis["history"])
-        analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], classifier_id+"tmp2.png")
-        analysis.export_confusion_matrix(model_analysis["confusion_matrix"], classifier_id+"tmp3.png")
-
-        I2 = get_image(classifier_id+"tmp2.png")
-        I3 = get_image(classifier_id+"tmp3.png")
-
-        data = [[I2, I3]]
-        table = Table(data)
-        story.append(table)
-
-    doc.build(story)

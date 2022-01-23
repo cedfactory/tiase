@@ -23,9 +23,6 @@ def out(msg, format=None):
         else:
             print(msg)       
 
-def make_report_for_value(current_value, library_models, test_vs_pred):
-    export_pdf.make_report_for_value(current_value, library_models, test_vs_pred)
-
 def make_report(report, filename):
     export_csv.make_report(report, filename+'.csv')
     export_pdf.make_report(report, filename+'.pdf')
@@ -367,7 +364,6 @@ def execute(filename):
                     out("Precision : {:.2f}".format(model_analysis["precision"]))
                     out("Recall : {:.2f}".format(model_analysis["recall"]))
                     out("f1_score : {:.2f}".format(model_analysis["f1_score"]))
-                    values_classifiers_results[current_value]["classifiers"][classifier_id] = model_analysis
 
                     if export_filename:
                         prefix = ""
@@ -377,8 +373,17 @@ def execute(filename):
 
                     test_vs_pred.append(analysis.testvspred(classifier_id, model_analysis["y_test"], model_analysis["y_test_prob"]))
 
+                    roc_curve_filename = export_root + "/" + current_value + "_" + classifier_id + "_roc_curve.png"
+                    analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], roc_curve_filename)
+                    model_analysis["roc_curve_filename"] = roc_curve_filename
+
+                    confusion_matrix_fiename = export_root + "/" + current_value + "_" + classifier_id + "_confusion_matrix.png"
+                    analysis.export_confusion_matrix(model_analysis["confusion_matrix"], confusion_matrix_fiename)
+                    model_analysis["confusion_matrix_fiename"] = confusion_matrix_fiename
+
+                    values_classifiers_results[current_value]["classifiers"][classifier_id] = model_analysis
+
                 analysis.export_roc_curves(test_vs_pred, export_root + "/"+current_value+"_roc_curves.png", current_value)
-                make_report_for_value(current_value, library_models, test_vs_pred)
                 values_classifiers_results[current_value]["roc_curves_filename"] = export_root + "/"+current_value+"_roc_curves.png"
             
         final_report = {}
