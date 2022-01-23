@@ -377,9 +377,15 @@ def execute(filename):
                     analysis.export_roc_curve(model_analysis["y_test"], model_analysis["y_test_prob"], roc_curve_filename)
                     model_analysis["roc_curve_filename"] = roc_curve_filename
 
-                    confusion_matrix_fiename = export_root + "/" + current_value + "_" + classifier_id + "_confusion_matrix.png"
-                    analysis.export_confusion_matrix(model_analysis["confusion_matrix"], confusion_matrix_fiename)
-                    model_analysis["confusion_matrix_fiename"] = confusion_matrix_fiename
+                    confusion_matrix_filename = export_root + "/" + current_value + "_" + classifier_id + "_confusion_matrix.png"
+                    analysis.export_confusion_matrix(model_analysis["confusion_matrix"], confusion_matrix_filename)
+                    model_analysis["confusion_matrix_filename"] = confusion_matrix_filename
+
+                    if "history" in model_analysis.keys():
+                        history_filename = export_root + "/" + current_value + "_" + classifier_id
+                        analysis.export_history(filename, model_analysis["history"])
+                        model_analysis["history_accuracy_filename"] = history_filename + "_accuracy.png"
+                        model_analysis["history_loss_filename"] = history_filename + "_loss.png"
 
                     values_classifiers_results[current_value]["classifiers"][classifier_id] = model_analysis
 

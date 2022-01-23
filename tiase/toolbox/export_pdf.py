@@ -94,10 +94,14 @@ def make_report(report, filename):
             elements.append(Paragraph("{}".format(key), styles['Heading2']))
             classifier_model_analysis = report["values_classifiers_results"][value]["classifiers"][key]
             I2 = get_image(classifier_model_analysis["roc_curve_filename"])
-            I3 = get_image(classifier_model_analysis["confusion_matrix_fiename"])
-
-            data = [[I2, I3]]
-            table = Table(data)
+            I3 = get_image(classifier_model_analysis["confusion_matrix_filename"])
+            table = Table([[I2, I3]])
             elements.append(table)
+
+            if "history_accuracy_filename" in classifier_model_analysis.keys():
+                I4 = get_image(classifier_model_analysis["history_accuracy_filename"])
+                I5 = get_image(classifier_model_analysis["history_loss_filename"])
+                table = Table([[I4, I5]])
+                elements.append(table)
 
     doc.build(elements)
