@@ -383,7 +383,7 @@ def execute(filename):
 
                     if "history" in model_analysis.keys():
                         history_filename = export_root + "/" + current_value + "_" + classifier_id
-                        analysis.export_history(filename, model_analysis["history"])
+                        analysis.export_history(history_filename, model_analysis["history"])
                         model_analysis["history_accuracy_filename"] = history_filename + "_accuracy.png"
                         model_analysis["history_loss_filename"] = history_filename + "_loss.png"
 
