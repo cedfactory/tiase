@@ -16,7 +16,7 @@ def send_mail(message, attachments=None):
     sender_email = os.environ.get("EMAIL_USER")
     receiver_email = os.environ.get("EMAIL_USER")
     password = os.environ.get("EMAIL_PASS")
-    if sender_email == "" or password == "":
+    if sender_email == None or password == None:
         return 1
 
     # Create a secure SSL context
