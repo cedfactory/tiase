@@ -8,8 +8,8 @@ import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Reshape, Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
-from keras.layers.embeddings import Embedding
-from keras.preprocessing import sequence
+#from tensorflow.keras.layers import Embedding
+#from keras.preprocessing import sequence
 from keras import backend
 from keras import Model
 # Functional API : https://keras.io/guides/functional_api/

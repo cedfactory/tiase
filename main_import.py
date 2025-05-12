@@ -36,7 +36,7 @@ def _download(values):
     
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
+    if len(sys.argv) >= 1:
         if sys.argv[1] == "--test1" or sys.argv[1] == "-t1": _test1()
         elif sys.argv[1] == "--test2" or sys.argv[1] == "-t2": _test2()
         elif sys.argv[1] == "--test3" or sys.argv[1] == "-t3": _test3()
