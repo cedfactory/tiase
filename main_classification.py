@@ -1,18 +1,15 @@
-import pandas as pd
-import numpy as np
-
 from matplotlib import pyplot as plt
-from tiase.fimport import fimport,synthetic,visu
+from tiase.fimport import fimport, visu
 from tiase.findicators import findicators
-from tiase.fdatapreprocessing import fdataprep
-from tiase.ml import data_splitter,hyper_parameters_tuning,classifiers_factory,meta_classifier,analysis,toolbox
+from tiase.ml import data_splitter, hyper_parameters_tuning, classifiers_factory, analysis,toolbox
 import os
-from rich import print,inspect
+from rich import print
 
 import warnings
 warnings.simplefilter("ignore")
 
-def evaluate_cross_validation(value):
+
+def evaluate_cross_validation():
     filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     print(df.head())
@@ -30,6 +27,7 @@ def evaluate_cross_validation(value):
     print("Averaged accuracy : ", results["average_accuracy"])
     print(results)
 
+
 def evaluate_hyper_parameters_tuning():
     filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
@@ -44,7 +42,7 @@ def evaluate_hyper_parameters_tuning():
     ds = data_splitter.DataSplitterTrainTestSimple(df, target="target", seq_len=3)
     ds.split(0.7)
 
-    classifier = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 10}, ds)
+    classifier = classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 10})
     classifier.build()
     '''classifier.fit()
     classifier_analysis = classifier.get_analysis()
@@ -54,8 +52,8 @@ def evaluate_hyper_parameters_tuning():
     print("Recall :    {:.3f}".format(classifier_analysis["recall"]))
     print("f1_score :  {:.3f}".format(classifier_analysis["f1_score"]))'''
 
-    hpt_grid_search = hyper_parameters_tuning.HPTGridSearch(ds, {"classifier":classifier})
-    result = hpt_grid_search.fit()
+    hpt_grid_search = hyper_parameters_tuning.HPTGridSearch({"classifier": classifier})
+    result = hpt_grid_search.fit(ds)
     print(result)
 
     model_analysis = hpt_grid_search.get_analysis()
@@ -79,22 +77,22 @@ def evaluate_classifiers(df, value, verbose=False):
         
     target = "target"
     g_classifiers = [
-        #{ "name": "DTC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': None}, ds)},
-        { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': 3}, ds)},
-        #{ "name": "DTC5", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': 5}, ds)},
-        { "name": "Gaussian process", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("gaussian process", None, ds)},
-        { "name": "Gaussian naive bayes", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("gaussian naive bayes", None, ds)},
-        { "name": "mlp", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("mlp", {'hidden_layer_sizes': 80}, ds)},
-        #{ "name": "LSTM1", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 20}, ds)},
-        #{ "name": "LSTM2", "classifier" : cclassifiers_factory.ClassifiersFactory.get_classifier("lstm2", {'epochs': 20}, ds)},
-        #{ "name": "LSTM3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstm3", {'epochs': 20}, ds)},
-        #{ "name": "LSTM Hao 2020", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstmhao2020", {'epochs': 40}, ds)},
-        #{ "name": "BiLSTM", "classifier" : lassifiers_factory.ClassifiersFactory.get_classifier("bilstm", {'epochs': 20}, ds)},
-        { "name": "SVC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", None, ds)},
-        { "name": "SVC_poly", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'}, ds)},
-        #{ "name": "XGBoost", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("xgboost, None, ds)},
-        #{ "name": "AlwaysAsPrevious", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("as previous", None, ds)},
-        #{ "name": "AlwaysSameClass", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("same class", {'class_to_return': 1}, ds)}
+        #{ "name": "DTC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': None})},
+        { "name": "DTC3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': 3})},
+        #{ "name": "DTC5", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("decision tree", {'max_depth': 5})},
+        { "name": "Gaussian process", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("gaussian process", None)},
+        { "name": "Gaussian naive bayes", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("gaussian naive bayes", None)},
+        { "name": "mlp", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("mlp", {'hidden_layer_sizes': 80})},
+        #{ "name": "LSTM1", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstm1", {'epochs': 20})},
+        #{ "name": "LSTM2", "classifier" : cclassifiers_factory.ClassifiersFactory.get_classifier("lstm2", {'epochs': 20})},
+        #{ "name": "LSTM3", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstm3", {'epochs': 20})},
+        #{ "name": "LSTM Hao 2020", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("lstmhao2020", {'epochs': 40})},
+        #{ "name": "BiLSTM", "classifier" : lassifiers_factory.ClassifiersFactory.get_classifier("bilstm", {'epochs': 20})},
+        { "name": "SVC", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", None)},
+        { "name": "SVC_poly", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("svc", {'kernel': 'poly'})},
+        #{ "name": "XGBoost", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("xgboost, None)},
+        #{ "name": "AlwaysAsPrevious", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("as previous", None)},
+        #{ "name": "AlwaysSameClass", "classifier" : classifiers_factory.ClassifiersFactory.get_classifier("same class", {'class_to_return': 1})}
     ]
 
     test_vs_pred = []
@@ -102,7 +100,7 @@ def evaluate_classifiers(df, value, verbose=False):
         name = g_classifier["name"]
         model = g_classifier["classifier"]
 
-        model.fit()
+        model.fit(ds)
         model_analysis = model.get_analysis()
 
         debug = False
@@ -137,8 +135,8 @@ def evaluate_classifiers(df, value, verbose=False):
 
     analysis.export_roc_curves(test_vs_pred, "roc_curves_"+value+".png", value)
 
-def experiment(value):
 
+def experiment(value):
     filename = "./tiase/data/test/google_stocks_data.csv"
     df = fimport.get_dataframe_from_csv(filename)
     print(df.head())
@@ -167,8 +165,10 @@ Options:
     [--experiment --cac40 --cv --hpt]
 """
 
+
 def _usage():
     print(_usage_str)
+
 
 if __name__ == "__main__":
     import sys
@@ -181,12 +181,10 @@ if __name__ == "__main__":
                 value = sys.argv[2]
             experiment(value)
         elif sys.argv[1] == "--cv":
-            value = ""
-            if len(sys.argv) > 2:
-                value = sys.argv[2]
-            evaluate_cross_validation(value)
+            evaluate_cross_validation()
         elif sys.argv[1] == "--cac40":
             cac40()
         else:
             _usage()
-    else: _usage()
+    else:
+        _usage()

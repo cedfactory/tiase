@@ -152,9 +152,15 @@ nasdaq100 = {
 def download_from_yahoo(values, folder = ""):
     for value in values:
         data_df = yf.download(value, period="max")
+
+        cols = ['Close', 'High', 'Low', 'Open', 'Volume']
+        df_simple = data_df.loc[:, [(col, 'AI.PA') for col in cols]]
+        df_simple.columns = cols
+
+        print(df_simple)
         filename = './' + folder + '/' + value + '.csv'
         print(filename)
-        data_df.to_csv(filename)
+        df_simple.to_csv(filename)
 
 def get_dataframe_from_yahoo(value, params=None):
     result = yf.Ticker(value)
@@ -171,8 +177,16 @@ def get_dataframe_from_yahoo(value, params=None):
     return hist
 
 def get_dataframe_from_csv(csvfile, params=None):
+
     dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
     dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
+    '''
+    dataframe = pd.read_csv(csvfile,
+                            parse_dates=[0],
+                            index_col=0,
+                            skiprows=0,
+                            date_format="%Y-%m-%d")
+    '''
     if params and params["start"]:
         dataframe = dataframe.loc[params["start"]:]
     if params and params["end"]:

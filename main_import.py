@@ -27,6 +27,7 @@ def _test3():
     df = synthetic.create_dataframe(y, .1)
     visu.display_from_dataframe(df,"Close", "close.png")
 
+
 def _download(values):
     if values == "cac40":
         fimport.download_from_yahoo(fimport.cac40.keys())
@@ -37,10 +38,16 @@ def _download(values):
 if __name__ == '__main__':
     import sys
     if len(sys.argv) >= 1:
-        if sys.argv[1] == "--test1" or sys.argv[1] == "-t1": _test1()
-        elif sys.argv[1] == "--test2" or sys.argv[1] == "-t2": _test2()
-        elif sys.argv[1] == "--test3" or sys.argv[1] == "-t3": _test3()
-        elif sys.argv[1] == "--cac40" : _download('cac40')
-        elif sys.argv[1] == "--nasdaq100" : _download('nasdaq100')
-        else: _usage()
+        if sys.argv[1] == "--test1" or sys.argv[1] == "-t1":
+            _test1()
+        elif sys.argv[1] == "--test2" or sys.argv[1] == "-t2":
+            _test2()
+        elif sys.argv[1] == "--test3" or sys.argv[1] == "-t3":
+            _test3()
+        elif sys.argv[1] == "--cac40":
+            _download('cac40')
+        elif sys.argv[1] == "--nasdaq100":
+            _download('nasdaq100')
+        else:
+            _usage()
     else: _usage()

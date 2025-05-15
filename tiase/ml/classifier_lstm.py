@@ -1,15 +1,13 @@
 from . import toolbox,analysis,classifier
-from scikeras.wrappers import KerasClassifier
+#from scikeras.wrappers import KerasClassifier
 import xml.etree.cElementTree as ET
 
-from rich import print,inspect
+from rich import print
 
 import numpy as np
 import tensorflow as tf
-from keras.models import Sequential
+from tensorflow.keras.models import Sequential
 from keras.layers import Reshape, Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
-#from tensorflow.keras.layers import Embedding
-#from keras.preprocessing import sequence
 from keras import backend
 from keras import Model
 # Functional API : https://keras.io/guides/functional_api/
@@ -120,6 +118,7 @@ class ClassifierLSTM1(ClassifierLSTM):
     def __init__(self, params = None):
         super().__init__(params)
 
+        self.model = None
         self.lstm_size = 100
         self.param_grid = {
             'epochs': [10, 20, 30, 40],
@@ -134,6 +133,7 @@ class ClassifierLSTM1(ClassifierLSTM):
 
     def build(self):
         print("[Build ClassifierLSTM1]")
+
         def create_keras_classifier():
             model = Sequential()
             model.add(Reshape((1, self.input_size), input_shape=(self.input_size,)))

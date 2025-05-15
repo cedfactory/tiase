@@ -1,8 +1,6 @@
 from tiase.fimport import fimport,visu
 from tiase.findicators import findicators
-from tiase.fdatapreprocessing import fdataprep
 import pandas as pd
-import numpy as np
 import os
 
 def various():
@@ -60,13 +58,19 @@ Options:
     [--various --cac40]
 """
 
+
 def _usage():
     print(_usage_str)
+
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--various": various()
-        elif sys.argv[1] == "--cac40": cac40()
-        else: _usage()
-    else: _usage()
+        if sys.argv[1] == "--various":
+            various()
+        elif sys.argv[1] == "--cac40":
+            cac40()
+        else:
+            _usage()
+    else:
+        _usage()
