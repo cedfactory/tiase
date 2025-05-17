@@ -1,18 +1,17 @@
 from . import toolbox,analysis,classifier
-#from scikeras.wrappers import KerasClassifier
 import xml.etree.cElementTree as ET
 
 from rich import print
 
 import numpy as np
 import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras.models import Sequential
-from keras.layers import Reshape, Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
+from tensorflow.keras.layers import Reshape, Dense, LSTM, Dropout, ReLU, BatchNormalization, AveragePooling1D, Conv1D, concatenate, Concatenate, MaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D, Bidirectional
+from scikeras.wrappers import KerasClassifier
 from keras import backend
 from keras import Model
 # Functional API : https://keras.io/guides/functional_api/
-from tensorflow import keras
-from tensorflow.keras import layers
 
 #
 # Simple LSTM for Sequence Classification
@@ -57,7 +56,11 @@ class ClassifierLSTM(classifier.Classifier):
         self.build()
 
         #print(self.model.summary())
-        self.history = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=self.epochs, batch_size=self.batch_size, verbose=0)
+        self.history = self.model.fit(self.X_train, self.y_train,
+                                      validation_data=(self.X_test, self.y_test),
+                                      epochs=self.epochs,
+                                      batch_size=self.batch_size,
+                                      verbose=0)
 
     def get_model(self):
         return self.model
@@ -141,13 +144,20 @@ class ClassifierLSTM1(ClassifierLSTM):
 
             if self.n_classes > 2:
                 model.add(Dense(self.n_classes, activation='softmax'))
-                model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             else:
                 model.add(Dense(1, activation='sigmoid'))
-                model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
             return model
 
-        self.model = KerasClassifier(model=create_keras_classifier)
+        if self.n_classes > 2:
+            self.model = KerasClassifier(model=create_keras_classifier,
+                                         loss='sparse_categorical_crossentropy',
+                                         optimizer='adam',
+                                         metrics=['accuracy'])
+        else:
+            self.model = KerasClassifier(model=create_keras_classifier,
+                                         loss='binary_crossentropy',
+                                         optimizer='adam',
+                                         metrics=['accuracy'])
 
 '''
 LSTM2
@@ -186,13 +196,20 @@ class ClassifierLSTM2(ClassifierLSTM):
 
             if self.n_classes > 2:
                 model.add(Dense(self.n_classes, activation='softmax'))
-                model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             else:
                 model.add(Dense(1, activation='sigmoid'))
-                model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
             return model
 
-        self.model = KerasClassifier(model=create_keras_classifier)
+        if self.n_classes > 2:
+            self.model = KerasClassifier(model=create_keras_classifier,
+                                         loss='sparse_categorical_crossentropy',
+                                         optimizer='adam',
+                                         metrics=['accuracy'])
+        else:
+            self.model = KerasClassifier(model=create_keras_classifier,
+                                         loss='binary_crossentropy',
+                                         optimizer='adam',
+                                         metrics=['accuracy'])
 
 
 '''
@@ -226,13 +243,15 @@ class ClassifierLSTM3(ClassifierLSTM):
         def create_keras_classifier():
             inputs = keras.Input(shape=(self.input_size,))
             reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(inputs)
-            x = layers.LSTM(self.lstm_size, activation="sigmoid")(reshaped)
-            outputs = layers.Dense(1)(x)
+            x = LSTM(self.lstm_size, activation="sigmoid")(reshaped)
+            outputs = Dense(1)(x)
             model = keras.Model(inputs=inputs, outputs=outputs)
-            model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
             return model
 
-        self.model = KerasClassifier(model=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier,
+                                     loss=keras.losses.BinaryCrossentropy(from_logits=True),
+                                     optimizer=keras.optimizers.Adam(),
+                                     metrics=["accuracy"])
 
 '''
 LSTMHao2020
@@ -263,28 +282,30 @@ class ClassifierLSTMHao2020(ClassifierLSTM):
             inputs = keras.Input(shape=(self.input_size,), name="Input")
             reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(inputs)
             convmax2 = Conv1D(10, 3, activation="relu", padding='same')(reshaped)
-            convmax2 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax2)
+            convmax2 = MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax2)
             
             convmax3 = Conv1D(20, 3, activation="relu", padding='same')(convmax2)
-            convmax3 = layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax3)
-            F3 = layers.LSTM(10, activation="sigmoid")(convmax3)
+            convmax3 = MaxPooling1D(pool_size=2, strides=2, padding='same')(convmax3)
+            F3 = LSTM(10, activation="sigmoid")(convmax3)
 
-            F2 = layers.LSTM(10, activation="sigmoid")(convmax2)
+            F2 = LSTM(10, activation="sigmoid")(convmax2)
             
-            F1 = layers.LSTM(10, activation="sigmoid")(reshaped)
+            F1 = LSTM(10, activation="sigmoid")(reshaped)
 
-            concat = layers.concatenate([F1, F2, F3])
+            concat = concatenate([F1, F2, F3])
 
-            outputs = layers.Dense(10)(concat)
-            outputs = layers.Dense(1, name="Output")(outputs)
+            outputs = Dense(10)(concat)
+            outputs = Dense(1, name="Output")(outputs)
 
             model = keras.Model(inputs=inputs, outputs=outputs)
-            model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
-            backend.set_value(model.optimizer.learning_rate, 0.001)
+            keras.backend.set_value(model.optimizer.learning_rate, 0.001)
 
             return model
 
-        self.model = KerasClassifier(model=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier,
+                                     loss=keras.losses.BinaryCrossentropy(from_logits=True),
+                                     optimizer=keras.optimizers.Adam(),
+                                     metrics=["accuracy"])
 
 '''
 BiLSTM
@@ -312,22 +333,24 @@ class ClassifierBiLSTM(ClassifierLSTM):
             in_seq = keras.Input(shape=(self.input_size,))
             reshaped = Reshape((1, self.input_size), input_shape=(self.input_size,))(in_seq)
             
-            x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(reshaped)
-            x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
-            x = layers.Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x) 
+            x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(reshaped)
+            x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+            x = Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x)
         
-            avg_pool = layers.GlobalAveragePooling1D()(x)
-            max_pool = layers.GlobalMaxPooling1D()(x)
-            conc = layers.concatenate([avg_pool, max_pool])
-            conc = layers.Dense(int(self.seq_len/2), activation="relu")(conc)
-            out = layers.Dense(1, activation="sigmoid")(conc)      
+            avg_pool = GlobalAveragePooling1D()(x)
+            max_pool = GlobalMaxPooling1D()(x)
+            conc = concatenate([avg_pool, max_pool])
+            conc = Dense(int(self.seq_len/2), activation="relu")(conc)
+            out = Dense(1, activation="sigmoid")(conc)
 
             model = keras.Model(inputs=in_seq, outputs=out)
-            model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
 
             return model
 
-        self.model = KerasClassifier(model=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier,
+                                     loss=keras.losses.BinaryCrossentropy(from_logits=True),
+                                     optimizer=keras.optimizers.Adam(),
+                                     metrics=["accuracy"])
 
 '''
 CNN + Bi-LSTM model
@@ -453,9 +476,9 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
             x = self.inception_c(x, c7)
             x = self.inception_c(x, c7)    
                 
-            x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
-            x = layers.Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
-            x = layers.Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x) 
+            x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+            x = Bidirectional(LSTM(self.seq_len, return_sequences=True))(x)
+            x = Bidirectional(LSTM(int(self.seq_len/2), return_sequences=True))(x)
                 
             avg_pool = GlobalAveragePooling1D()(x)
             max_pool = GlobalMaxPooling1D()(x)
@@ -463,9 +486,12 @@ class ClassifierCNNBiLSTM(ClassifierLSTM):
             conc = Dense(64, activation="relu")(conc)
             out = Dense(1, activation="sigmoid")(conc)      
 
-            model = Model(inputs=in_seq, outputs=out)
-            model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer=keras.optimizers.Adam(), metrics=["accuracy"])
+            model = keras.Model(inputs=in_seq, outputs=out)
 
             return model
 
-        self.model = KerasClassifier(model=create_keras_classifier)
+        self.model = KerasClassifier(model=create_keras_classifier,
+                                     loss=keras.losses.BinaryCrossentropy(from_logits=True),
+                                     optimizer=keras.optimizers.Adam(),
+                                     metrics=["accuracy"])
+    
