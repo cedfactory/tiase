@@ -52,6 +52,11 @@ def make_report(report, filename):
         elements.append(PageBreak()) # break
         elements.append(Paragraph("{}".format(value), styles['Heading1']))
 
+        # Input
+        input_filename = report["values_classifiers_results"][value]["input"]
+        elements.append(get_image(input_filename))
+        elements.append(PageBreak())  # break
+
         classifiers_results = report["values_classifiers_results"][value]
         roc_curves_filename = classifiers_results.get("roc_curves_filename", "")
         if roc_curves_filename:
@@ -103,5 +108,6 @@ def make_report(report, filename):
                 I5 = get_image(classifier_model_analysis["history_loss_filename"])
                 table = Table([[I4, I5]])
                 elements.append(table)
+            elements.append(PageBreak())  # break
 
     doc.build(elements)

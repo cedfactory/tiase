@@ -1,4 +1,5 @@
 import xml.etree.cElementTree as ET
+import mplfinance as mpf
 from tiase.fimport import fimport,visu
 from tiase.fdatapreprocessing import fdataprep
 from tiase.featureengineering import fprocessfeature
@@ -103,7 +104,9 @@ def execute(filename):
                 if not isinstance(df, pd.DataFrame):
                     out("\U0001F4A5 no input data for {}".format(value))
                     continue
-                
+
+                df_ohlcv = df.copy()
+
                 if export_filename:
                     df.to_csv(get_full_path(export_filename))
 
@@ -391,6 +394,9 @@ def execute(filename):
 
                 analysis.export_roc_curves(test_vs_pred, export_root + "/"+current_value+"_roc_curves.png", current_value)
                 values_classifiers_results[current_value]["roc_curves_filename"] = export_root + "/"+current_value+"_roc_curves.png"
+
+                mpf.plot(df_ohlcv, type='candle', style='charles', volume=True, savefig=export_root + "/"+current_value+"_candle.png")
+                values_classifiers_results[current_value]["input"] = export_root + "/"+current_value+"_candle.png"
             
         final_report = {}
         final_report["xmlfile"] = filename
