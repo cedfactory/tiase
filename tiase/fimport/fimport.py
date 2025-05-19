@@ -178,8 +178,11 @@ def get_dataframe_from_yahoo(value, params=None):
 
 def get_dataframe_from_csv(csvfile, params=None):
 
-    dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
-    dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
+    #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
+    #dataframe = pd.read_csv(csvfile,parse_dates=[0],index_col=0,skiprows=0,date_parser=dateparse)
+    dataframe = pd.read_csv(csvfile, index_col=0, skiprows=0)
+    dataframe.index = pd.to_datetime(dataframe.index, errors="coerce")
+
     '''
     dataframe = pd.read_csv(csvfile,
                             parse_dates=[0],

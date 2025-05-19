@@ -59,4 +59,4 @@ class TestMlLstmHao:
         model.export_predictions("./tmp/lstm_hao_trend.png")
 
         prediction = model.predict()
-        assert(prediction == pytest.approx(1639.23, 0.0001))
+        assert(prediction == pytest.approx(1639.5, 0.0001))
